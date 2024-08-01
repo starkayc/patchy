@@ -1,24 +1,21 @@
 require "http"
 require "kemal"
 require "yaml"
-# require "mime"
+require "db"
+require "sqlite3"
+require "digest"
 
 require "./utils"
 require "./handling"
 require "./lib/**"
 require "./config"
 
-# macro error(message)
-#     env.response.content_type = "application/json"
-#     env.response.status_code = 403
-#     error_message = {"error" => {{message}}}.to_json
-# 	error_message
-#   end
-
 CONFIG = Config.load
 Kemal.config.port = CONFIG.port
+SQL = DB.open("sqlite3://#{CONFIG.db}")
 
-Utils.create_files_directory
+Utils.create_db
+Utils.create_files_dir
 
 get "/" do |env|
   render "src/views/index.ecr"
@@ -33,40 +30,20 @@ get "/:filename" do |env|
   Handling.retrieve_file(env)
 end
 
+get "/delete" do |env|
+  Handling.delete_file(env)
+end
+
 get "/stats" do |env|
   Handling.stats(env)
 end
 
-# TODO: HANDLE FILE DELETION WITH COOKIES
-
-#   spawn do
-#     loop do
-#       begin
-#         Utils.check_old_files
-#       rescue ex
-#         puts "#{"[ERROR]".colorize(:red)} xd"
-#       end
-#       sleep 10
-#     end
-#   end
-# Fiber.yield
-
 CHECK_OLD_FILES = Fiber.new do
   loop do
     Utils.check_old_files
-    sleep 1
+    sleep CONFIG.delete_files_after_check_seconds
   end
 end
 
 CHECK_OLD_FILES.enqueue
-# https://kemalcr.com/cookbook/unix_domain_socket/
-# Kemal.run do |config|
-#   if CONFIG.unix_socket != nil
-#     config.server.not_nil!.bind_unix(Socket::UNIXAddress.new(CONFIG.unix_socket))
-#   else
-#     config.server.port = CONFIG.port
-#   end
-# end
 Kemal.run
-
-# Fiber.yield
