@@ -1,7 +1,25 @@
 module Handling
   extend self
 
+  private macro error403(message)
+    env.response.content_type = "application/json"
+    env.response.status_code = 403
+    error_message = {"error" => {{message}}}.to_json
+    return error_message
+  end
+
+  private macro msg(message)
+  env.response.content_type = "application/json"
+  msg = {"message" => {{message}}}.to_json
+  return msg
+end
+
   def upload(env)
+    env.response.content_type = "application/json"
+    # You can modify this if you want to allow files smaller than 1MiB
+    if env.request.headers["Content-Length"].to_i > 1048576*CONFIG.size_limit
+      error403("File is too big. The maximum size allowed is #{CONFIG.size_limit}MiB")
+    end
     filename = ""
     extension = ""
     original_filename = ""
@@ -13,6 +31,11 @@ module Handling
     HTTP::FormData.parse(env.request) do |upload|
       next if upload.filename.nil? || upload.filename.to_s.empty?
       extension = File.extname("#{upload.filename}")
+      if CONFIG.blocked_extensions.includes?(extension.split(".")[1])
+        error403("Extension '#{extension}' is not allowed")
+      end
+      # TODO: Check if random string is already taken by some file (This will likely
+      # never happen but it is better to design it that way)
       filename = Random.base58(CONFIG.filename_lenght)
       if !filename.is_a?(String)
         return "This doesn't look like a file"
@@ -25,12 +48,11 @@ module Handling
         original_filename = upload.filename
         uploaded_at = Time.utc
         file_hash = Utils.hash_file(file_path)
-        ip_address = env.request.not_nil!.remote_address.to_s.split(":").first
+        ip_address = env.request.remote_address.to_s.split(":").first
         SQL.exec "INSERT INTO FILES VALUES (?, ?, ?, ?, ?, ?, ?)",
           original_filename, filename, extension, uploaded_at, file_hash, ip_address, delete_key
       end
     end
-    env.response.content_type = "application/json"
     if !filename.empty?
       JSON.build do |j|
         j.object do
@@ -44,57 +66,32 @@ module Handling
         end
       end
     else
-      env.response.content_type = "application/json"
-      env.response.status_code = 403
-      error_message = {"error" => "No file"}.to_json
-      error_message
+      error403("No file")
     end
   end
 
   def retrieve_file(env)
-    begin
-      if !File.extname(env.params.url["filename"]).empty?
-        send_file env, "#{CONFIG.files}/#{env.params.url["filename"]}"
-        # next
-      end
-      dir = Dir.new("#{CONFIG.files}")
-      dir.each do |filename|
-        if filename.starts_with?("#{env.params.url["filename"]}")
-          send_file env, "#{CONFIG.files}/#{env.params.url["filename"]}" + File.extname(filename)
-        end
-      end
-      raise ""
-    rescue
-      env.response.content_type = "text/plain"
-      env.response.status_code = 403
-      return "File does not exist"
-    end
+    filename = SQL.query_one "SELECT filename FROM files WHERE filename = ?", env.params.url["filename"].to_s.split(".").first, as: String
+    extension = SQL.query_one "SELECT extension FROM files WHERE filename = ?", filename, as: String
+    send_file env, "#{CONFIG.files}/#{filename}#{extension}"
   end
 
   def stats(env)
-    begin
-      dir = Dir.new("#{CONFIG.files}")
-    rescue
-      env.response.content_type = "text/plain"
-      env.response.status_code = 403
-      return "Unknown error"
-    end
-
+    env.response.content_type = "application/json"
     json_data = JSON.build do |json|
       json.object do
         json.field "stats" do
           json.object do
             begin
-              json.field "filesHosted", dir.children.size
+              json.field "filesHosted", SQL.query_one "SELECT COUNT (filename) FROM files", as: Int32
+              json.field "maxUploadSize", CONFIG.size_limit
             rescue
-              json.field "filesHosted", 0
+              json.field "error", "Unknown error"
             end
           end
         end
       end
     end
-    dir.close
-    env.response.content_type = "application/json"
     json_data
   end
 
@@ -105,18 +102,12 @@ module Handling
         file_extension = SQL.query_one "SELECT extension FROM files WHERE delete_key = ?", env.params.query["key"], as: String
         File.delete("#{CONFIG.files}/#{file_to_delete}#{file_extension}")
         SQL.exec "DELETE FROM files WHERE delete_key = ?", env.params.query["key"]
-        env.response.content_type = "application/json"
-        error_message = {"message" => "File deleted successfully"}.to_json
-        error_message
-      rescue
-        env.response.content_type = "application/json"
-        env.response.status_code = 403
+        msg("File deleted successfully")
+      rescue ex
+        error403("Unknown error: #{ex.message}")
       end
     else
-      env.response.content_type = "application/json"
-      env.response.status_code = 403
-      error_message = {"error" => "Huh? This delete key doesn't exist"}.to_json
-      error_message
+      error403("Huh? This delete key doesn't exist")
     end
   end
 end
