@@ -100,13 +100,12 @@ end
   end
 
   def retrieve_file(env)
-    puts env.params.url
     begin
       filename = SQL.query_one "SELECT filename FROM files WHERE filename = ?", env.params.url["filename"].to_s.split(".").first, as: String
       extension = SQL.query_one "SELECT extension FROM files WHERE filename = ?", filename, as: String
       send_file env, "#{CONFIG.files}/#{filename}#{extension}"
     rescue
-      error404("This file does not exist")
+      error403("This file does not exist")
     end
   end
 
