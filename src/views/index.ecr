@@ -1,100 +1,53 @@
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>File Upload with Progress Bar</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>File Upload</h1>
+        <div id="drop-area">
+            <p>Drag & Drop your file here or click to upload</p>
+            <input type="file" id="fileElem" accept="*/*" style="display: none;">
+            <label for="fileElem" class="button">Select File</label>
+            <div id="progress-container" style="display: none;">
+                <div id="progress-bar"></div>
+            </div>
+        </div>
+        <div id="status"></div>
+    </div>
+    
+    <script src="script.js"></script>
+</body>
+</html> -->
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>File Upload</title>
-	<style>
-		body {
-			background-color: #111;
-			color: aliceblue
-		}
-
-		.container {
-			margin: 0 auto;
-			max-width: 700px;
-		}
-
-		.jumbotron {
-			margin: 60px 0;
-			text-align: center;
-			transition: width .5s, height .5s, margin .5s, padding .5s;
-		}
-
-		#progressContainer {
-			margin-top: 10px;
-			width: 100%;
-			background-color: #343434;
-			border: 1px solid #ccc;
-		}
-
-		#progressBar {
-			height: 20px;
-			width: 0;
-			background-color: #6d95bb;
-		}
-	</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> <%= host %> </title>
+    <link rel="stylesheet" href="styles.css">
 </head>
-
 <body>
-	<div class="container">
-	<div class="jumbotron">
-		<div id="dropZone" class="drop-zone">
-    <p>Drag and drop a file here or click to select</p>
-    <input type="file" id="fileInput" name="file" style="display: none;">
-</div>
-		<label for="fileInput"></label>
-		<input type="file" id="fileInput">
-		<button id="uploadButton">Upload File</button>
-		<div id="progressContainer">
-			<div id="progressBar"></div>
-		</div>
-		<div id="linkContainer"></div>
-	</div>
-	</div>
-
-	<script>
-		document.getElementById('uploadButton').addEventListener('click', () => {
-			const fileInput = document.getElementById('fileInput');
-			const file = fileInput.files[0];
-
-			const formData = new FormData();
-			formData.append('file', file);
-
-			const xhr = new XMLHttpRequest();
-			xhr.open('POST', 'upload', true);
-
-			// Track upload progress
-			xhr.upload.addEventListener('progress', (event) => {
-				if (event.lengthComputable) {
-					const percentComplete = (event.loaded / event.total) * 100;
-					document.getElementById('progressBar').style.width = percentComplete + '%';
-					document.getElementById('progressBar').textContent = Math.round(percentComplete) + '%';
-				}
-			});
-
-			// Handle upload completion
-			xhr.addEventListener('load', () => {
-				if (xhr.status === 200) {
-					const response = JSON.parse(xhr.responseText);
-					const linkContainer = document.getElementById('linkContainer');
-					linkContainer.innerHTML = `<a href="${response.link}" target="_blank">View Uploaded File</a>`;
-				} else if (xhr.status === 403) {
-					const response = JSON.parse(xhr.responseText);
-					const linkContainer = document.getElementById('linkContainer');
-					linkContainer.innerHTML = `<a target="_blank">ERROR: ${response.error}</a>`;
-				}
-			});
-
-			// Handle upload error
-			xhr.addEventListener('error', () => {
-				console.error('Upload error');
-			});
-
-			xhr.send(formData);
-		});
-	</script>
+    <div class="container">
+        <h1 style="font-size: 72px; text-align: center; margin: 20px;"> <%= host %> </h1>
+        <p style="text-align: center; font-size: 22px;"> <%= CONFIG.siteInfo %> </p>
+        <div id="drop-area">
+            <p style='padding: 0;margin: 0; color: #123718bf;'>Drop or Choose file(s)</p>
+            <input type="file" id="fileElem" accept="*/*" style="display: none;">
+            <!-- <label for="fileElem" class="button">Select File</label> -->
+        </div>
+        <div id="upload-status"></div>
+    </div>
+    <div>
+        <div style="text-align:center;">
+        <p> <a href='./chatterino.png'>Chatterino Config</a> </p>
+        <p> <a href='./sharex.sxcu'>ShareX Config</a> </p>
+        <p> <a href='https://codeberg.org/Fijxu/file-uploader-crystal'>file-uploader-crystal (BETA <%= CURRENT_VERSION %>-<%= CURRENT_COMMIT %> @ <%= CURRENT_BRANCH %>)</a> </p>
+        </div>
+    <script src="script.js"></script>
 </body>
-
 </html>

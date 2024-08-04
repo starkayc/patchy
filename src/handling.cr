@@ -56,7 +56,8 @@ end
     if !filename.empty?
       JSON.build do |j|
         j.object do
-          j.field "link", "https://#{env.request.headers["Host"]}/#{filename + extension}"
+          CONFIG.secure ? j.field "link", "https://#{env.request.headers["Host"]}/#{filename}" : j.field "link", "http://#{env.request.headers["Host"]}/#{filename}"
+          j.field "linkExt", "https://#{env.request.headers["Host"]}/#{filename}#{extension}"
           j.field "id", filename
           j.field "ext", extension
           j.field "name", original_filename
@@ -71,6 +72,7 @@ end
   end
 
   def retrieve_file(env)
+    puts env.params.url
     filename = SQL.query_one "SELECT filename FROM files WHERE filename = ?", env.params.url["filename"].to_s.split(".").first, as: String
     extension = SQL.query_one "SELECT extension FROM files WHERE filename = ?", filename, as: String
     send_file env, "#{CONFIG.files}/#{filename}#{extension}"
@@ -102,7 +104,7 @@ end
         file_extension = SQL.query_one "SELECT extension FROM files WHERE delete_key = ?", env.params.query["key"], as: String
         File.delete("#{CONFIG.files}/#{file_to_delete}#{file_extension}")
         SQL.exec "DELETE FROM files WHERE delete_key = ?", env.params.query["key"]
-        msg("File deleted successfully")
+        msg("File '#{file_to_delete}' deleted successfully")
       rescue ex
         error403("Unknown error: #{ex.message}")
       end

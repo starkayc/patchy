@@ -14,10 +14,16 @@ CONFIG = Config.load
 Kemal.config.port = CONFIG.port
 SQL = DB.open("sqlite3://#{CONFIG.db}")
 
+# https://github.com/iv-org/invidious/blob/90e94d4e6cc126a8b7a091d12d7a5556bfe369d5/src/invidious.cr#L78
+CURRENT_BRANCH  = {{ "#{`git branch | sed -n '/* /s///p'`.strip}" }}
+CURRENT_COMMIT  = {{ "#{`git rev-list HEAD --max-count=1 --abbrev-commit`.strip}" }}
+CURRENT_VERSION = {{ "#{`git log -1 --format=%ci | awk '{print $1}' | sed s/-/./g`.strip}" }}
+
 Utils.create_db
 Utils.create_files_dir
 
 get "/" do |env|
+  host = env.request.headers["Host"]
   render "src/views/index.ecr"
 end
 
@@ -47,3 +53,7 @@ end
 
 CHECK_OLD_FILES.enqueue
 Kemal.run
+
+{% if flag?(:release) || flag?(:production) %}
+  Kemal.config.env = "production" if !ENV.has_key?("KEMAL_ENV")
+{% end %}

@@ -4,6 +4,7 @@ class Config
   include YAML::Serializable
 
   property files : String = "./files"
+  property secure : Bool = false
   property db : String = "./db.sqlite3"
   property filename_lenght : Int8 = 3
   # In MiB
@@ -16,6 +17,8 @@ class Config
   property delete_key_lenght : Int8 = 8
   # Blocked extensions that are not allowed to be uploaded to the server
   property blocked_extensions : Array(String) = [] of String
+  property siteInfo : String = "xd"
+  property siteWarning : String? = ""
 
   def self.load
     config_file = "config/config.yml"
