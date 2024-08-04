@@ -1,0 +1,3 @@
+module LOGGER
+
+end

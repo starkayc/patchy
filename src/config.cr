@@ -13,8 +13,8 @@ class Config
   property unix_socket : String?
   property delete_files_after : Int32 = 7
   # How often should the check of old files be performed? (in seconds)
-  property delete_files_after_check_seconds : Int32 = 60
-  property delete_key_lenght : Int8 = 8
+  property delete_files_after_check_seconds : Int32 = 1800
+  property delete_key_lenght : Int8 = 4
   # Blocked extensions that are not allowed to be uploaded to the server
   property blocked_extensions : Array(String) = [] of String
   property siteInfo : String = "xd"

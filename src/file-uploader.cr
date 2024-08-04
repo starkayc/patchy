@@ -23,6 +23,7 @@ Utils.create_db
 Utils.create_files_dir
 
 get "/" do |env|
+  files_hosted = SQL.query_one "SELECT COUNT (filename) FROM files", as: Int32
   host = env.request.headers["Host"]
   render "src/views/index.ecr"
 end

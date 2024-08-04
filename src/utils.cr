@@ -14,6 +14,7 @@ module Utils
 
   def create_files_dir
     if !Dir.exists?("#{CONFIG.files}")
+      puts "INFO: Creatin files folder under '#{CONFIG.files}'"
       begin
         Dir.mkdir("#{CONFIG.files}")
       rescue ex

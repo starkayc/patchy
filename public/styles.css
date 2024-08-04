@@ -17,9 +17,9 @@ p, h1, h2, h3, h4, h5 {
     max-width: 700px;
     margin: auto;
 /*     background: white; */
-    padding: 20px;
+    /*! padding: 20px; */
     border-radius: 0px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    /*! box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); */
 }
 
 #drop-area {
@@ -86,9 +86,9 @@ nav a, nav > ul
     display: flex;
     align-items: center;
     justify-content: space-between;
-    border: 2px solid #f40101; /* Optional styling for the status box */
-    padding: 10px; /* Optional padding */
-    border-radius: 6px; /* Optional rounded corners */
+    border: 2px solid #eee; /* Optional styling for the status box */
+    padding: 5px; /* Optional padding */
+    /*! border-radius: 6px; */ /* Optional rounded corners */
     /*! background-color: #f9f9f9; */ /* Optional background color */
 }
 
