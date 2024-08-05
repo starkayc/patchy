@@ -1,28 +1,3 @@
-<!-- <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>File Upload with Progress Bar</title>
-    <link rel="stylesheet" href="styles.css">
-</head>
-<body>
-    <div class="container">
-        <h1>File Upload</h1>
-        <div id="drop-area">
-            <p>Drag & Drop your file here or click to upload</p>
-            <input type="file" id="fileElem" accept="*/*" style="display: none;">
-            <label for="fileElem" class="button">Select File</label>
-            <div id="progress-container" style="display: none;">
-                <div id="progress-bar"></div>
-            </div>
-        </div>
-        <div id="status"></div>
-    </div>
-    
-    <script src="script.js"></script>
-</body>
-</html> -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -31,11 +6,12 @@
     <title> <%= host %> </title>
     <link rel="stylesheet" href="styles.css">
     <link rel="icon" href="./favicon.gif" type="image/gif" />
+    <script src="script.js"></script>
 </head>
 <body>
     <div class="container">
-        <h1 style="font-size: 72px; text-align: center; margin: 20px;"> <%= host %> </h1>
-        <p style="text-align: center; font-size: 22px;"> <%= CONFIG.siteInfo %> </p>
+        <h1 style="font-size: 68px; text-align: center; margin: 20px;"><%= host %></h1>
+        <p style="text-align: center; font-size: 22px;"><%= CONFIG.siteInfo %></p>
         <div id="drop-area">
             <p style='padding: 0;margin: 0; color: #123718bf;'>Arrastra, Pega o Selecciona archivos.</p>
             <input type="file" id="fileElem" accept="*/*" style="display: none;">
@@ -45,11 +21,10 @@
     </div>
     <div>
         <div style="text-align:center;">
-        <p> <a href='./chatterino.png'>Chatterino Config</a> </p>
-        <p> <a href='./sharex.sxcu'>ShareX Config</a> </p>
-        <p> <a href='https://codeberg.org/Fijxu/file-uploader-crystal'>file-uploader-crystal (BETA <%= CURRENT_VERSION %>-<%= CURRENT_COMMIT %> @ <%= CURRENT_BRANCH %>)</a> </p>
+        <p>
+            <a href='./chatterino.png'>Chatterino Config</a> | <a href='./sharex.sxcu'>ShareX Config</a> | <a href='https://codeberg.org/Fijxu/file-uploader-crystal'>file-uploader-crystal (BETA <%= CURRENT_VERSION %>-<%= CURRENT_COMMIT %> @ <%= CURRENT_BRANCH %>)</a>
+        </p>
         <p>Archivos alojados: <%= files_hosted %></p>
         </div>
-    <script src="script.js"></script>
 </body>
 </html>

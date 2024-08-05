@@ -1,13 +1,14 @@
 # file-uploader
 
 Simple file uploader made on Crystal.
-I'm making this to replace my current File uploader hosted on https://ayaya.beauty which uses https://github.com/nokonoko/uguu
+~~I'm making this to replace my current File uploader hosted on https://ayaya.beauty which uses https://github.com/nokonoko/uguu~~ Already replaced lol.
 
 ## Features
 
 - Temporary file file uploader like Uguu
 - File deletion link (not available in frontend for now)
 - Chatterino and ShareX support
+- Unix socket support if you don't want to deal with all the TCP overhead
 - Low memory usage: Between 6MB at idle and 25MB if a file is being uploaded or retrieved. I will depend of your traffic.
 
 ## TODO

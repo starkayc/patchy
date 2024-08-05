@@ -89,7 +89,7 @@ document.addEventListener("DOMContentLoaded", () => {
         uploadText.innerHTML = "0%";
         uploadText.className = "percent"
         copyButton.className = "copy-button"; // Add class for styling
-        copyButton.innerHTML = "Copy Link"; // Set button text
+        copyButton.innerHTML = "Copiar"; // Set button text
         copyButton.style.display = "none"; // Hide initially
 
         // Update progress text

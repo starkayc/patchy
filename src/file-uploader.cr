@@ -32,7 +32,15 @@ Utils.create_files_dir
 Routing.register_all
 
 Jobs.run
-Kemal.run
+
+# Simple but ugly way
+if !CONFIG.unix_socket.nil?
+  Kemal.run do |config|
+    config.server.not_nil!.bind_unix "#{CONFIG.unix_socket}"
+  end
+else
+  Kemal.run
+end
 
 {% if flag?(:release) || flag?(:production) %}
   Kemal.config.env = "production" if !ENV.has_key?("KEMAL_ENV")

@@ -1,12 +1,60 @@
+@font-face {
+    font-family: "FG";
+    font-weight: 500;
+    src: url('framd.ttf');
+}
+
+@font-face {
+    font-family: "FG";
+    font-weight: 900;
+    src: url('frahv.ttf');
+}
+@font-face {
+    font-family: "XFG";
+    font-weight: 900;
+    src: url('frahvmod.ttf');
+}
+
+html {
+    font-family: "FG";
+        background-image: linear-gradient(to bottom,
+            rgba(11, 11, 11, 0.92),
+            rgba(11, 11, 11, 0.92)),
+        url(./bliss-small.avif);
+    background-attachment: fixed;
+}
+
 body {
-    font-family: Arial, sans-serif;
-    background-color: #111;
+/*     font-family: Arial, sans-serif; */
+/*     background-color: #111; */
     margin: 0;
     padding: 20px;
 }
 
 p, h1, h2, h3, h4, h5 {
     color: aliceblue
+}
+
+h1 {
+    font-family: "FG";
+    font-weight: 200;
+    max-width: 100%;
+    overflow-wrap: break-word;
+}
+
+a {
+    text-decoration: none;
+}
+
+.bottom {
+        font-size: 0.9em;
+/*    margin-top: 1ch;*/
+    flex: 1;
+    text-align: center;
+}
+
+.bottom > p {
+    margin: 10px 0px;
 }
 
 .percent {
@@ -21,6 +69,7 @@ p, h1, h2, h3, h4, h5 {
     border-radius: 0px;
     /*! box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); */
 }
+
 
 #drop-area {
     /*! border: 2px solid #00ff00; */
@@ -44,7 +93,6 @@ p, h1, h2, h3, h4, h5 {
     transition: background-color .25s,width .5s,height .5s;
 }
 
-
 .button {
     display: inline-block;
     padding: 10px 20px;
@@ -57,17 +105,6 @@ p, h1, h2, h3, h4, h5 {
 
 .upload-status {
     margin-top: 10px;
-}
-
-.copy-button {
-    margin-top: 5px;
-    padding: 5px 10px;
-    background: #28a745;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    display: none; /* Hidden initially */
 }
 
 nav a, nav > ul
@@ -86,7 +123,7 @@ nav a, nav > ul
     display: flex;
     align-items: center;
     justify-content: space-between;
-    border: 2px solid #eee; /* Optional styling for the status box */
+    border: 2px solid #999; /* Optional styling for the status box */
     padding: 5px; /* Optional padding */
     /*! border-radius: 6px; */ /* Optional rounded corners */
     /*! background-color: #f9f9f9; */ /* Optional background color */
