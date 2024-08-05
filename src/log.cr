@@ -1,3 +1,2 @@
 module LOGGER
-
 end
