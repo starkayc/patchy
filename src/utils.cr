@@ -69,4 +69,17 @@ module Utils
       end
     end
   end
+
+  # Delete socket if the server has not been previously cleaned by the server (Due to unclean exits, crashes, etc.)
+  def delete_socket
+    if File.exists?("#{CONFIG.unix_socket}")
+      LOGGER.info "Deleting old unix socket"
+      begin
+        File.delete("#{CONFIG.unix_socket}")
+      rescue ex
+        LOGGER.fatal "#{ex.message}"
+        exit(1)
+      end
+    end
+  end
 end

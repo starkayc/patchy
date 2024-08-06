@@ -4,7 +4,6 @@ class Config
   include YAML::Serializable
 
   property files : String = "./files"
-  property secure : Bool = false
   property db : String = "./db.sqlite3"
   property db_table_name : String = "files"
   property filename_length : Int8 = 3

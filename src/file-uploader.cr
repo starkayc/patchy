@@ -33,6 +33,7 @@ Routing.register_all
 
 Jobs.run
 
+Utils.delete_socket
 # Simple but ugly way
 if !CONFIG.unix_socket.nil?
   Kemal.run do |config|
@@ -41,6 +42,11 @@ if !CONFIG.unix_socket.nil?
 else
   Kemal.run
 end
+
+# Set permissions to 777 so NGINX can read and write to it (BROKEN)
+sleep 1.second
+LOGGER.info "Setting sock permissions to 777"
+File.chmod("#{CONFIG.unix_socket}", File::Permissions::All)
 
 {% if flag?(:release) || flag?(:production) %}
   Kemal.config.env = "production" if !ENV.has_key?("KEMAL_ENV")
