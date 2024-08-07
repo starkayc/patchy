@@ -31,23 +31,18 @@ Utils.create_db
 Utils.create_files_dir
 Routing.register_all
 
-Jobs.run
-
 Utils.delete_socket
-# Simple but ugly way
-if !CONFIG.unix_socket.nil?
-  Kemal.run do |config|
-    config.server.not_nil!.bind_unix "#{CONFIG.unix_socket}"
-  end
-else
-  Kemal.run
-end
-
-# Set permissions to 777 so NGINX can read and write to it (BROKEN)
-sleep 1.second
-LOGGER.info "Setting sock permissions to 777"
-File.chmod("#{CONFIG.unix_socket}", File::Permissions::All)
+Jobs.run
 
 {% if flag?(:release) || flag?(:production) %}
   Kemal.config.env = "production" if !ENV.has_key?("KEMAL_ENV")
 {% end %}
+
+# Set permissions to 777 so NGINX can read and write to it (BROKEN)
+if !CONFIG.unix_socket.nil?
+  sleep 1.second
+  LOGGER.info "Setting sock permissions to 777"
+  File.chmod("#{CONFIG.unix_socket}", File::Permissions::All)
+end
+
+sleep
