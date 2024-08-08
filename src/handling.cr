@@ -17,12 +17,14 @@ module Handling
     extension = ""
     original_filename = ""
     uploaded_at = ""
-    file_hash = ""
+    checksum = ""
     ip_address = ""
     delete_key = nil
     # TODO: Return the file that matches a checksum inside the database
     HTTP::FormData.parse(env.request) do |upload|
       next if upload.filename.nil? || upload.filename.to_s.empty?
+      # TODO: upload.body is emptied when is copied or read
+      # Utils.check_duplicate(upload.dup)
       extension = File.extname("#{upload.filename}")
       if CONFIG.blocked_extensions.includes?(extension.split(".")[1])
         error401("Extension '#{extension}' is not allowed")
@@ -33,8 +35,8 @@ module Handling
         IO.copy(upload.body, file)
       end
       original_filename = upload.filename
-      uploaded_at = Time.utc
-      file_hash = Utils.hash_file(file_path)
+      uploaded_at = Time::Format::HTTP_DATE.format(Time.utc)
+      checksum = Utils.hash_file(file_path)
       # X-Forwarded-For if behind a reverse proxy and the header is set in the reverse
       # proxy configuration.
       ip_address = env.request.headers.try &.["X-Forwarded-For"]? ? env.request.headers.["X-Forwarded-For"] : env.request.remote_address.to_s.split(":").first
@@ -49,7 +51,7 @@ module Handling
           j.field "id", filename
           j.field "ext", extension
           j.field "name", original_filename
-          j.field "checksum", file_hash
+          j.field "checksum", checksum
           if CONFIG.delete_key_length > 0
             delete_key = Random.base58(CONFIG.delete_key_length)
             j.field "deleteKey", delete_key
@@ -58,13 +60,20 @@ module Handling
         end
       end
       begin
+      LOGGER.debug "Generating thumbnail in background"
+      spawn { Utils.generate_thumbnail(filename, extension) }
+      rescue ex
+         LOGGER.error "An error ocurred when trying to generate a thumbnail: #{ex.message}"
+      end
+      begin
         # Insert SQL data just before returning the upload information
-        SQL.exec "INSERT INTO #{CONFIG.db_table_name} VALUES (?, ?, ?, ?, ?, ?, ?)",
-          original_filename, filename, extension, uploaded_at, file_hash, ip_address, delete_key
+        SQL.exec "INSERT INTO #{CONFIG.db_table_name} VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+          original_filename, filename, extension, uploaded_at, checksum, ip_address, delete_key, nil
       rescue ex
         LOGGER.error "An error ocurred when trying to insert the data into the DB: #{ex.message}"
         error500("An error ocurred when trying to insert the data into the DB")
       end
+
       return json
     else
       LOGGER.debug "No file provided by the user"
@@ -73,20 +82,55 @@ module Handling
   end
 
   def retrieve_file(env)
+      protocol = env.request.headers.try &.["X-Forwarded-Proto"]? ? env.request.headers["X-Forwarded-Proto"] : "http"
+      host = env.request.headers.try &.["X-Forwarded-Host"]? ? env.request.headers["X-Forwarded-Host"] : env.request.headers["Host"]
     begin
-      LOGGER.debug "#{env.request.headers["X-Forwarded-For"]} /#{env.params.url["filename"]}"
-    rescue
-      LOGGER.debug "NO X-Forwarded-For @ /#{env.params.url["filename"]}"
-    end
-    begin
-      filename = SQL.query_one "SELECT filename FROM #{CONFIG.db_table_name} WHERE filename = ?", env.params.url["filename"].to_s.split(".").first, as: String
-      original_filename = SQL.query_one "SELECT original_filename FROM #{CONFIG.db_table_name} WHERE filename = ?", env.params.url["filename"].to_s.split(".").first, as: String
-      extension = SQL.query_one "SELECT extension FROM #{CONFIG.db_table_name} WHERE filename = ?", filename, as: String
-      headers(env, {"Content-Disposition" => "inline; filename*=UTF-8''#{original_filename}"})
-      send_file env, "#{CONFIG.files}/#{filename}#{extension}"
+      fileinfo = SQL.query_all("SELECT filename, original_filename, uploaded_at, extension, checksum
+      FROM #{CONFIG.db_table_name}
+      WHERE filename = ?",
+      env.params.url["filename"],
+        as: {filename: String, ofilename: String, up_at: String, ext: String, checksum: String})[0]
+
+      headers(env, {"Content-Disposition" => "inline; filename*=UTF-8''#{fileinfo[:ofilename]}"})
+      headers(env, {"Last-Modified" => "#{fileinfo[:up_at]}"})
+      headers(env, {"ETag" => "#{fileinfo[:checksum]}"})
+
+      if env.request.headers.try &.["User-Agent"].includes?("chatterino-api-cache/") || env.request.headers.try &.["User-Agent"].includes?("FFZBot/")
+        env.response.content_type = "text/html"
+        return %(
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta property="og:title" content="#{fileinfo[:ofilename]}">
+    <meta property="og:image" content="#{protocol}://#{host}#{CONFIG.thumbnails.split(".")[1]}/#{fileinfo[:filename]}.jpg">
+</head>
+</html>
+)
+      end
+      send_file env, "#{CONFIG.files}/#{fileinfo[:filename]}#{fileinfo[:ext]}"
     rescue ex
-      LOGGER.debug "File #{filename} does not exist: #{ex.message}"
-      error403("File #{filename} does not exist")
+      LOGGER.debug "File '#{env.params.url["filename"]}' does not exist: #{ex.message}"
+      error403("File '#{env.params.url["filename"]}' does not exist")
+    end
+  end
+
+  def retrieve_thumbnail(env)
+    begin
+      # fileinfo = SQL.query_all("SELECT filename, original_filename, uploaded_at, extension, checksum
+      # FROM #{CONFIG.db_table_name}
+      # WHERE filename = ?",
+      # env.params.url["filename"],
+      #   as: {filename: String, ofilename: String, up_at: String, ext: String, checksum: String})[0]
+
+      # headers(env, {"Content-Disposition" => "inline; filename*=UTF-8''#{fileinfo[:ofilename]}"})
+      # headers(env, {"Last-Modified" => "#{fileinfo[:up_at]}"})
+      # headers(env, {"ETag" => "#{fileinfo[:checksum]}"})
+
+      send_file env, "#{CONFIG.thumbnails}/#{env.params.url["thumbnail"]}"
+    rescue ex
+      LOGGER.debug "Thumbnail '#{env.params.url["thumbnail"]}' does not exist: #{ex.message}"
+      error403("Thumbnail '#{env.params.url["thumbnail"]}' does not exist")
     end
   end
 
@@ -113,12 +157,16 @@ module Handling
   def delete_file(env)
     if SQL.query_one "SELECT EXISTS(SELECT 1 FROM #{CONFIG.db_table_name} WHERE delete_key = ?)", env.params.query["key"], as: Bool
       begin
-        file_to_delete = SQL.query_one "SELECT filename FROM #{CONFIG.db_table_name} WHERE delete_key = ?", env.params.query["key"], as: String
-        file_extension = SQL.query_one "SELECT extension FROM #{CONFIG.db_table_name} WHERE delete_key = ?", env.params.query["key"], as: String
-        File.delete("#{CONFIG.files}/#{file_to_delete}#{file_extension}")
+        fileinfo = SQL.query_all("SELECT filename, extension
+        FROM #{CONFIG.db_table_name}
+        WHERE delete_key = ?",
+        env.params.query["key"],
+          as: {filename: String, extension: String})[0]
+
+        File.delete("#{CONFIG.files}/#{fileinfo[:filename]}#{fileinfo[:extension]}")
         SQL.exec "DELETE FROM #{CONFIG.db_table_name} WHERE delete_key = ?", env.params.query["key"]
-        LOGGER.debug "File '#{file_to_delete}' was deleted using key '#{env.params.query["key"]}'}"
-        msg("File '#{file_to_delete}' deleted successfully")
+        LOGGER.debug "File '#{fileinfo[:filename]}' was deleted using key '#{env.params.query["key"]}'}"
+        msg("File '#{fileinfo[:filename]}' deleted successfully")
       rescue ex
         LOGGER.error("Unknown error: #{ex.message}")
         error500("Unknown error")

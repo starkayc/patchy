@@ -6,7 +6,7 @@ filename_length: 3
 size_limit: 512
 port: 8080
 # If you define the unix socket, it will only listen on the socket and not the port.
-unix_socket: "/tmp/file-uploader.sock"
+#unix_socket: "/tmp/file-uploader.sock"
 # In days
 delete_files_after: 7
 # In seconds

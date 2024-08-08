@@ -20,6 +20,10 @@ module Routing
       Handling.retrieve_file(env)
     end
 
+    get "/thumbnails/:thumbnail" do |env|
+      Handling.retrieve_thumbnail(env)
+    end
+
     get "/delete" do |env|
       Handling.delete_file(env)
     end

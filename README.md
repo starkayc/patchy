@@ -9,6 +9,7 @@ Already replaced lol.
 - Temporary file uploads like Uguu
 - File deletion link (not available in frontend for now)
 - Chatterino and ShareX support
+- Video Thumbnails for Chatterino and FrankerFaceZ
 - Unix socket support if you don't want to deal with all the TCP overhead
 - Automatic protocol detection (HTTPS or HTTP)
 - Low memory usage: Between 6MB at idle and 25MB if a file is being uploaded or retrieved. It will depend of your traffic.

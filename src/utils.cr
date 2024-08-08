@@ -6,7 +6,7 @@ module Utils
       LOGGER.info "Creating sqlite3 database at '#{CONFIG.db}'"
       begin
         SQL.exec "CREATE TABLE IF NOT EXISTS #{CONFIG.db_table_name}
-		(original_filename text, filename text, extension text, uploaded_at text, hash text, ip text, delete_key text)"
+		(original_filename text, filename text, extension text, uploaded_at text, checksum text, ip text, delete_key text, thumbnail text)"
       rescue ex
         LOGGER.fatal "#{ex.message}"
         exit(1)
@@ -39,7 +39,7 @@ module Utils
           File.delete("#{CONFIG.files}/#{file}")
         rescue ex
           LOGGER.error "#{ex.message}"
-        end
+          end
       end
     end
     # Close directory to prevent `Too many open files (File::Error)` error.
@@ -47,14 +47,27 @@ module Utils
     dir.close
   end
 
+  # TODO:
+  # def check_duplicate(upload)
+  #   file_checksum = SQL.query_all("SELECT checksum FROM #{CONFIG.db_table_name} WHERE original_filename = ?", upload.filename, as:String).try &.[0]?
+  #   if file_checksum.nil?
+  #     return
+  #   else
+  #     uploaded_file_checksum = hash_io(upload.body)
+  #     pp file_checksum
+  #     pp uploaded_file_checksum
+  #     if file_checksum == uploaded_file_checksum
+  #       puts "Dupl"
+  #     end
+  #   end
+  # end
+
   def hash_file(file_path : String)
-    File.open(file_path, "r") do |file|
-      # https://crystal-lang.org/api/master/IO/Digest.html
-      buffer = Bytes.new(256)
-      io = IO::Digest.new(file, Digest::SHA1.new)
-      io.read(buffer)
-      return io.final.hexstring
-    end
+    Digest::SHA1.hexdigest &.file(file_path)
+  end
+
+  def hash_io(file_path : IO)
+    Digest::SHA1.hexdigest &.update(file_path)
   end
 
   # TODO: Check if there are no other possibilities to get a random filename and exit
@@ -68,6 +81,24 @@ module Utils
         filename = Random.base58(CONFIG.filename_length)
       end
     end
+  end
+
+  # TODO: Thumbnail generation for videos. Done but error checking IS NOT DONE
+  def generate_thumbnail(filename, extension)
+    Process.run("ffmpeg",
+      [
+      "-hide_banner",
+      "-i",
+      "#{CONFIG.files}/#{filename+extension}",
+      "-movflags", "faststart",
+      "-f", "mjpeg",
+      "-q:v", "2",
+      "-vf", "scale='min(350,iw)':'min(350,ih)':force_original_aspect_ratio=decrease, thumbnail=100",
+      "-frames:v", "1",
+      "-update", "1",
+      "#{CONFIG.thumbnails}/#{filename}.jpg"
+      ])
+    SQL.exec "UPDATE #{CONFIG.db_table_name} SET thumbnail = ? WHERE filename = ?", filename+".jpg", filename
   end
 
   # Delete socket if the server has not been previously cleaned by the server (Due to unclean exits, crashes, etc.)
