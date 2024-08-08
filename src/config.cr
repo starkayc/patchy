@@ -7,15 +7,15 @@ class Config
   property thumbnails : String = "./thumbnails"
   property db : String = "./db.sqlite3"
   property db_table_name : String = "files"
-  property filename_length : Int8 = 3
+  property filename_length : Int32 = 3
   # In MiB
   property size_limit : Int16 = 512
-  property port : UInt16 = 8080
+  property port : Int32 = 8080
   property unix_socket : String?
   property delete_files_after : Int32 = 7
   # How often should the check of old files be performed? (in seconds)
   property delete_files_after_check_seconds : Int32 = 1800
-  property delete_key_length : Int8 = 4
+  property delete_key_length : Int32 = 4
   # Blocked extensions that are not allowed to be uploaded to the server
   property blocked_extensions : Array(String) = [] of String
   property siteInfo : String = "xd"
