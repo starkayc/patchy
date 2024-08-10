@@ -1,4 +1,6 @@
 files: "./files"
+thumbnails: "./thumbnails"
+generate_thumbnails: false
 db: "./db.sqlite3"
 db_table_name: "files"
 filename_length: 3

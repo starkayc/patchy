@@ -26,6 +26,20 @@ module Utils
     end
   end
 
+  def create_thumbnails_dir
+    if !CONFIG.thumbnails
+      if !Dir.exists?("#{CONFIG.thumbnails}")
+        LOGGER.info "Creating thumbnaisl folder under '#{CONFIG.thumbnails}'"
+        begin
+          Dir.mkdir("#{CONFIG.thumbnails}")
+        rescue ex
+          LOGGER.fatal "#{ex.message}"
+          exit(1)
+        end
+      end
+    end
+  end
+
   def check_old_files
     LOGGER.info "Deleting old files"
     dir = Dir.new("#{CONFIG.files}")
@@ -39,12 +53,23 @@ module Utils
           File.delete("#{CONFIG.files}/#{file}")
         rescue ex
           LOGGER.error "#{ex.message}"
-          end
+        end
       end
     end
     # Close directory to prevent `Too many open files (File::Error)` error.
     # This is because the directory class is still saved on memory for some reason.
     dir.close
+  end
+
+  def check_dependencies
+    dependencies = ["ffmpeg"]
+    dependencies.each do |dep|
+      next if !CONFIG.generate_thumbnails
+      if !Process.find_executable(dep)
+        LOGGER.fatal("'#{dep}' was not found")
+        exit(1)
+      end
+    end
   end
 
   # TODO:
@@ -83,22 +108,28 @@ module Utils
     end
   end
 
-  # TODO: Thumbnail generation for videos. Done but error checking IS NOT DONE
   def generate_thumbnail(filename, extension)
-    Process.run("ffmpeg",
+    # Disable generation if false
+    return if !CONFIG.generate_thumbnails
+    LOGGER.debug "Generating thumbnail for #{filename + extension} in background"
+    process = Process.run("ffmpeg",
       [
-      "-hide_banner",
-      "-i",
-      "#{CONFIG.files}/#{filename+extension}",
-      "-movflags", "faststart",
-      "-f", "mjpeg",
-      "-q:v", "2",
-      "-vf", "scale='min(350,iw)':'min(350,ih)':force_original_aspect_ratio=decrease, thumbnail=100",
-      "-frames:v", "1",
-      "-update", "1",
-      "#{CONFIG.thumbnails}/#{filename}.jpg"
+        "-hide_banner",
+        "-i",
+        "#{CONFIG.files}/#{filename + extension}",
+        "-movflags", "faststart",
+        "-f", "mjpeg",
+        "-q:v", "2",
+        "-vf", "scale='min(350,iw)':'min(350,ih)':force_original_aspect_ratio=decrease, thumbnail=100",
+        "-frames:v", "1",
+        "-update", "1",
+        "#{CONFIG.thumbnails}/#{filename}.jpg",
       ])
-    SQL.exec "UPDATE #{CONFIG.db_table_name} SET thumbnail = ? WHERE filename = ?", filename+".jpg", filename
+    if process.normal_exit?
+      LOGGER.debug "Thumbnail for #{filename + extension} generated successfully"
+      SQL.exec "UPDATE #{CONFIG.db_table_name} SET thumbnail = ? WHERE filename = ?", filename + ".jpg", filename
+    else
+    end
   end
 
   # Delete socket if the server has not been previously cleaned by the server (Due to unclean exits, crashes, etc.)
@@ -112,5 +143,27 @@ module Utils
         exit(1)
       end
     end
+  end
+
+  def detect_extension(file) : String
+    magic_bytes = {
+      ".png"  => "89504e470d0a1a0a",
+      ".jpg"  => "ffd8ff",
+      ".webm" => "1a45dfa3",
+      ".mp4"  => "66747970",
+      ".gif"  => "474946383",
+      ".7z"   => "377abcaf271c",
+      ".gz"   => "1f8b",
+    }
+    file = File.open(file)
+    slice = Bytes.new(8)
+    hex = IO::Hexdump.new(file)
+    hex.read(slice)
+    magic_bytes.each do |ext, mb|
+      if slice.hexstring.includes?(mb)
+        return ext
+      end
+    end
+    ""
   end
 end

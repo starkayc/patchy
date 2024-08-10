@@ -5,8 +5,10 @@ class Config
 
   property files : String = "./files"
   property thumbnails : String = "./thumbnails"
+  property generate_thumbnails : Bool = false
   property db : String = "./db.sqlite3"
   property db_table_name : String = "files"
+  property incremental_filename_length : Bool = true
   property filename_length : Int32 = 3
   # In MiB
   property size_limit : Int16 = 512

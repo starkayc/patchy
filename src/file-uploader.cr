@@ -28,6 +28,7 @@ CURRENT_BRANCH  = {{ "#{`git branch | sed -n '/* /s///p'`.strip}" }}
 CURRENT_COMMIT  = {{ "#{`git rev-list HEAD --max-count=1 --abbrev-commit`.strip}" }}
 CURRENT_VERSION = {{ "#{`git log -1 --format=%ci | awk '{print $1}' | sed s/-/./g`.strip}" }}
 
+Utils.check_dependencies
 Utils.create_db
 Utils.create_files_dir
 Routing.register_all
@@ -39,7 +40,6 @@ Jobs.run
   Kemal.config.env = "production" if !ENV.has_key?("KEMAL_ENV")
 {% end %}
 
-# Set permissions to 777 so NGINX can read and write to it (BROKEN)
 if !CONFIG.unix_socket.nil?
   sleep 1.second
   LOGGER.info "Changing socket permissions to 777"
@@ -47,6 +47,7 @@ if !CONFIG.unix_socket.nil?
     File.chmod("#{CONFIG.unix_socket}", File::Permissions::All)
   rescue ex
     LOGGER.fatal "#{ex.message}"
+    exit(1)
   end
 end
 

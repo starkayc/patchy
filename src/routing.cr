@@ -16,11 +16,15 @@ module Routing
       Handling.upload(env)
     end
 
+    post "/api/uploadurl" do |env|
+      Handling.upload_url(env)
+    end
+
     get "/:filename" do |env|
       Handling.retrieve_file(env)
     end
 
-    get "/thumbnails/:thumbnail" do |env|
+    get "/thumbnail/:thumbnail" do |env|
       Handling.retrieve_thumbnail(env)
     end
 
@@ -28,8 +32,12 @@ module Routing
       Handling.delete_file(env)
     end
 
-    get "/stats" do |env|
+    get "/api/stats" do |env|
       Handling.stats(env)
+    end
+
+    get "/sharex.sxcu" do |env|
+      Handling.sharex_config(env)
     end
   end
 end
