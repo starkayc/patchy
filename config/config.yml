@@ -3,6 +3,8 @@ thumbnails: "./thumbnails"
 generate_thumbnails: false
 db: "./db.sqlite3"
 db_table_name: "files"
+adminEnabled: false
+adminApiKey: "asd"
 filename_length: 3
 # In MiB
 size_limit: 512
@@ -20,3 +22,9 @@ log_level: "debug"
 
 blocked_extensions:
   - "exe"
+
+# List of useragents that use OpenGraph to gather file information
+opengraph_useragents:
+  - "chatterino-api-cache/"
+  - "FFZBot/"
+  - "Twitterbot/"

@@ -29,7 +29,7 @@ module Utils
   def create_thumbnails_dir
     if !CONFIG.thumbnails
       if !Dir.exists?("#{CONFIG.thumbnails}")
-        LOGGER.info "Creating thumbnaisl folder under '#{CONFIG.thumbnails}'"
+        LOGGER.info "Creating thumbnails folder under '#{CONFIG.thumbnails}'"
         begin
           Dir.mkdir("#{CONFIG.thumbnails}")
         rescue ex
@@ -143,6 +143,25 @@ module Utils
         exit(1)
       end
     end
+  end
+
+  def delete_file(env)
+        fileinfo = SQL.query_all("SELECT filename, extension, thumbnail
+        FROM #{CONFIG.db_table_name}
+        WHERE delete_key = ?",
+          env.params.query["key"],
+          as: {filename: String, extension: String, thumbnail: String | Nil})[0]
+
+        # Delete file
+        File.delete("#{CONFIG.files}/#{fileinfo[:filename]}#{fileinfo[:extension]}")
+        if fileinfo[:thumbnail]
+          # Delete thumbnail
+          File.delete("#{CONFIG.thumbnails}/#{fileinfo[:thumbnail]}")
+        end
+        # Delete entry from db
+        SQL.exec "DELETE FROM #{CONFIG.db_table_name} WHERE delete_key = ?", env.params.query["key"]
+        LOGGER.debug "File '#{fileinfo[:filename]}' was deleted using key '#{env.params.query["key"]}'}"
+        msg("File '#{fileinfo[:filename]}' deleted successfully")
   end
 
   def detect_extension(file) : String

@@ -8,7 +8,7 @@ require "digest"
 require "./logger"
 require "./routing"
 require "./utils"
-require "./handling"
+require "./handling/**"
 require "./config"
 require "./jobs"
 require "./lib/**"
@@ -27,6 +27,7 @@ SQL = DB.open("sqlite3://#{CONFIG.db}")
 CURRENT_BRANCH  = {{ "#{`git branch | sed -n '/* /s///p'`.strip}" }}
 CURRENT_COMMIT  = {{ "#{`git rev-list HEAD --max-count=1 --abbrev-commit`.strip}" }}
 CURRENT_VERSION = {{ "#{`git log -1 --format=%ci | awk '{print $1}' | sed s/-/./g`.strip}" }}
+CURRENT_TAG     = {{ "#{`git describe --long --abbrev=7 --tags | sed 's/([^-]*)-g.*/r\1/;s/-/./g'`.strip}" }}
 
 Utils.check_dependencies
 Utils.create_db

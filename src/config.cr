@@ -8,6 +8,8 @@ class Config
   property generate_thumbnails : Bool = false
   property db : String = "./db.sqlite3"
   property db_table_name : String = "files"
+  property adminEnabled : Bool = false
+  property adminApiKey : String = ""
   property incremental_filename_length : Bool = true
   property filename_length : Int32 = 3
   # In MiB
@@ -20,6 +22,7 @@ class Config
   property delete_key_length : Int32 = 4
   # Blocked extensions that are not allowed to be uploaded to the server
   property blocked_extensions : Array(String) = [] of String
+  property opengraph_useragents : Array(String) = [] of String
   property siteInfo : String = "xd"
   property siteWarning : String? = ""
   property log_level : LogLevel = LogLevel::Info

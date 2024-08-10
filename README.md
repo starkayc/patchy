@@ -10,6 +10,7 @@ Already replaced lol.
 - File deletion link (not available in frontend for now)
 - Chatterino and ShareX support
 - Video Thumbnails for Chatterino and FrankerFaceZ (Requires `ffmpeg` to be installed, can be disabled.)
+- [Small Admin API](./src/handling/admin.cr) that allows you to delete files. (Needs to be enabled in the configuration)
 - Unix socket support if you don't want to deal with all the TCP overhead
 - Automatic protocol detection (HTTPS or HTTP)
 - Low memory usage: Between 6MB at idle and 25MB if a file is being uploaded or retrieved. It will depend of your traffic.

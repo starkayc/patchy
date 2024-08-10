@@ -20,6 +20,12 @@ module Routing
       Handling.upload_url(env)
     end
 
+    if CONFIG.adminEnabled
+      post "/api/admin/delete" do |env|
+        Handling::Admin.delete_file(env)
+      end
+    end
+
     get "/:filename" do |env|
       Handling.retrieve_file(env)
     end
