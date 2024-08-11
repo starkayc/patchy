@@ -17,9 +17,8 @@ module Routing
     end
     before_post do |env|
       ip_address = env.request.headers.try &.["X-Forwarded-For"]? ? env.request.headers.["X-Forwarded-For"] : env.request.remote_address.to_s.split(":").first
-      if ip_address.includes?(ip_address)
-        # TODO: Custom halt function to return a JSON
-        halt env, status_code: 401, response: CONFIG.torMessage
+      if @@exit_nodes.includes?(ip_address)
+        halt env, status_code: 401, response: error401(CONFIG.torMessage)
       end
     end
   end
