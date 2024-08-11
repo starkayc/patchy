@@ -21,6 +21,9 @@ module Handling
     checksum = ""
     ip_address = ""
     delete_key = nil
+    ip_address = env.request.headers.try &.["X-Forwarded-For"]? ? env.request.headers.["X-Forwarded-For"] : env.request.remote_address.to_s.split(":").first
+    protocol = env.request.headers.try &.["X-Forwarded-Proto"]? ? env.request.headers["X-Forwarded-Proto"] : "http"
+    host = env.request.headers.try &.["X-Forwarded-Host"]? ? env.request.headers["X-Forwarded-Host"] : env.request.headers["Host"]
     # TODO: Return the file that matches a checksum inside the database
     HTTP::FormData.parse(env.request) do |upload|
       if upload.filename.nil? || upload.filename.to_s.empty?
@@ -42,11 +45,8 @@ module Handling
       uploaded_at = Time::Format::HTTP_DATE.format(Time.utc)
       checksum = Utils.hash_file(file_path)
     end
-    protocol = env.request.headers.try &.["X-Forwarded-Proto"]? ? env.request.headers["X-Forwarded-Proto"] : "http"
-    host = env.request.headers.try &.["X-Forwarded-Host"]? ? env.request.headers["X-Forwarded-Host"] : env.request.headers["Host"]
     # X-Forwarded-For if behind a reverse proxy and the header is set in the reverse
     # proxy configuration.
-    ip_address = env.request.headers.try &.["X-Forwarded-For"]? ? env.request.headers.["X-Forwarded-For"] : env.request.remote_address.to_s.split(":").first
     json = JSON.build do |j|
       j.object do
         j.field "link", "#{protocol}://#{host}/#{filename}"
@@ -79,20 +79,28 @@ module Handling
   end
 
   # The most unoptimized and unstable feature lol
+  # TODO: Support batch upload via JSON array
   def upload_url(env)
     env.response.content_type = "application/json"
-    extension = ""
-    filename = Utils.generate_filename
-    original_filename = ""
-    uploaded_at = Time::Format::HTTP_DATE.format(Time.utc)
-    checksum = ""
+    files = env.params.json["files"].as((Array(JSON::Any)))
+    successfull_files = [] of NamedTuple(filename: String, extension: String, original_filename: String, checksum: String, delete_key: String | Nil)
+    failed_files = [] of String
     ip_address = env.request.headers.try &.["X-Forwarded-For"]? ? env.request.headers.["X-Forwarded-For"] : env.request.remote_address.to_s.split(":").first
-    delete_key = nil
+    protocol = env.request.headers.try &.["X-Forwarded-Proto"]? ? env.request.headers["X-Forwarded-Proto"] : "http"
+    host = env.request.headers.try &.["X-Forwarded-Host"]? ? env.request.headers["X-Forwarded-Host"] : env.request.headers["Host"]
     # X-Forwarded-For if behind a reverse proxy and the header is set in the reverse
     # proxy configuration.
-    if !env.params.body.nil? || env.params.body["url"].empty?
-      url = env.params.body["url"]
+    if files.empty?
+    end
+    files.each do |url|
+      url = url.to_s
+      filename = Utils.generate_filename
+      original_filename = ""
+      extension = ""
+      checksum = ""
+      uploaded_at = Time::Format::HTTP_DATE.format(Time.utc)
       extension = File.extname(URI.parse(url).path)
+      delete_key = nil
       file_path = ::File.join ["#{CONFIG.files}", filename + extension]
       File.open(file_path, "w") do |output|
         begin
@@ -102,8 +110,11 @@ module Handling
         rescue ex
           LOGGER.debug "Failed to download file '#{url}': #{ex.message}"
           error403("Failed to download file '#{url}'")
+          failed_files << url
         end
       end
+      #   successfull_files << url
+      # end
       if extension.empty?
         extension = Utils.detect_extension(file_path)
         File.rename(file_path, file_path + extension)
@@ -113,42 +124,45 @@ module Handling
       # original_filename = URI.parse("https://ayaya.beauty/PqC").path.split("/").last
       original_filename = url.split("/").last
       checksum = Utils.hash_file(file_path)
-      if !filename.empty?
-        protocol = env.request.headers.try &.["X-Forwarded-Proto"]? ? env.request.headers["X-Forwarded-Proto"] : "http"
-        host = env.request.headers.try &.["X-Forwarded-Host"]? ? env.request.headers["X-Forwarded-Host"] : env.request.headers["Host"]
-        json = JSON.build do |j|
+      begin
+        spawn { Utils.generate_thumbnail(filename, extension) }
+      rescue ex
+        LOGGER.error "An error ocurred when trying to generate a thumbnail: #{ex.message}"
+      end
+      begin
+        # Insert SQL data just before returning the upload information
+        SQL.exec("INSERT INTO #{CONFIG.dbTableName} VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+          original_filename, filename, extension, uploaded_at, checksum, ip_address, delete_key, nil)
+        successfull_files << {filename:          filename,
+                              original_filename: original_filename,
+                              extension:         extension,
+                              delete_key:        delete_key,
+                              checksum:          checksum}
+      rescue ex
+        LOGGER.error "An error ocurred when trying to insert the data into the DB: #{ex.message}"
+        error500("An error ocurred when trying to insert the data into the DB")
+      end
+    end
+    json = JSON.build do |j|
+      j.array do
+        successfull_files.each do |fileinfo|
           j.object do
-            j.field "link", "#{protocol}://#{host}/#{filename}"
-            j.field "linkExt", "#{protocol}://#{host}/#{filename}#{extension}"
-            j.field "id", filename
-            j.field "ext", extension
-            j.field "name", original_filename
-            j.field "checksum", checksum
+            j.field "link", "#{protocol}://#{host}/#{fileinfo[:filename]}"
+            j.field "linkExt", "#{protocol}://#{host}/#{fileinfo[:filename]}#{fileinfo[:extension]}"
+            j.field "id", fileinfo[:filename]
+            j.field "ext", fileinfo[:extension]
+            j.field "name", fileinfo[:original_filename]
+            j.field "checksum", fileinfo[:checksum]
             if CONFIG.deleteKeyLength > 0
               delete_key = Random.base58(CONFIG.deleteKeyLength)
-              j.field "deleteKey", delete_key
-              j.field "deleteLink", "#{protocol}://#{host}/delete?key=#{delete_key}"
+              j.field "deleteKey", fileinfo[:delete_key]
+              j.field "deleteLink", "#{protocol}://#{host}/delete?key=#{fileinfo[:delete_key]}"
             end
           end
         end
-        begin
-          spawn { Utils.generate_thumbnail(filename, extension) }
-        rescue ex
-          LOGGER.error "An error ocurred when trying to generate a thumbnail: #{ex.message}"
-        end
-        begin
-          # Insert SQL data just before returning the upload information
-          SQL.exec "INSERT INTO #{CONFIG.dbTableName} VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-            original_filename, filename, extension, uploaded_at, checksum, ip_address, delete_key, nil
-        rescue ex
-          LOGGER.error "An error ocurred when trying to insert the data into the DB: #{ex.message}"
-          error500("An error ocurred when trying to insert the data into the DB")
-        end
-        return json
       end
-    else
     end
-    error403("Data malformed")
+    return json
   end
 
   def retrieve_file(env)
