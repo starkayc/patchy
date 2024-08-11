@@ -30,7 +30,7 @@ module Handling
       # TODO: upload.body is emptied when is copied or read
       # Utils.check_duplicate(upload.dup)
       extension = File.extname("#{upload.filename}")
-      if CONFIG.blocked_extensions.includes?(extension.split(".")[1])
+      if CONFIG.blockedExtensions.includes?(extension.split(".")[1])
         error401("Extension '#{extension}' is not allowed")
       end
       filename = Utils.generate_filename
@@ -55,8 +55,8 @@ module Handling
         j.field "ext", extension
         j.field "name", original_filename
         j.field "checksum", checksum
-        if CONFIG.delete_key_length > 0
-          delete_key = Random.base58(CONFIG.delete_key_length)
+        if CONFIG.deleteKeyLength > 0
+          delete_key = Random.base58(CONFIG.deleteKeyLength)
           j.field "deleteKey", delete_key
           j.field "deleteLink", "#{protocol}://#{host}/delete?key=#{delete_key}"
         end
@@ -69,7 +69,7 @@ module Handling
     end
     begin
       # Insert SQL data just before returning the upload information
-      SQL.exec "INSERT INTO #{CONFIG.db_table_name} VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+      SQL.exec "INSERT INTO #{CONFIG.dbTableName} VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
         original_filename, filename, extension, uploaded_at, checksum, ip_address, delete_key, nil
     rescue ex
       LOGGER.error "An error ocurred when trying to insert the data into the DB: #{ex.message}"
@@ -124,8 +124,8 @@ module Handling
             j.field "ext", extension
             j.field "name", original_filename
             j.field "checksum", checksum
-            if CONFIG.delete_key_length > 0
-              delete_key = Random.base58(CONFIG.delete_key_length)
+            if CONFIG.deleteKeyLength > 0
+              delete_key = Random.base58(CONFIG.deleteKeyLength)
               j.field "deleteKey", delete_key
               j.field "deleteLink", "#{protocol}://#{host}/delete?key=#{delete_key}"
             end
@@ -138,7 +138,7 @@ module Handling
         end
         begin
           # Insert SQL data just before returning the upload information
-          SQL.exec "INSERT INTO #{CONFIG.db_table_name} VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+          SQL.exec "INSERT INTO #{CONFIG.dbTableName} VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
             original_filename, filename, extension, uploaded_at, checksum, ip_address, delete_key, nil
         rescue ex
           LOGGER.error "An error ocurred when trying to insert the data into the DB: #{ex.message}"
@@ -156,7 +156,7 @@ module Handling
     host = env.request.headers.try &.["X-Forwarded-Host"]? ? env.request.headers["X-Forwarded-Host"] : env.request.headers["Host"]
     begin
       fileinfo = SQL.query_all("SELECT filename, original_filename, uploaded_at, extension, checksum, thumbnail
-      FROM #{CONFIG.db_table_name}
+      FROM #{CONFIG.dbTableName}
       WHERE filename = ?",
         env.params.url["filename"].split(".").first,
         as: {filename: String, ofilename: String, up_at: String, ext: String, checksum: String, thumbnail: String | Nil})[0]
@@ -165,7 +165,7 @@ module Handling
       headers(env, {"Last-Modified" => "#{fileinfo[:up_at]}"})
       headers(env, {"ETag" => "#{fileinfo[:checksum]}"})
 
-      CONFIG.opengraph_useragents.each do |useragent|
+      CONFIG.opengraphUseragents.each do |useragent|
         if env.request.headers.try &.["User-Agent"].includes?(useragent)
           env.response.content_type = "text/html"
           return %(
@@ -206,10 +206,10 @@ module Handling
         json.object do
           json.field "stats" do
             json.object do
-              json.field "filesHosted", SQL.query_one "SELECT COUNT (filename) FROM #{CONFIG.db_table_name}", as: Int32
+              json.field "filesHosted", SQL.query_one "SELECT COUNT (filename) FROM #{CONFIG.dbTableName}", as: Int32
               json.field "maxUploadSize", CONFIG.size_limit
-              json.field "thumbnailGeneration", CONFIG.generate_thumbnails
-              json.field "filenameLength", CONFIG.filename_length
+              json.field "thumbnailGeneration", CONFIG.generateThumbnails
+              json.field "filenameLength", CONFIG.fileameLength
             end
           end
         end
@@ -222,10 +222,10 @@ module Handling
   end
 
   def delete_file(env)
-    if SQL.query_one "SELECT EXISTS(SELECT 1 FROM #{CONFIG.db_table_name} WHERE delete_key = ?)", env.params.query["key"], as: Bool
+    if SQL.query_one "SELECT EXISTS(SELECT 1 FROM #{CONFIG.dbTableName} WHERE delete_key = ?)", env.params.query["key"], as: Bool
       begin
         fileinfo = SQL.query_all("SELECT filename, extension, thumbnail
-        FROM #{CONFIG.db_table_name}
+        FROM #{CONFIG.dbTableName}
         WHERE delete_key = ?",
           env.params.query["key"],
           as: {filename: String, extension: String, thumbnail: String | Nil})[0]
@@ -237,7 +237,7 @@ module Handling
           File.delete("#{CONFIG.thumbnails}/#{fileinfo[:thumbnail]}")
         end
         # Delete entry from db
-        SQL.exec "DELETE FROM #{CONFIG.db_table_name} WHERE delete_key = ?", env.params.query["key"]
+        SQL.exec "DELETE FROM #{CONFIG.dbTableName} WHERE delete_key = ?", env.params.query["key"]
         LOGGER.debug "File '#{fileinfo[:filename]}' was deleted using key '#{env.params.query["key"]}'}"
         msg("File '#{fileinfo[:filename]}' deleted successfully")
       rescue ex

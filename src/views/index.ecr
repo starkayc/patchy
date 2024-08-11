@@ -25,6 +25,9 @@
             <a href='./chatterino.png'>Chatterino Config</a> | <a href='./sharex.sxcu'>ShareX Config</a> | <a href='https://codeberg.org/Fijxu/file-uploader-crystal'>file-uploader-crystal (BETA <%= CURRENT_TAG %> - <%= CURRENT_VERSION %> @ <%= CURRENT_BRANCH %>)</a>
         </p>
         <p>Archivos alojados: <%= files_hosted %></p>
+        <% if CONFIG.blockTorAddresses %>
+        <p style="color: red"><%= CONFIG.torMessage %></p>
+        <% end %>
         </div>
 </body>
 </html>

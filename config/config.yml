@@ -1,30 +1,36 @@
 files: "./files"
 thumbnails: "./thumbnails"
-generate_thumbnails: false
+generateThumbnails: false
 db: "./db.sqlite3"
-db_table_name: "files"
+dbTableName: "files"
 adminEnabled: false
 adminApiKey: "asd"
-filename_length: 3
+fileameLength: 3
 # In MiB
 size_limit: 512
 port: 8080
+blockTorAddresses: true
+# Every hour
+torExitNodesCheck: 3600
+torExitNodesUrl: "https://www.dan.me.uk/torlist/?exit"
+torExitNodesFile: "./torexitnodes.txt"
+torMessage: "TOR IS BLOCKED!"
 # If you define the unix socket, it will only listen on the socket and not the port.
 #unix_socket: "/tmp/file-uploader.sock"
 # In days
-delete_files_after: 7
+deleteFilesAfter: 7
 # In seconds
-delete_files_after_check_seconds: 1800
-delete_key_length: 4
+deleteFilesCheck: 1800
+deleteKeyLength: 4
 siteInfo: "Whatever you want to put here"
 siteWarning: "WARNING!"
 log_level: "debug"
 
-blocked_extensions:
+blockedExtensions:
   - "exe"
 
 # List of useragents that use OpenGraph to gather file information
-opengraph_useragents:
+opengraphUseragents:
   - "chatterino-api-cache/"
   - "FFZBot/"
   - "Twitterbot/"

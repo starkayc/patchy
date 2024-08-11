@@ -5,24 +5,30 @@ class Config
 
   property files : String = "./files"
   property thumbnails : String = "./thumbnails"
-  property generate_thumbnails : Bool = false
+  property generateThumbnails : Bool = false
   property db : String = "./db.sqlite3"
-  property db_table_name : String = "files"
+  property dbTableName : String = "files"
   property adminEnabled : Bool = false
-  property adminApiKey : String = ""
-  property incremental_filename_length : Bool = true
-  property filename_length : Int32 = 3
+  property adminApiKey : String? = ""
+  property incremental_fileameLength : Bool = true
+  property fileameLength : Int32 = 3
   # In MiB
   property size_limit : Int16 = 512
   property port : Int32 = 8080
   property unix_socket : String?
-  property delete_files_after : Int32 = 7
+  property blockTorAddresses : Bool? = false
+  property torExitNodesCheck : Int32 = 3600
+  # The list needs to contain a IP address per line
+  property torExitNodesUrl : String = "https://www.dan.me.uk/torlist/?exit"
+  property torExitNodesFile : String = "./torexitnodes.txt"
+  property torMessage : String? = "Tor is blocked!"
+  property deleteFilesAfter : Int32 = 7
   # How often should the check of old files be performed? (in seconds)
-  property delete_files_after_check_seconds : Int32 = 1800
-  property delete_key_length : Int32 = 4
+  property deleteFilesCheck : Int32 = 1800
+  property deleteKeyLength : Int32 = 4
   # Blocked extensions that are not allowed to be uploaded to the server
-  property blocked_extensions : Array(String) = [] of String
-  property opengraph_useragents : Array(String) = [] of String
+  property blockedExtensions : Array(String) = [] of String
+  property opengraphUseragents : Array(String) = [] of String
   property siteInfo : String = "xd"
   property siteWarning : String? = ""
   property log_level : LogLevel = LogLevel::Info
@@ -36,8 +42,8 @@ class Config
   end
 
   def self.check_config(config : Config)
-    if config.filename_length <= 0
-      puts "Config: filename_length cannot be #{config.filename_length}"
+    if config.fileameLength <= 0
+      puts "Config: fileameLength cannot be #{config.fileameLength}"
       exit(1)
     end
   end

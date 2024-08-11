@@ -74,9 +74,11 @@ WantedBy=default.target
 - ~~Add file size limit~~ ADDED
 - ~~Fix error when accessing `http://127.0.0.1:8080` with an empty DB.~~ Fixed somehow.
 - Better frontend...
-- ~~Disable file deletion if `delete_files_after_check_seconds` or `delete_files_after` is set to `0`~~ DONE
-- ~~Disable delete key if `delete_key_length` is `0`~~ DONE (But I think there is a better way to do it)
-- ~~Exit if `filename_length` is `0`~~ DONE
+- ~~Disable file deletion if `deleteFilesCheck` or `deleteFilesAfter` is set to `0`~~ DONE
+- ~~Disable delete key if `deleteKeyLength` is `0`~~ DONE (But I think there is a better way to do it)
+- ~~Exit if `fileameLength` is `0`~~ DONE
 - ~~Disable file limit if `size_limit` is `0`~~ DONE
 - ~~Prevent files from being overwritten in the event of a name collision~~ DONE
 - Dockerfile and Docker image (Crystal doesn't has dependency hell like other languages so is not really necessary to do, but useful for people that want instant deploy)
+- Custom file expiration using headers (Like rustypaste)
+- Small CLI to upload files (like `rpaste` from rustypaste)

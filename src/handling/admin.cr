@@ -14,7 +14,7 @@ module Handling::Admin
       file = file.to_s
       begin
         fileinfo = SQL.query_one("SELECT filename, extension, thumbnail
-        FROM #{CONFIG.db_table_name}
+        FROM #{CONFIG.dbTableName}
         WHERE filename = ?",
           file,
           as: {filename: String, extension: String, thumbnail: String | Nil})
@@ -26,11 +26,11 @@ module Handling::Admin
           File.delete("#{CONFIG.thumbnails}/#{fileinfo[:thumbnail]}")
         end
         # Delete entry from db
-        SQL.exec "DELETE FROM #{CONFIG.db_table_name} WHERE filename = ?", file
+        SQL.exec "DELETE FROM #{CONFIG.dbTableName} WHERE filename = ?", file
         LOGGER.debug "File '#{fileinfo[:filename]}' was deleted"
         successfull_files << file
       rescue ex : DB::NoResultsError
-        LOGGER.error("File '#{file}' doesn't exist: #{ex.message}")
+        LOGGER.error("File '#{file}' doesn't exist or is not registered in the database: #{ex.message}")
         failed_files << file
       rescue ex
         LOGGER.error "Unknown error: #{ex.message}"

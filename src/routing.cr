@@ -1,11 +1,27 @@
+require "./http-errors"
+
 module Routing
-  #   @@ip : String = ""
+  @@exit_nodes = Array(String).new
+  if CONFIG.blockTorAddresses
+    spawn do
+      # Wait a little for Utils.retrieve_tor_exit_nodes to execute first
+      # or it will load an old exit node list
+      # I think this can be replaced by channels which makes me able to
+      # receive data from fibers
+      sleep 5
+      loop do
+        LOGGER.debug "Updating Tor exit nodes array"
+        @@exit_nodes = Utils.load_tor_exit_nodes
+        sleep CONFIG.torExitNodesCheck + 5
+      end
+    end
+    before_post do |env|
+      ip_address = env.request.headers.try &.["X-Forwarded-For"]? ? env.request.headers.["X-Forwarded-For"] : env.request.remote_address.to_s.split(":").first
+      error401 CONFIG.torMessage if ip_address.includes?(ip_address)
+    end
+  end
 
   def self.register_all
-    # before_get "*" do |env|
-    #   @@ip = env.request.headers["X-Real-IP"]
-    # end
-
     get "/" do |env|
       files_hosted = SQL.query_one "SELECT COUNT (filename) FROM files", as: Int32
       host = env.request.headers["Host"]
