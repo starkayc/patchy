@@ -34,3 +34,7 @@ opengraphUseragents:
   - "chatterino-api-cache/"
   - "FFZBot/"
   - "Twitterbot/"
+
+alternativeDomains: 
+  - "ayaya.beauty"
+  - "lamartina.gay"

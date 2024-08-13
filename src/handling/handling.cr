@@ -21,9 +21,6 @@ module Handling
     checksum = ""
     ip_address = ""
     delete_key = nil
-    ip_address = env.request.headers.try &.["X-Forwarded-For"]? ? env.request.headers.["X-Forwarded-For"] : env.request.remote_address.to_s.split(":").first
-    protocol = env.request.headers.try &.["X-Forwarded-Proto"]? ? env.request.headers["X-Forwarded-Proto"] : "http"
-    host = env.request.headers.try &.["X-Forwarded-Host"]? ? env.request.headers["X-Forwarded-Host"] : env.request.headers["Host"]
     # TODO: Return the file that matches a checksum inside the database
     HTTP::FormData.parse(env.request) do |upload|
       if upload.filename.nil? || upload.filename.to_s.empty?
@@ -85,9 +82,6 @@ module Handling
     files = env.params.json["files"].as((Array(JSON::Any)))
     successfull_files = [] of NamedTuple(filename: String, extension: String, original_filename: String, checksum: String, delete_key: String | Nil)
     failed_files = [] of String
-    ip_address = env.request.headers.try &.["X-Forwarded-For"]? ? env.request.headers.["X-Forwarded-For"] : env.request.remote_address.to_s.split(":").first
-    protocol = env.request.headers.try &.["X-Forwarded-Proto"]? ? env.request.headers["X-Forwarded-Proto"] : "http"
-    host = env.request.headers.try &.["X-Forwarded-Host"]? ? env.request.headers["X-Forwarded-Host"] : env.request.headers["Host"]
     # X-Forwarded-For if behind a reverse proxy and the header is set in the reverse
     # proxy configuration.
     if files.empty?
@@ -166,8 +160,6 @@ module Handling
   end
 
   def retrieve_file(env)
-    protocol = env.request.headers.try &.["X-Forwarded-Proto"]? ? env.request.headers["X-Forwarded-Proto"] : "http"
-    host = env.request.headers.try &.["X-Forwarded-Host"]? ? env.request.headers["X-Forwarded-Host"] : env.request.headers["Host"]
     begin
       fileinfo = SQL.query_all("SELECT filename, original_filename, uploaded_at, extension, checksum, thumbnail
       FROM #{CONFIG.dbTableName}
@@ -224,6 +216,7 @@ module Handling
               json.field "maxUploadSize", CONFIG.size_limit
               json.field "thumbnailGeneration", CONFIG.generateThumbnails
               json.field "filenameLength", CONFIG.fileameLength
+              json.field "alternativeDomains", CONFIG.alternativeDomains
             end
           end
         end
@@ -265,9 +258,8 @@ module Handling
   end
 
   def sharex_config(env)
-    protocol = env.request.headers.try &.["X-Forwarded-Proto"]? ? env.request.headers["X-Forwarded-Proto"] : "http"
-    host = env.request.headers.try &.["X-Forwarded-Host"]? ? env.request.headers["X-Forwarded-Host"] : env.request.headers["Host"]
     env.response.content_type = "application/json"
+    # So it's able to download the file instead of displaying it
     env.response.headers["Content-Disposition"] = "attachment; filename=\"#{host}.sxcu\""
     return %({
   "Version": "14.0.1",

@@ -10,7 +10,8 @@ class Config
   property dbTableName : String = "files"
   property adminEnabled : Bool = false
   property adminApiKey : String? = ""
-  property incremental_fileameLength : Bool = true
+  # Not implemented
+  property incrementalFileameLength : Bool = true
   property fileameLength : Int32 = 3
   # In MiB
   property size_limit : Int16 = 512
@@ -27,11 +28,15 @@ class Config
   property deleteFilesCheck : Int32 = 1800
   property deleteKeyLength : Int32 = 4
   # Blocked extensions that are not allowed to be uploaded to the server
-  property blockedExtensions : Array(String) = [] of String
-  property opengraphUseragents : Array(String) = [] of String
   property siteInfo : String = "xd"
   property siteWarning : String? = ""
   property log_level : LogLevel = LogLevel::Info
+  property blockedExtensions : Array(String) = [] of String
+  property opengraphUseragents : Array(String) = [] of String
+  # Since this program detects the Host header of the client it can be used
+  # with multiple domains. You can display the domains in the frontend
+  # and in `/api/stats`
+  property alternativeDomains : Array(String) = [] of String
 
   def self.load
     config_file = "config/config.yml"

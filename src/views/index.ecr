@@ -22,11 +22,22 @@
     <div>
         <div style="text-align:center;">
         <p>
-            <a href='./chatterino.png'>Chatterino Config</a> | <a href='./sharex.sxcu'>ShareX Config</a> | <a href='https://codeberg.org/Fijxu/file-uploader-crystal'>file-uploader-crystal (BETA <%= CURRENT_TAG %> - <%= CURRENT_VERSION %> @ <%= CURRENT_BRANCH %>)</a>
+            <a href='./chatterino.png'>Chatterino Config</a> | 
+			<a href='./sharex.sxcu'>ShareX Config</a> | 
+			<a href='https://codeberg.org/Fijxu/file-uploader-crystal'>
+			file-uploader-crystal (BETA <%= CURRENT_TAG %> - <%= CURRENT_VERSION %> @ <%= CURRENT_BRANCH %>)
+			</a>
         </p>
         <p>Archivos alojados: <%= files_hosted %></p>
         <% if CONFIG.blockTorAddresses %>
         <p style="color: red"><%= CONFIG.torMessage %></p>
+        <% end %>
+		<% if !CONFIG.alternativeDomains.empty? %>
+		<p>
+		<% CONFIG.alternativeDomains.each do | domain | %>
+			<a href="https://<%= domain %>"><%= domain %></a> 
+		<% end %>
+        </p>
         <% end %>
         </div>
 </body>

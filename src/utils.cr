@@ -87,11 +87,11 @@ module Utils
   #   end
   # end
 
-  def hash_file(file_path : String)
+  def hash_file(file_path : String) : String
     Digest::SHA1.hexdigest &.file(file_path)
   end
 
-  def hash_io(file_path : IO)
+  def hash_io(file_path : IO) : String
     Digest::SHA1.hexdigest &.update(file_path)
   end
 
@@ -191,12 +191,12 @@ module Utils
     resp = HTTP::Client.get(CONFIG.torExitNodesUrl) do |res|
       if res.success? && res.status_code == 200
         begin
-        File.open(CONFIG.torExitNodesFile, "w") do |output|
-          IO.copy(res.body_io, output)
+          File.open(CONFIG.torExitNodesFile, "w") do |output|
+            IO.copy(res.body_io, output)
+          end
+        rescue ex
+          LOGGER.error "Failed to write to file: #{ex.message}"
         end
-      rescue ex
-        LOGGER.error "Failed to write to file: #{ex.message}"
-      end
       else
         LOGGER.error "Failed to retrieve exit nodes list. Status Code: #{res.status_code}"
       end

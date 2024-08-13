@@ -5,7 +5,7 @@ module Handling::Admin
 
   def delete_file(env)
     if env.request.headers.try &.["X-Api-Key"]? != CONFIG.adminApiKey || nil
-        error401 "Wrong API Key"
+      error401 "Wrong API Key"
     end
     files = env.params.json["files"].as((Array(JSON::Any)))
     successfull_files = [] of String

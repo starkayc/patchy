@@ -1,6 +1,19 @@
 require "./http-errors"
 
+macro ip_address
+  env.request.headers.try &.["X-Forwarded-For"]? || env.request.remote_address.to_s.split(":").first
+end
+
+macro protocol
+  env.request.headers.try &.["X-Forwarded-Proto"]? || "http"
+end
+
+macro host
+  env.request.headers.try &.["X-Forwarded-Host"]? || env.request.headers["Host"]
+end
+
 module Routing
+  extend self
   @@exit_nodes = Array(String).new
   if CONFIG.blockTorAddresses
     spawn do
@@ -16,17 +29,15 @@ module Routing
       end
     end
     before_post do |env|
-      ip_address = env.request.headers.try &.["X-Forwarded-For"]? ? env.request.headers.["X-Forwarded-For"] : env.request.remote_address.to_s.split(":").first
       if @@exit_nodes.includes?(ip_address)
         halt env, status_code: 401, response: error401(CONFIG.torMessage)
       end
     end
   end
 
-  def self.register_all
+  def register_all
     get "/" do |env|
       files_hosted = SQL.query_one "SELECT COUNT (filename) FROM files", as: Int32
-      host = env.request.headers["Host"]
       render "src/views/index.ecr"
     end
 
@@ -36,12 +47,6 @@ module Routing
 
     post "/api/uploadurl" do |env|
       Handling.upload_url(env)
-    end
-
-    if CONFIG.adminEnabled
-      post "/api/admin/delete" do |env|
-        Handling::Admin.delete_file(env)
-      end
     end
 
     get "/:filename" do |env|
@@ -62,6 +67,16 @@ module Routing
 
     get "/sharex.sxcu" do |env|
       Handling.sharex_config(env)
+    end
+
+    self.register_admin
+  end
+
+  def register_admin
+    if CONFIG.adminEnabled
+      post "/api/admin/delete" do |env|
+        Handling::Admin.delete_file(env)
+      end
     end
   end
 end
