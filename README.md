@@ -10,6 +10,7 @@ Already replaced lol.
 - File deletion link (not available in frontend for now)
 - Chatterino and ShareX support
 - Video Thumbnails for Chatterino and FrankerFaceZ (Requires `ffmpeg` to be installed, can be disabled.)
+- Rate Limiting (WIP)
 - [Small Admin API](./src/handling/admin.cr) that allows you to delete files. (Needs to be enabled in the configuration)
 - Unix socket support if you don't want to deal with all the TCP overhead
 - Automatic protocol detection (HTTPS or HTTP)

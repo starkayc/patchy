@@ -6,12 +6,15 @@ module Handling
 
   def upload(env)
     env.response.content_type = "application/json"
+    ip_address = Utils.ip_address(env)
+    protocol = Utils.protocol(env)
+    host = Utils.host(env)
     # You can modify this if you want to allow files smaller than 1MiB.
     # This is generally a good way to check the filesize but there is a better way to do it
     # which is inspecting the file directly (If I'm not wrong).
     if CONFIG.size_limit > 0
       if env.request.headers["Content-Length"].to_i > 1048576*CONFIG.size_limit
-        error413("File is too big. The maximum size allowed is #{CONFIG.size_limit}MiB")
+        return error413("File is too big. The maximum size allowed is #{CONFIG.size_limit}MiB")
       end
     end
     filename = ""
@@ -19,19 +22,18 @@ module Handling
     original_filename = ""
     uploaded_at = ""
     checksum = ""
-    ip_address = ""
     delete_key = nil
     # TODO: Return the file that matches a checksum inside the database
     HTTP::FormData.parse(env.request) do |upload|
       if upload.filename.nil? || upload.filename.to_s.empty?
         LOGGER.debug "No file provided by the user"
-        error403("No file provided")
+        return error403("No file provided")
       end
       # TODO: upload.body is emptied when is copied or read
       # Utils.check_duplicate(upload.dup)
       extension = File.extname("#{upload.filename}")
       if CONFIG.blockedExtensions.includes?(extension.split(".")[1])
-        error401("Extension '#{extension}' is not allowed")
+        return error401("Extension '#{extension}' is not allowed")
       end
       filename = Utils.generate_filename
       file_path = ::File.join ["#{CONFIG.files}", filename + extension]
@@ -68,17 +70,23 @@ module Handling
       # Insert SQL data just before returning the upload information
       SQL.exec "INSERT INTO #{CONFIG.dbTableName} VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
         original_filename, filename, extension, uploaded_at, checksum, ip_address, delete_key, nil
+      SQL.exec "INSERT OR IGNORE INTO #{CONFIG.ipTableName} (ip) VALUES ('#{ip_address}')"
+      SQL.exec "UPDATE #{CONFIG.ipTableName} SET count = count + 1 WHERE ip = ('#{ip_address}')"
+
     rescue ex
       LOGGER.error "An error ocurred when trying to insert the data into the DB: #{ex.message}"
-      error500("An error ocurred when trying to insert the data into the DB")
+      return error500("An error ocurred when trying to insert the data into the DB")
     end
-    return json
+    json
   end
 
   # The most unoptimized and unstable feature lol
   # TODO: Support batch upload via JSON array
   def upload_url(env)
     env.response.content_type = "application/json"
+    ip_address = Utils.ip_address(env)
+    protocol = Utils.protocol(env)
+    host = Utils.host(env)
     files = env.params.json["files"].as((Array(JSON::Any)))
     successfull_files = [] of NamedTuple(filename: String, extension: String, original_filename: String, checksum: String, delete_key: String | Nil)
     failed_files = [] of String
@@ -103,7 +111,7 @@ module Handling
           end
         rescue ex
           LOGGER.debug "Failed to download file '#{url}': #{ex.message}"
-          error403("Failed to download file '#{url}'")
+          return error403("Failed to download file '#{url}'")
           failed_files << url
         end
       end
@@ -134,7 +142,7 @@ module Handling
                               checksum:          checksum}
       rescue ex
         LOGGER.error "An error ocurred when trying to insert the data into the DB: #{ex.message}"
-        error500("An error ocurred when trying to insert the data into the DB")
+        return error500("An error ocurred when trying to insert the data into the DB")
       end
     end
     json = JSON.build do |j|
@@ -156,11 +164,13 @@ module Handling
         end
       end
     end
-    return json
+    json
   end
 
   def retrieve_file(env)
     begin
+      protocol = Utils.protocol(env)
+      host = Utils.host(env)
       fileinfo = SQL.query_all("SELECT filename, original_filename, uploaded_at, extension, checksum, thumbnail
       FROM #{CONFIG.dbTableName}
       WHERE filename = ?",
@@ -192,7 +202,7 @@ module Handling
       send_file env, "#{CONFIG.files}/#{fileinfo[:filename]}#{fileinfo[:ext]}"
     rescue ex
       LOGGER.debug "File '#{env.params.url["filename"]}' does not exist: #{ex.message}"
-      error403("File '#{env.params.url["filename"]}' does not exist")
+      return error403("File '#{env.params.url["filename"]}' does not exist")
     end
   end
 
@@ -201,7 +211,7 @@ module Handling
       send_file env, "#{CONFIG.thumbnails}/#{env.params.url["thumbnail"]}"
     rescue ex
       LOGGER.debug "Thumbnail '#{env.params.url["thumbnail"]}' does not exist: #{ex.message}"
-      error403("Thumbnail '#{env.params.url["thumbnail"]}' does not exist")
+      return error403("Thumbnail '#{env.params.url["thumbnail"]}' does not exist")
     end
   end
 
@@ -223,7 +233,7 @@ module Handling
       end
     rescue ex
       LOGGER.error "Unknown error: #{ex.message}"
-      error500("Unknown error")
+      return error500("Unknown error")
     end
     json_data
   end
@@ -246,18 +256,20 @@ module Handling
         # Delete entry from db
         SQL.exec "DELETE FROM #{CONFIG.dbTableName} WHERE delete_key = ?", env.params.query["key"]
         LOGGER.debug "File '#{fileinfo[:filename]}' was deleted using key '#{env.params.query["key"]}'}"
-        msg("File '#{fileinfo[:filename]}' deleted successfully")
+        return msg("File '#{fileinfo[:filename]}' deleted successfully")
       rescue ex
         LOGGER.error("Unknown error: #{ex.message}")
-        error500("Unknown error")
+        return error500("Unknown error")
       end
     else
       LOGGER.debug "Key '#{env.params.query["key"]}' does not exist"
-      error401("Delete key '#{env.params.query["key"]}' does not exist. No files were deleted")
+      return error401("Delete key '#{env.params.query["key"]}' does not exist. No files were deleted")
     end
   end
 
   def sharex_config(env)
+    host = Utils.host(env)
+    protocol = Utils.protocol(env)
     env.response.content_type = "application/json"
     # So it's able to download the file instead of displaying it
     env.response.headers["Content-Disposition"] = "attachment; filename=\"#{host}.sxcu\""

@@ -22,6 +22,10 @@ class Config
   # The list needs to contain a IP address per line
   property torExitNodesUrl : String = "https://www.dan.me.uk/torlist/?exit"
   property torExitNodesFile : String = "./torexitnodes.txt"
+  property filesPerIP : Int32 = 32
+  property ipTableName : String = "ips"
+  # How often is the file limit per IP reset?
+  property rateLimitPeriod : Int32 = 600
   property torMessage : String? = "Tor is blocked!"
   property deleteFilesAfter : Int32 = 7
   # How often should the check of old files be performed? (in seconds)

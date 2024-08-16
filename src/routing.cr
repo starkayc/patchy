@@ -1,20 +1,11 @@
 require "./http-errors"
 
-macro ip_address
-  env.request.headers.try &.["X-Forwarded-For"]? || env.request.remote_address.to_s.split(":").first
-end
-
-macro protocol
-  env.request.headers.try &.["X-Forwarded-Proto"]? || "http"
-end
-
-macro host
-  env.request.headers.try &.["X-Forwarded-Host"]? || env.request.headers["Host"]
-end
-
 module Routing
   extend self
   @@exit_nodes = Array(String).new
+  #   @@ip_address : String = ""
+  #   @@protocol : String = ""
+  #   @@host : String = ""
   if CONFIG.blockTorAddresses
     spawn do
       # Wait a little for Utils.retrieve_tor_exit_nodes to execute first
@@ -29,15 +20,20 @@ module Routing
       end
     end
     before_post do |env|
-      if @@exit_nodes.includes?(ip_address)
+      if @@exit_nodes.includes?(Utils.ip_address(env))
         halt env, status_code: 401, response: error401(CONFIG.torMessage)
       end
-    end
+      ip_count = SQL.query_one "SELECT count FROM #{CONFIG.ipTableName} WHERE ip = ?", Utils.ip_address(env), as: Int32
+	  if ip_count >= CONFIG.filesPerIP
+        halt env, status_code: 401, response: error401("Rate limited!")
+	  end
+	end
   end
 
   def register_all
     get "/" do |env|
-      files_hosted = SQL.query_one "SELECT COUNT (filename) FROM files", as: Int32
+      host = Utils.host(env)
+      files_hosted = SQL.query_one "SELECT COUNT (filename) FROM #{CONFIG.dbTableName}", as: Int32
       render "src/views/index.ecr"
     end
 

@@ -2,11 +2,14 @@ module Utils
   extend self
 
   def create_db
-    if !SQL.query_one "SELECT EXISTS (SELECT name FROM sqlite_schema WHERE type='table' AND name='#{CONFIG.dbTableName}');", as: Bool
+    if !SQL.query_one "SELECT EXISTS (SELECT 1 FROM sqlite_schema WHERE type='table' AND name='#{CONFIG.dbTableName}')
+		AND EXISTS (SELECT 1 FROM sqlite_schema WHERE type='table' AND name='#{CONFIG.ipTableName}');", as: Bool
       LOGGER.info "Creating sqlite3 database at '#{CONFIG.db}'"
       begin
         SQL.exec "CREATE TABLE IF NOT EXISTS #{CONFIG.dbTableName}
 		(original_filename text, filename text, extension text, uploaded_at text, checksum text, ip text, delete_key text, thumbnail text)"
+        SQL.exec "CREATE TABLE IF NOT EXISTS #{CONFIG.ipTableName}
+		(ip text UNIQUE, count integer DEFAULT 0)"
       rescue ex
         LOGGER.fatal "#{ex.message}"
         exit(1)
@@ -205,5 +208,29 @@ module Utils
 
   def load_tor_exit_nodes
     exit_nodes = File.read_lines(CONFIG.torExitNodesFile)
+  end
+
+  def ip_address(env) : String
+    begin
+      return env.request.headers.try &.["X-Forwarded-For"]
+    rescue
+      return env.request.remote_address.to_s.split(":").first
+    end
+  end
+
+  def protocol(env) : String
+    begin
+      return env.request.headers.try &.["X-Forwarded-Proto"]
+    rescue
+      return "http"
+    end
+  end
+
+  def host(env) : String
+	begin
+      return env.request.headers.try &.["X-Forwarded-Host"]
+    rescue
+      return env.request.headers["Host"]
+    end
   end
 end
