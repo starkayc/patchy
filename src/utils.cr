@@ -9,7 +9,7 @@ module Utils
         SQL.exec "CREATE TABLE IF NOT EXISTS #{CONFIG.dbTableName}
 		(original_filename text, filename text, extension text, uploaded_at text, checksum text, ip text, delete_key text, thumbnail text)"
         SQL.exec "CREATE TABLE IF NOT EXISTS #{CONFIG.ipTableName}
-		(ip text UNIQUE, count integer DEFAULT 0)"
+		(ip text UNIQUE, count integer DEFAULT 0, date integer)"
       rescue ex
         LOGGER.fatal "#{ex.message}"
         exit(1)

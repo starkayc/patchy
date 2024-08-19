@@ -3,7 +3,7 @@ thumbnails: "./thumbnails"
 generateThumbnails: false
 db: "./db.sqlite3"
 dbTableName: "files"
-adminEnabled: false
+adminEnabled: true
 adminApiKey: "asd"
 fileameLength: 3
 # In MiB
@@ -15,6 +15,10 @@ torExitNodesCheck: 3600
 torExitNodesUrl: "https://www.dan.me.uk/torlist/?exit"
 torExitNodesFile: "./torexitnodes.txt"
 torMessage: "TOR IS BLOCKED!"
+filesPerIP: 2
+ipTableName: "ips"
+rateLimitPeriod: 20
+rateLimitMessage: ""
 # If you define the unix socket, it will only listen on the socket and not the port.
 #unix_socket: "/tmp/file-uploader.sock"
 # In days

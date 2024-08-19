@@ -22,7 +22,9 @@ module Handling
     original_filename = ""
     uploaded_at = ""
     checksum = ""
-    delete_key = nil
+    if CONFIG.deleteKeyLength > 0
+      delete_key = Random.base58(CONFIG.deleteKeyLength)
+    end
     # TODO: Return the file that matches a checksum inside the database
     HTTP::FormData.parse(env.request) do |upload|
       if upload.filename.nil? || upload.filename.to_s.empty?
@@ -46,21 +48,6 @@ module Handling
     end
     # X-Forwarded-For if behind a reverse proxy and the header is set in the reverse
     # proxy configuration.
-    json = JSON.build do |j|
-      j.object do
-        j.field "link", "#{protocol}://#{host}/#{filename}"
-        j.field "linkExt", "#{protocol}://#{host}/#{filename}#{extension}"
-        j.field "id", filename
-        j.field "ext", extension
-        j.field "name", original_filename
-        j.field "checksum", checksum
-        if CONFIG.deleteKeyLength > 0
-          delete_key = Random.base58(CONFIG.deleteKeyLength)
-          j.field "deleteKey", delete_key
-          j.field "deleteLink", "#{protocol}://#{host}/delete?key=#{delete_key}"
-        end
-      end
-    end
     begin
       spawn { Utils.generate_thumbnail(filename, extension) }
     rescue ex
@@ -70,12 +57,26 @@ module Handling
       # Insert SQL data just before returning the upload information
       SQL.exec "INSERT INTO #{CONFIG.dbTableName} VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
         original_filename, filename, extension, uploaded_at, checksum, ip_address, delete_key, nil
-      SQL.exec "INSERT OR IGNORE INTO #{CONFIG.ipTableName} (ip) VALUES ('#{ip_address}')"
+      SQL.exec "INSERT OR IGNORE INTO #{CONFIG.ipTableName} (ip, date) VALUES (?, ?)", ip_address, Time.utc.to_unix
+      # SQL.exec "INSERT OR IGNORE INTO #{CONFIG.ipTableName} (ip) VALUES ('#{ip_address}')"
       SQL.exec "UPDATE #{CONFIG.ipTableName} SET count = count + 1 WHERE ip = ('#{ip_address}')"
-
     rescue ex
       LOGGER.error "An error ocurred when trying to insert the data into the DB: #{ex.message}"
       return error500("An error ocurred when trying to insert the data into the DB")
+    end
+    json = JSON.build do |j|
+      j.object do
+        j.field "link", "#{protocol}://#{host}/#{filename}"
+        j.field "linkExt", "#{protocol}://#{host}/#{filename}#{extension}"
+        j.field "id", filename
+        j.field "ext", extension
+        j.field "name", original_filename
+        j.field "checksum", checksum
+        if CONFIG.deleteKeyLength > 0
+          j.field "deleteKey", delete_key
+          j.field "deleteLink", "#{protocol}://#{host}/delete?key=#{delete_key}"
+        end
+      end
     end
     json
   end

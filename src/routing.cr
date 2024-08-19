@@ -3,9 +3,6 @@ require "./http-errors"
 module Routing
   extend self
   @@exit_nodes = Array(String).new
-  #   @@ip_address : String = ""
-  #   @@protocol : String = ""
-  #   @@host : String = ""
   if CONFIG.blockTorAddresses
     spawn do
       # Wait a little for Utils.retrieve_tor_exit_nodes to execute first
@@ -19,15 +16,39 @@ module Routing
         sleep CONFIG.torExitNodesCheck + 5
       end
     end
-    before_post do |env|
-      if @@exit_nodes.includes?(Utils.ip_address(env))
-        halt env, status_code: 401, response: error401(CONFIG.torMessage)
+  end
+
+  before_post do |env|
+    if env.request.headers.try &.["X-Api-Key"]? == CONFIG.adminApiKey
+      # Skips Tor and Rate limits if the API key matches
+      next
+    end
+    if CONFIG.blockTorAddresses && @@exit_nodes.includes?(Utils.ip_address(env))
+      halt env, status_code: 401, response: error401(CONFIG.torMessage)
+    end
+    # There is a better way to do this
+    if env.request.resource == "/upload"
+      begin
+        ip_info = SQL.query_all("SELECT ip, count, date FROM #{CONFIG.ipTableName} WHERE ip = ?", Utils.ip_address(env), as: {ip: String, count: Int32, date: Int32})[0]
+        time_since_first_upload = Time.utc.to_unix - ip_info[:date]
+        time_until_unban = ip_info[:date] - Time.utc.to_unix + CONFIG.rateLimitPeriod
+        if time_since_first_upload > CONFIG.rateLimitPeriod
+          SQL.exec "DELETE FROM #{CONFIG.ipTableName} WHERE ip = ?", ip_info[:ip]
+        end
+        if ip_info[:count] >= CONFIG.filesPerIP && time_since_first_upload < CONFIG.rateLimitPeriod
+          halt env, status_code: 401, response: error401("Rate limited! Try again in #{time_until_unban} seconds")
+        end
+      rescue ex
+        LOGGER.error "Error when trying to enforce rate limits: #{ex.message}"
+        next
       end
-      ip_count = SQL.query_one "SELECT count FROM #{CONFIG.ipTableName} WHERE ip = ?", Utils.ip_address(env), as: Int32
-	  if ip_count >= CONFIG.filesPerIP
-        halt env, status_code: 401, response: error401("Rate limited!")
-	  end
-	end
+    end
+  end
+
+  before_post "/api/admin" do |env|
+    if env.request.headers.try &.["X-Api-Key"]? != CONFIG.adminApiKey || nil
+      error401 "Wrong API Key"
+    end
   end
 
   def register_all
@@ -70,9 +91,15 @@ module Routing
 
   def register_admin
     if CONFIG.adminEnabled
+      post "/api/admin/upload" do |env|
+        Handling::Admin.delete_ip_limit(env)
+      end
       post "/api/admin/delete" do |env|
         Handling::Admin.delete_file(env)
       end
+    end
+    post "/api/admin/deleteiplimit" do |env|
+      Handling::Admin.delete_ip_limit(env)
     end
   end
 end
