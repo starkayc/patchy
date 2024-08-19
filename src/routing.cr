@@ -18,6 +18,12 @@ module Routing
     end
   end
 
+  before_post "/api/admin/*" do |env|
+    if env.request.headers.try &.["X-Api-Key"]? != CONFIG.adminApiKey || nil
+      halt env, status_code: 401, response: error401("Wrong API Key")
+    end
+  end
+
   before_post do |env|
     if env.request.headers.try &.["X-Api-Key"]? == CONFIG.adminApiKey
       # Skips Tor and Rate limits if the API key matches
@@ -42,12 +48,6 @@ module Routing
         LOGGER.error "Error when trying to enforce rate limits: #{ex.message}"
         next
       end
-    end
-  end
-
-  before_post "/api/admin" do |env|
-    if env.request.headers.try &.["X-Api-Key"]? != CONFIG.adminApiKey || nil
-      error401 "Wrong API Key"
     end
   end
 
@@ -91,9 +91,9 @@ module Routing
 
   def register_admin
     if CONFIG.adminEnabled
-      post "/api/admin/upload" do |env|
-        Handling::Admin.delete_ip_limit(env)
-      end
+      #   post "/api/admin/upload" do |env|
+      #     Handling::Admin.delete_ip_limit(env)
+      #   end
       post "/api/admin/delete" do |env|
         Handling::Admin.delete_file(env)
       end
