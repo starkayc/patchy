@@ -56,7 +56,7 @@ module Handling::Admin
         # Delete entry from db
         SQL.exec "DELETE FROM #{CONFIG.ipTableName} WHERE ip = ?", ip
         LOGGER.debug "Rate limit for '#{ip}' was deleted"
-        successfull_ips << ip 
+        successfull_ips << ip
       rescue ex : DB::NoResultsError
         LOGGER.error("Rate limit for '#{ip}' doesn't exist or is not registered in the database: #{ex.message}")
         failed_ips << ip

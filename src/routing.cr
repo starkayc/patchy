@@ -3,19 +3,10 @@ require "./http-errors"
 module Routing
   extend self
   @@exit_nodes = Array(String).new
-  if CONFIG.blockTorAddresses
-    spawn do
-      # Wait a little for Utils.retrieve_tor_exit_nodes to execute first
-      # or it will load an old exit node list
-      # I think this can be replaced by channels which makes me able to
-      # receive data from fibers
-      sleep 5
-      loop do
-        LOGGER.debug "Updating Tor exit nodes array"
-        @@exit_nodes = Utils.load_tor_exit_nodes
-        sleep CONFIG.torExitNodesCheck + 5
-      end
-    end
+
+  def reload_exit_nodes
+    LOGGER.debug "Updating Tor exit nodes array"
+    @@exit_nodes = Utils.load_tor_exit_nodes
   end
 
   before_post "/api/admin/*" do |env|
@@ -86,20 +77,21 @@ module Routing
       Handling.sharex_config(env)
     end
 
-    self.register_admin
+    if CONFIG.adminEnabled
+      self.register_admin
+    end
   end
 
   def register_admin
-    if CONFIG.adminEnabled
-      #   post "/api/admin/upload" do |env|
-      #     Handling::Admin.delete_ip_limit(env)
-      #   end
-      post "/api/admin/delete" do |env|
-        Handling::Admin.delete_file(env)
-      end
+    #   post "/api/admin/upload" do |env|
+    #     Handling::Admin.delete_ip_limit(env)
+    #   end
+    post "/api/admin/delete" do |env|
+      Handling::Admin.delete_file(env)
     end
-    post "/api/admin/deleteiplimit" do |env|
-      Handling::Admin.delete_ip_limit(env)
-    end
+  end
+
+  post "/api/admin/deleteiplimit" do |env|
+    Handling::Admin.delete_ip_limit(env)
   end
 end

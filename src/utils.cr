@@ -135,7 +135,8 @@ module Utils
     end
   end
 
-  # Delete socket if the server has not been previously cleaned by the server (Due to unclean exits, crashes, etc.)
+  # Delete socket if the server has not been previously cleaned by the server
+  # (Due to unclean exits, crashes, etc.)
   def delete_socket
     if File.exists?("#{CONFIG.unix_socket}")
       LOGGER.info "Deleting old unix socket"
@@ -167,21 +168,43 @@ module Utils
     msg("File '#{fileinfo[:filename]}' deleted successfully")
   end
 
+  MAGIC_BYTES = {
+    # Images
+    ".png"  => "89504e470d0a1a0a",
+    ".heic" => "6674797068656963",
+    ".jpg"  => "ffd8ff",
+    ".gif"  => "474946383",
+    # Videos
+    ".mp4"  => "66747970",
+    ".webm" => "1a45dfa3",
+    ".mov"  => "6d6f6f76",
+    ".wmv"  => "󠀀3026b2758e66cf11",
+    ".flv"  => "󠀀464c5601",
+    ".mpeg" => "000001bx",
+	# Audio
+    ".mp3" => "󠀀494433",
+    ".aac" => "󠀀fff1",
+    ".wav" => "󠀀57415645666d7420",
+    ".flac" => "󠀀664c614300000022",
+    ".ogg" => "󠀀4f67675300020000000000000000",
+    ".wma" => "󠀀3026b2758e66cf11a6d900aa0062ce6c",
+    ".aiff" => "󠀀464f524d00",
+    # Whatever
+    ".7z"  => "377abcaf271c",
+    ".gz"  => "1f8b",
+    ".iso" => "󠀀4344303031",
+	# Documents
+	"pdf" => "󠀀25504446",
+	"html" => "<!DOCTYPE html>",
+  }
+
   def detect_extension(file) : String
-    magic_bytes = {
-      ".png"  => "89504e470d0a1a0a",
-      ".jpg"  => "ffd8ff",
-      ".webm" => "1a45dfa3",
-      ".mp4"  => "66747970",
-      ".gif"  => "474946383",
-      ".7z"   => "377abcaf271c",
-      ".gz"   => "1f8b",
-    }
     file = File.open(file)
-    slice = Bytes.new(8)
+    slice = Bytes.new(16)
     hex = IO::Hexdump.new(file)
+    # Reads the first 16 bytes of the file in Heap
     hex.read(slice)
-    magic_bytes.each do |ext, mb|
+    MAGIC_BYTES.each do |ext, mb|
       if slice.hexstring.includes?(mb)
         return ext
       end
@@ -191,17 +214,21 @@ module Utils
 
   def retrieve_tor_exit_nodes
     LOGGER.debug "Retrieving Tor exit nodes list"
-    resp = HTTP::Client.get(CONFIG.torExitNodesUrl) do |res|
-      if res.success? && res.status_code == 200
-        begin
-          File.open(CONFIG.torExitNodesFile, "w") do |output|
-            IO.copy(res.body_io, output)
+    HTTP::Client.get(CONFIG.torExitNodesUrl) do |res|
+      begin
+        if res.success? && res.status_code == 200
+          begin
+            File.open(CONFIG.torExitNodesFile, "w") { |output| IO.copy(res.body_io, output) }
+          rescue ex
+            LOGGER.error "Failed to write to file: #{ex.message}"
           end
-        rescue ex
-          LOGGER.error "Failed to write to file: #{ex.message}"
+        else
+          LOGGER.error "Failed to retrieve exit nodes list. Status Code: #{res.status_code}"
         end
-      else
-        LOGGER.error "Failed to retrieve exit nodes list. Status Code: #{res.status_code}"
+      rescue ex : Socket::ConnectError
+        LOGGER.error "Failed to connect to #{CONFIG.torExitNodesUrl}: #{ex.message}"
+      rescue ex
+        LOGGER.error "Unknown error: #{ex.message}"
       end
     end
   end
@@ -227,7 +254,7 @@ module Utils
   end
 
   def host(env) : String
-	begin
+    begin
       return env.request.headers.try &.["X-Forwarded-Host"]
     rescue
       return env.request.headers["Host"]

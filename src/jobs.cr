@@ -20,6 +20,8 @@ module Jobs
     spawn do
       loop do
         Utils.retrieve_tor_exit_nodes
+		# Updates the @@exit_nodes array instantly
+		Routing.reload_exit_nodes
         sleep CONFIG.torExitNodesCheck
       end
     end
@@ -28,9 +30,7 @@ module Jobs
   def self.kemal
     spawn do
       if !CONFIG.unix_socket.nil?
-        Kemal.run do |config|
-          config.server.not_nil!.bind_unix "#{CONFIG.unix_socket}"
-        end
+        Kemal.run &.server.not_nil!.bind_unix "#{CONFIG.unix_socket}"
       else
         Kemal.run
       end
