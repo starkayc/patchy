@@ -7,6 +7,7 @@ module Routing
   def reload_exit_nodes
     LOGGER.debug "Updating Tor exit nodes array"
     @@exit_nodes = Utils.load_tor_exit_nodes
+    LOGGER.debug "IPs inside the exit nodes array: #{@@exit_nodes.size}"
   end
 
   before_post "/api/admin/*" do |env|
@@ -93,5 +94,13 @@ module Routing
 
   post "/api/admin/deleteiplimit" do |env|
     Handling::Admin.delete_ip_limit(env)
+  end
+
+  post "/api/admin/fileinfo" do |env|
+    Handling::Admin.retrieve_file_info(env)
+  end
+
+    get "/api/admin/torexitnodes" do |env|
+    Handling::Admin.retrieve_tor_exit_nodes(env, @@exit_nodes)
   end
 end

@@ -20,8 +20,8 @@ module Jobs
     spawn do
       loop do
         Utils.retrieve_tor_exit_nodes
-		# Updates the @@exit_nodes array instantly
-		Routing.reload_exit_nodes
+        # Updates the @@exit_nodes array instantly
+        Routing.reload_exit_nodes
         sleep CONFIG.torExitNodesCheck
       end
     end

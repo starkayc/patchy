@@ -35,9 +35,8 @@ class Config
   property blockTorAddresses : Bool? = false
   # How often (in seconds) should this program download the exit nodes list
   property torExitNodesCheck : Int32 = 3600
-  # A URL with a list of exit nodes addresses
-  # The list needs to contain a IP address per line
-  property torExitNodesUrl : String = "https://www.dan.me.uk/torlist/?exit"
+  # Only https://check.torproject.org/exit-addresses is supported
+  property torExitNodesUrl : String = "https://check.torproject.org/exit-addresses"
   # Where the file of the exit nodes will be located, can be placed anywhere
   property torExitNodesFile : String = "./torexitnodes.txt"
   # Message that will be displayed to the Tor user.

@@ -1,5 +1,6 @@
 require "../http-errors"
 require "http/client"
+require "benchmark"
 
 module Handling
   extend self
@@ -43,7 +44,7 @@ module Handling
         IO.copy(upload.body, output)
       end
       original_filename = upload.filename
-      uploaded_at = Time::Format::HTTP_DATE.format(Time.utc)
+      uploaded_at = Time.utc
       checksum = Utils.hash_file(file_path)
     end
     # X-Forwarded-For if behind a reverse proxy and the header is set in the reverse
@@ -101,7 +102,7 @@ module Handling
       original_filename = ""
       extension = ""
       checksum = ""
-      uploaded_at = Time::Format::HTTP_DATE.format(Time.utc)
+      uploaded_at = Time.utc
       extension = File.extname(URI.parse(url).path)
       delete_key = nil
       file_path = ::File.join ["#{CONFIG.files}", filename + extension]
@@ -123,7 +124,7 @@ module Handling
         File.rename(file_path, file_path + extension)
         file_path = ::File.join ["#{CONFIG.files}", filename + extension]
       end
-      # TODO: Benchmark this:
+      # The second one is faster and it uses less memory
       # original_filename = URI.parse("https://ayaya.beauty/PqC").path.split("/").last
       original_filename = url.split("/").last
       checksum = Utils.hash_file(file_path)
@@ -177,10 +178,21 @@ module Handling
       WHERE filename = ?",
         env.params.url["filename"].split(".").first,
         as: {filename: String, ofilename: String, up_at: String, ext: String, checksum: String, thumbnail: String | Nil})[0]
-
-      headers(env, {"Content-Disposition" => "inline; filename*=UTF-8''#{fileinfo[:ofilename]}"})
-      headers(env, {"Last-Modified" => "#{fileinfo[:up_at]}"})
-      headers(env, {"ETag" => "#{fileinfo[:checksum]}"})
+      #   Benchmark.ips do |x|
+      #     x.report("header multiple") { headers(env, {"Content-Disposition" => "inline; filename*=UTF-8''#{fileinfo[:ofilename]}",
+      # 	"Last-Modified" => "#{fileinfo[:up_at]}",
+      # 	"ETag" => "#{fileinfo[:checksum]}"}) }
+      #     x.report("shorter sleep") do
+      # 		env.response.headers["Content-Disposition"] = "inline; filename*=UTF-8''#{fileinfo[:ofilename]}"
+      # 		env.response.headers["Last-Modified"] = "#{fileinfo[:up_at]}"
+      # 		env.response.headers["ETag"] = "#{fileinfo[:checksum]}"
+      # 	end
+      #   end
+      # `env.response.headers` is faster than `headers(env, Hash(String, String))`
+      # https://github.com/kemalcr/kemal/blob/3243b8e0e03568ad3bd9f0ad6f445c871605b821/src/kemal/helpers/helpers.cr#L102C1-L104C4
+      env.response.headers["Content-Disposition"] = "inline; filename*=UTF-8''#{fileinfo[:ofilename]}"
+      #   env.response.headers["Last-Modified"] = "#{fileinfo[:up_at]}"
+      env.response.headers["ETag"] = "#{fileinfo[:checksum]}"
 
       CONFIG.opengraphUseragents.each do |useragent|
         if env.request.headers.try &.["User-Agent"].includes?(useragent)

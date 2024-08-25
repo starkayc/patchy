@@ -181,21 +181,21 @@ module Utils
     ".wmv"  => "󠀀3026b2758e66cf11",
     ".flv"  => "󠀀464c5601",
     ".mpeg" => "000001bx",
-	# Audio
-    ".mp3" => "󠀀494433",
-    ".aac" => "󠀀fff1",
-    ".wav" => "󠀀57415645666d7420",
+    # Audio
+    ".mp3"  => "󠀀494433",
+    ".aac"  => "󠀀fff1",
+    ".wav"  => "󠀀57415645666d7420",
     ".flac" => "󠀀664c614300000022",
-    ".ogg" => "󠀀4f67675300020000000000000000",
-    ".wma" => "󠀀3026b2758e66cf11a6d900aa0062ce6c",
+    ".ogg"  => "󠀀4f67675300020000000000000000",
+    ".wma"  => "󠀀3026b2758e66cf11a6d900aa0062ce6c",
     ".aiff" => "󠀀464f524d00",
     # Whatever
     ".7z"  => "377abcaf271c",
     ".gz"  => "1f8b",
     ".iso" => "󠀀4344303031",
-	# Documents
-	"pdf" => "󠀀25504446",
-	"html" => "<!DOCTYPE html>",
+    # Documents
+    "pdf"  => "󠀀25504446",
+    "html" => "<!DOCTYPE html>",
   }
 
   def detect_extension(file) : String
@@ -235,6 +235,13 @@ module Utils
 
   def load_tor_exit_nodes
     exit_nodes = File.read_lines(CONFIG.torExitNodesFile)
+    ips = [] of String
+    exit_nodes.each do |line|
+      if line.includes?("ExitAddress")
+        ips << line.split(" ")[1]
+      end
+    end
+    return ips
   end
 
   def ip_address(env) : String
