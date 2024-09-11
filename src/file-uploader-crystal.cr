@@ -32,6 +32,7 @@ CURRENT_TAG     = {{ "#{`git describe --long --abbrev=7 --tags | sed 's/([^-]*)-
 Utils.check_dependencies
 Utils.create_db
 Utils.create_files_dir
+Utils.create_thumbnails_dir
 Routing.register_all
 
 Utils.delete_socket

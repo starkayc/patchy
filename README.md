@@ -84,3 +84,5 @@ WantedBy=default.target
 - Custom file expiration using headers (Like rustypaste)
 - Small CLI to upload files (like `rpaste` from rustypaste)
 - Add more endpoints to Admin API
+
+- 

@@ -83,8 +83,7 @@ module Handling
   end
 
   # The most unoptimized and unstable feature lol
-  # TODO: Support batch upload via JSON array
-  def upload_url(env)
+  def upload_url_bulk(env)
     env.response.content_type = "application/json"
     ip_address = Utils.ip_address(env)
     protocol = Utils.protocol(env)
@@ -147,6 +146,92 @@ module Handling
         return error500("An error ocurred when trying to insert the data into the DB")
       end
     end
+    json = JSON.build do |j|
+      j.array do
+        successfull_files.each do |fileinfo|
+          j.object do
+            j.field "link", "#{protocol}://#{host}/#{fileinfo[:filename]}"
+            j.field "linkExt", "#{protocol}://#{host}/#{fileinfo[:filename]}#{fileinfo[:extension]}"
+            j.field "id", fileinfo[:filename]
+            j.field "ext", fileinfo[:extension]
+            j.field "name", fileinfo[:original_filename]
+            j.field "checksum", fileinfo[:checksum]
+            if CONFIG.deleteKeyLength > 0
+              delete_key = Random.base58(CONFIG.deleteKeyLength)
+              j.field "deleteKey", fileinfo[:delete_key]
+              j.field "deleteLink", "#{protocol}://#{host}/delete?key=#{fileinfo[:delete_key]}"
+            end
+          end
+        end
+      end
+    end
+    json
+  end
+
+  # TODO: Add delete url, same for upload_url_bulk
+  def upload_url(env)
+    env.response.content_type = "application/json"
+    ip_address = Utils.ip_address(env)
+    protocol = Utils.protocol(env)
+    host = Utils.host(env)
+    url = env.params.query["url"]
+    successfull_files = [] of NamedTuple(filename: String, extension: String, original_filename: String, checksum: String, delete_key: String | Nil)
+    failed_files = [] of String
+    # X-Forwarded-For if behind a reverse proxy and the header is set in the reverse
+    # proxy configuration.
+    if url.empty?
+    end
+    # files.each do |url|
+    url = url.to_s
+    filename = Utils.generate_filename
+    original_filename = ""
+    extension = ""
+    checksum = ""
+    uploaded_at = Time.utc
+    extension = File.extname(URI.parse(url).path)
+    delete_key = nil
+    file_path = ::File.join ["#{CONFIG.files}", filename + extension]
+    File.open(file_path, "w") do |output|
+      begin
+        HTTP::Client.get(url) do |res|
+          IO.copy(res.body_io, output)
+        end
+      rescue ex
+        LOGGER.debug "Failed to download file '#{url}': #{ex.message}"
+        return error403("Failed to download file '#{url}'")
+        failed_files << url
+      end
+    end
+    #   successfull_files << url
+    # end
+    if extension.empty?
+      extension = Utils.detect_extension(file_path)
+      File.rename(file_path, file_path + extension)
+      file_path = ::File.join ["#{CONFIG.files}", filename + extension]
+    end
+    # The second one is faster and it uses less memory
+    # original_filename = URI.parse("https://ayaya.beauty/PqC").path.split("/").last
+    original_filename = url.split("/").last
+    checksum = Utils.hash_file(file_path)
+    begin
+      spawn { Utils.generate_thumbnail(filename, extension) }
+    rescue ex
+      LOGGER.error "An error ocurred when trying to generate a thumbnail: #{ex.message}"
+    end
+    begin
+      # Insert SQL data just before returning the upload information
+      SQL.exec("INSERT INTO #{CONFIG.dbTableName} VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+        original_filename, filename, extension, uploaded_at, checksum, ip_address, delete_key, nil)
+      successfull_files << {filename:          filename,
+                            original_filename: original_filename,
+                            extension:         extension,
+                            delete_key:        delete_key,
+                            checksum:          checksum}
+    rescue ex
+      LOGGER.error "An error ocurred when trying to insert the data into the DB: #{ex.message}"
+      return error500("An error ocurred when trying to insert the data into the DB")
+    end
+    # end
     json = JSON.build do |j|
       j.array do
         successfull_files.each do |fileinfo|

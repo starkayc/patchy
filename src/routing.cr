@@ -54,8 +54,12 @@ module Routing
       Handling.upload(env)
     end
 
-    post "/api/uploadurl" do |env|
+    get "/upload" do |env|
       Handling.upload_url(env)
+    end
+
+    post "/api/uploadurl" do |env|
+      Handling.upload_url_bulk(env)
     end
 
     get "/:filename" do |env|
@@ -100,7 +104,7 @@ module Routing
     Handling::Admin.retrieve_file_info(env)
   end
 
-    get "/api/admin/torexitnodes" do |env|
+  get "/api/admin/torexitnodes" do |env|
     Handling::Admin.retrieve_tor_exit_nodes(env, @@exit_nodes)
   end
 end
