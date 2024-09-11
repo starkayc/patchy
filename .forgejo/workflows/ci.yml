@@ -32,8 +32,8 @@ jobs:
       with:
         images: git.nadeko.net/fijxu/file-uploader-crystal
         tags: |
-          type=sha,format=short,prefix={{date 'YYYY.MM.DD'}}-,enable=${{ github.ref == format('refs/heads/{0}', 'master') }}
-          type=raw,value=latest,enable=${{ github.ref == format('refs/heads/{0}', 'master') }}
+          type=sha,format=short,prefix={{date 'YYYY.MM.DD'}}-,enable=${{ github.ref == format('refs/heads/{0}', 'main') }}
+          type=raw,value=latest,enable=${{ github.ref == format('refs/heads/{0}', 'main') }}
 
     - uses: https://code.forgejo.org/docker/build-push-action@v5
       name: Build images
