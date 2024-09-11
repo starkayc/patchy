@@ -1,4 +1,4 @@
-name: file-uploader
+name: file-uploader-crystal
 version: 0.8.7
 
 authors:
@@ -6,7 +6,7 @@ authors:
 
 targets:
   file-uploader:
-    main: src/file-uploader.cr
+    main: src/file-uploader-crystal.cr
 
 dependencies:
   kemal:
