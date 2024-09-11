@@ -7,12 +7,12 @@ on:
     - cron: '0 7 * * 0'
   push:
     branches:
-      - "master"
+      - "main"
 
 jobs:
   build:
     runs-on: runner
-    
+
     steps:
     - uses: https://code.forgejo.org/actions/checkout@v2
 
@@ -45,4 +45,3 @@ jobs:
         push: true
         build-args: |
           "release=1"
-
