@@ -30,6 +30,6 @@ COPY --from=builder /file-uploader-crystal/file-uploader-crystal .
 RUN chmod o+rX -R ./config 
 
 EXPOSE 8080
-USER invidious
+USER file-uploader-crystal
 ENTRYPOINT ["/sbin/tini", "--"]
-CMD [ "/invidious/file-uploader" ]
+CMD [ "/file-uploader-crystal/file-uploader-crystal" ]
