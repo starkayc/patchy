@@ -30,7 +30,7 @@ module Utils
   end
 
   def create_thumbnails_dir
-    if !CONFIG.thumbnails
+    if CONFIG.thumbnails
       if !Dir.exists?("#{CONFIG.thumbnails}")
         LOGGER.info "Creating thumbnails folder under '#{CONFIG.thumbnails}'"
         begin
@@ -69,7 +69,7 @@ module Utils
     dependencies.each do |dep|
       next if !CONFIG.generateThumbnails
       if !Process.find_executable(dep)
-        LOGGER.fatal("'#{dep}' was not found")
+        LOGGER.fatal("'#{dep}' was not found.")
         exit(1)
       end
     end
@@ -113,7 +113,7 @@ module Utils
 
   def generate_thumbnail(filename, extension)
     # Disable generation if false
-    return if !CONFIG.generateThumbnails
+    return if !CONFIG.generateThumbnails || !CONFIG.thumbnails
     LOGGER.debug "Generating thumbnail for #{filename + extension} in background"
     process = Process.run("ffmpeg",
       [
@@ -128,7 +128,7 @@ module Utils
         "-update", "1",
         "#{CONFIG.thumbnails}/#{filename}.jpg",
       ])
-    if process.normal_exit?
+    if process.exit_code == 0
       LOGGER.debug "Thumbnail for #{filename + extension} generated successfully"
       SQL.exec "UPDATE #{CONFIG.dbTableName} SET thumbnail = ? WHERE filename = ?", filename + ".jpg", filename
     else

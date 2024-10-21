@@ -50,6 +50,13 @@ module Routing
       render "src/views/index.ecr"
     end
 
+    get "/chatterino" do |env|
+      host = Utils.host(env)
+      protocol = Utils.protocol(env)
+      files_hosted = SQL.query_one "SELECT COUNT (filename) FROM #{CONFIG.dbTableName}", as: Int32
+      render "src/views/chatterino.ecr"
+    end
+
     post "/upload" do |env|
       Handling.upload(env)
     end
@@ -80,6 +87,10 @@ module Routing
 
     get "/sharex.sxcu" do |env|
       Handling.sharex_config(env)
+    end
+
+    get "/chatterinoconfig" do |env|
+      Handling.chatterino_config(env)
     end
 
     if CONFIG.adminEnabled

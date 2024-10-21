@@ -152,13 +152,13 @@ module Handling::Admin
 
   # /api/admin/whitelist
   # curl -X GET -H "X-Api-Key: asd" http://localhost:8080/api/admin/torexitnodes | jq
-#   def add_ip_to_whitelist(env, nodes)
-#     json = JSON.build do |j|
-#       j.object do
-#         j.field "ips", nodes
-#       end
-#     end
-#   end
+  #   def add_ip_to_whitelist(env, nodes)
+  #     json = JSON.build do |j|
+  #       j.object do
+  #         j.field "ips", nodes
+  #       end
+  #     end
+  #   end
 
   # /api/admin/blacklist
   # curl -X GET -H "X-Api-Key: asd" http://localhost:8080/api/admin/torexitnodes | jq

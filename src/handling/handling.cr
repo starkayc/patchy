@@ -1,6 +1,7 @@
 require "../http-errors"
 require "http/client"
 require "benchmark"
+# require "../filters"
 
 module Handling
   extend self
@@ -10,6 +11,7 @@ module Handling
     ip_address = Utils.ip_address(env)
     protocol = Utils.protocol(env)
     host = Utils.host(env)
+    # filter = env.params.query["filter"]?
     # You can modify this if you want to allow files smaller than 1MiB.
     # This is generally a good way to check the filesize but there is a better way to do it
     # which is inspecting the file directly (If I'm not wrong).
@@ -46,6 +48,10 @@ module Handling
       original_filename = upload.filename
       uploaded_at = Time.utc
       checksum = Utils.hash_file(file_path)
+      # TODO: Apply filters
+      # if filter
+      #   Filters.apply_filter(file_path, filter)
+      # end
     end
     # X-Forwarded-For if behind a reverse proxy and the header is set in the reverse
     # proxy configuration.
@@ -88,13 +94,19 @@ module Handling
     ip_address = Utils.ip_address(env)
     protocol = Utils.protocol(env)
     host = Utils.host(env)
-    files = env.params.json["files"].as((Array(JSON::Any)))
+    begin
+      files = env.params.json["files"].as((Array(JSON::Any)))
+    rescue ex : JSON::ParseException
+      LOGGER.error "Body malformed: #{ex.message}"
+      return error400 "Body malformed: #{ex.message}"
+    rescue ex
+      LOGGER.error "Unknown error: #{ex.message}"
+      return error500 "Unknown error"
+    end
     successfull_files = [] of NamedTuple(filename: String, extension: String, original_filename: String, checksum: String, delete_key: String | Nil)
     failed_files = [] of String
     # X-Forwarded-For if behind a reverse proxy and the header is set in the reverse
     # proxy configuration.
-    if files.empty?
-    end
     files.each do |url|
       url = url.to_s
       filename = Utils.generate_filename
@@ -103,7 +115,9 @@ module Handling
       checksum = ""
       uploaded_at = Time.utc
       extension = File.extname(URI.parse(url).path)
-      delete_key = nil
+      if CONFIG.deleteKeyLength > 0
+        delete_key = Random.base58(CONFIG.deleteKeyLength)
+      end
       file_path = ::File.join ["#{CONFIG.files}", filename + extension]
       File.open(file_path, "w") do |output|
         begin
@@ -168,7 +182,6 @@ module Handling
     json
   end
 
-  # TODO: Add delete url, same for upload_url_bulk
   def upload_url(env)
     env.response.content_type = "application/json"
     ip_address = Utils.ip_address(env)
@@ -179,31 +192,29 @@ module Handling
     failed_files = [] of String
     # X-Forwarded-For if behind a reverse proxy and the header is set in the reverse
     # proxy configuration.
-    if url.empty?
-    end
-    # files.each do |url|
-    url = url.to_s
     filename = Utils.generate_filename
     original_filename = ""
     extension = ""
     checksum = ""
     uploaded_at = Time.utc
     extension = File.extname(URI.parse(url).path)
-    delete_key = nil
+    if CONFIG.deleteKeyLength > 0
+      delete_key = Random.base58(CONFIG.deleteKeyLength)
+    end
     file_path = ::File.join ["#{CONFIG.files}", filename + extension]
     File.open(file_path, "w") do |output|
       begin
+        # TODO: Connect timeout to prevent possible Denial of Service to the external website spamming requests
+        # https://crystal-lang.org/api/1.13.2/HTTP/Client.html#connect_timeout
         HTTP::Client.get(url) do |res|
           IO.copy(res.body_io, output)
         end
       rescue ex
         LOGGER.debug "Failed to download file '#{url}': #{ex.message}"
-        return error403("Failed to download file '#{url}'")
+        return error403("Failed to download file '#{url}': #{ex.message}")
         failed_files << url
       end
     end
-    #   successfull_files << url
-    # end
     if extension.empty?
       extension = Utils.detect_extension(file_path)
       File.rename(file_path, file_path + extension)
@@ -231,7 +242,6 @@ module Handling
       LOGGER.error "An error ocurred when trying to insert the data into the DB: #{ex.message}"
       return error500("An error ocurred when trying to insert the data into the DB")
     end
-    # end
     json = JSON.build do |j|
       j.array do
         successfull_files.each do |fileinfo|
@@ -382,5 +392,17 @@ module Handling
   "DeletionURL": "{json:deleteLink}",
   "ErrorMessage": "{json:error}"
 })
+  end
+
+  def chatterino_config(env)
+    host = Utils.host(env)
+    protocol = Utils.protocol(env)
+    env.response.content_type = "application/json"
+    return %({
+	"requestUrl": "#{protocol}://#{host}/upload",
+	"formField": "data",
+	"imageLink": "{link}",
+	"deleteLink": "{deleteLink}"
+  })
   end
 end

@@ -1,3 +1,10 @@
+macro error400(message)
+    env.response.content_type = "application/json"
+    env.response.status_code = 400
+    error_message = {"error" => {{message}}}.to_json
+    error_message
+  end
+
 macro error401(message)
     env.response.content_type = "application/json"
     env.response.status_code = 401
