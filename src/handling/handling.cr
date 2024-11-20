@@ -1,6 +1,7 @@
 require "../http-errors"
 require "http/client"
 require "benchmark"
+
 # require "../filters"
 
 module Handling
@@ -62,11 +63,11 @@ module Handling
     end
     begin
       # Insert SQL data just before returning the upload information
-      SQL.exec "INSERT INTO #{CONFIG.dbTableName} VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+      SQL.exec "INSERT INTO files VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
         original_filename, filename, extension, uploaded_at, checksum, ip_address, delete_key, nil
-      SQL.exec "INSERT OR IGNORE INTO #{CONFIG.ipTableName} (ip, date) VALUES (?, ?)", ip_address, Time.utc.to_unix
-      # SQL.exec "INSERT OR IGNORE INTO #{CONFIG.ipTableName} (ip) VALUES ('#{ip_address}')"
-      SQL.exec "UPDATE #{CONFIG.ipTableName} SET count = count + 1 WHERE ip = ('#{ip_address}')"
+      SQL.exec "INSERT OR IGNORE INTO ips (ip, date) VALUES (?, ?)", ip_address, Time.utc.to_unix
+      # SQL.exec "INSERT OR IGNORE INTO ips (ip) VALUES ('#{ip_address}')"
+      SQL.exec "UPDATE ips SET count = count + 1 WHERE ip = ('#{ip_address}')"
     rescue ex
       LOGGER.error "An error ocurred when trying to insert the data into the DB: #{ex.message}"
       return error500("An error ocurred when trying to insert the data into the DB")
@@ -148,7 +149,7 @@ module Handling
       end
       begin
         # Insert SQL data just before returning the upload information
-        SQL.exec("INSERT INTO #{CONFIG.dbTableName} VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+        SQL.exec("INSERT INTO files VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
           original_filename, filename, extension, uploaded_at, checksum, ip_address, delete_key, nil)
         successfull_files << {filename:          filename,
                               original_filename: original_filename,
@@ -231,7 +232,7 @@ module Handling
     end
     begin
       # Insert SQL data just before returning the upload information
-      SQL.exec("INSERT INTO #{CONFIG.dbTableName} VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+      SQL.exec("INSERT INTO files VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
         original_filename, filename, extension, uploaded_at, checksum, ip_address, delete_key, nil)
       successfull_files << {filename:          filename,
                             original_filename: original_filename,
@@ -269,7 +270,7 @@ module Handling
       protocol = Utils.protocol(env)
       host = Utils.host(env)
       fileinfo = SQL.query_all("SELECT filename, original_filename, uploaded_at, extension, checksum, thumbnail
-      FROM #{CONFIG.dbTableName}
+      FROM files
       WHERE filename = ?",
         env.params.url["filename"].split(".").first,
         as: {filename: String, ofilename: String, up_at: String, ext: String, checksum: String, thumbnail: String | Nil})[0]
@@ -330,7 +331,7 @@ module Handling
         json.object do
           json.field "stats" do
             json.object do
-              json.field "filesHosted", SQL.query_one "SELECT COUNT (filename) FROM #{CONFIG.dbTableName}", as: Int32
+              json.field "filesHosted", SQL.query_one "SELECT COUNT (filename) FROM files", as: Int32
               json.field "maxUploadSize", CONFIG.size_limit
               json.field "thumbnailGeneration", CONFIG.generateThumbnails
               json.field "filenameLength", CONFIG.fileameLength
@@ -347,10 +348,10 @@ module Handling
   end
 
   def delete_file(env)
-    if SQL.query_one "SELECT EXISTS(SELECT 1 FROM #{CONFIG.dbTableName} WHERE delete_key = ?)", env.params.query["key"], as: Bool
+    if SQL.query_one "SELECT EXISTS(SELECT 1 FROM files WHERE delete_key = ?)", env.params.query["key"], as: Bool
       begin
         fileinfo = SQL.query_all("SELECT filename, extension, thumbnail
-        FROM #{CONFIG.dbTableName}
+        FROM files
         WHERE delete_key = ?",
           env.params.query["key"],
           as: {filename: String, extension: String, thumbnail: String | Nil})[0]
@@ -362,7 +363,7 @@ module Handling
           File.delete("#{CONFIG.thumbnails}/#{fileinfo[:thumbnail]}")
         end
         # Delete entry from db
-        SQL.exec "DELETE FROM #{CONFIG.dbTableName} WHERE delete_key = ?", env.params.query["key"]
+        SQL.exec "DELETE FROM files WHERE delete_key = ?", env.params.query["key"]
         LOGGER.debug "File '#{fileinfo[:filename]}' was deleted using key '#{env.params.query["key"]}'}"
         return msg("File '#{fileinfo[:filename]}' deleted successfully")
       rescue ex

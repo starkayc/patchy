@@ -3,6 +3,8 @@ require "yaml"
 class Config
   include YAML::Serializable
 
+  # Colorize logs
+  property colorize_logs : Bool = true
   # Where the uploaded files will be located
   property files : String = "./files"
   # Where the thumbnails will be located when they are successfully generated
@@ -12,8 +14,6 @@ class Config
   property generateThumbnails : Bool = false
   # Where the SQLITE3 database will be located
   property db : String = "./db.sqlite3"
-  # Name of the table that will be used for file information
-  property dbTableName : String = "files"
   # Enable or disable the admin API
   property adminEnabled : Bool = false
   # The API key for admin routes. It's passed as a "X-Api-Key" header to the
@@ -45,8 +45,6 @@ class Config
   property torMessage : String? = "Tor is blocked!"
   # How many files an IP address can upload to the server
   property filesPerIP : Int32 = 32
-  # Name of the table that will be used for rate limit information
-  property ipTableName : String = "ips"
   # How often is the file limit per IP reset? (in seconds)
   property rateLimitPeriod : Int32 = 600
   # TODO: UNUSED CONSTANT

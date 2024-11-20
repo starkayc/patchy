@@ -8,7 +8,7 @@ module Jobs
     spawn do
       loop do
         Utils.check_old_files
-        sleep CONFIG.deleteFilesCheck
+        sleep CONFIG.deleteFilesCheck.seconds
       end
     end
   end
@@ -22,7 +22,7 @@ module Jobs
         Utils.retrieve_tor_exit_nodes
         # Updates the @@exit_nodes array instantly
         Routing.reload_exit_nodes
-        sleep CONFIG.torExitNodesCheck
+        sleep CONFIG.torExitNodesCheck.seconds
       end
     end
   end

@@ -2,13 +2,13 @@ module Utils
   extend self
 
   def create_db
-    if !SQL.query_one "SELECT EXISTS (SELECT 1 FROM sqlite_schema WHERE type='table' AND name='#{CONFIG.dbTableName}')
-		AND EXISTS (SELECT 1 FROM sqlite_schema WHERE type='table' AND name='#{CONFIG.ipTableName}');", as: Bool
+    if !SQL.query_one "SELECT EXISTS (SELECT 1 FROM sqlite_schema WHERE type='table' AND name='files')
+		AND EXISTS (SELECT 1 FROM sqlite_schema WHERE type='table' AND name='ips');", as: Bool
       LOGGER.info "Creating sqlite3 database at '#{CONFIG.db}'"
       begin
-        SQL.exec "CREATE TABLE IF NOT EXISTS #{CONFIG.dbTableName}
+        SQL.exec "CREATE TABLE IF NOT EXISTS files
 		(original_filename text, filename text, extension text, uploaded_at text, checksum text, ip text, delete_key text, thumbnail text)"
-        SQL.exec "CREATE TABLE IF NOT EXISTS #{CONFIG.ipTableName}
+        SQL.exec "CREATE TABLE IF NOT EXISTS ips
 		(ip text UNIQUE, count integer DEFAULT 0, date integer)"
       rescue ex
         LOGGER.fatal "#{ex.message}"
@@ -45,23 +45,23 @@ module Utils
 
   def check_old_files
     LOGGER.info "Deleting old files"
-    dir = Dir.new("#{CONFIG.files}")
-    # Delete entries from DB
-    SQL.exec "DELETE FROM #{CONFIG.dbTableName} WHERE uploaded_at < date('now', '-#{CONFIG.deleteFilesAfter} days');"
-    # Delete files
-    dir.each_child do |file|
-      if (Time.utc - File.info("#{CONFIG.files}/#{file}").modification_time).days >= CONFIG.deleteFilesAfter
-        LOGGER.debug "Deleting file '#{file}'"
-        begin
-          File.delete("#{CONFIG.files}/#{file}")
-        rescue ex
-          LOGGER.error "#{ex.message}"
+    fileinfo = SQL.query_all("SELECT filename, extension, thumbnail
+    FROM files
+    WHERE uploaded_at < datetime('now', '-#{CONFIG.deleteFilesAfter} days')",
+      as: {filename: String, extension: String, thumbnail: String | Nil})
+
+    fileinfo.each do |file|
+      LOGGER.debug "Deleting file '#{file[:filename]}#{file[:extension]}'"
+      begin
+        File.delete("#{CONFIG.files}/#{file[:filename]}#{file[:extension]}")
+        if file[:thumbnail]
+          File.delete("#{CONFIG.thumbnails}/#{file[:thumbnail]}")
         end
+        SQL.exec "DELETE FROM files WHERE filename = ?", file[:filename]
+      rescue ex
+        LOGGER.error "#{ex.message}"
       end
     end
-    # Close directory to prevent `Too many open files (File::Error)` error.
-    # This is because the directory class is still saved on memory for some reason.
-    dir.close
   end
 
   def check_dependencies
@@ -77,7 +77,7 @@ module Utils
 
   # TODO:
   # def check_duplicate(upload)
-  #   file_checksum = SQL.query_all("SELECT checksum FROM #{CONFIG.dbTableName} WHERE original_filename = ?", upload.filename, as:String).try &.[0]?
+  #   file_checksum = SQL.query_all("SELECT checksum FROM files WHERE original_filename = ?", upload.filename, as:String).try &.[0]?
   #   if file_checksum.nil?
   #     return
   #   else
@@ -101,8 +101,9 @@ module Utils
   # TODO: Check if there are no other possibilities to get a random filename and exit
   def generate_filename
     filename = Random.base58(CONFIG.fileameLength)
+
     loop do
-      if SQL.query_one("SELECT COUNT(filename) FROM #{CONFIG.dbTableName} WHERE filename = ?", filename, as: Int32) == 0
+      if SQL.query_one("SELECT COUNT(filename) FROM files WHERE filename = ?", filename, as: Int32) == 0
         return filename
       else
         LOGGER.debug "Filename collision! Generating a new filename"
@@ -130,8 +131,9 @@ module Utils
       ])
     if process.exit_code == 0
       LOGGER.debug "Thumbnail for #{filename + extension} generated successfully"
-      SQL.exec "UPDATE #{CONFIG.dbTableName} SET thumbnail = ? WHERE filename = ?", filename + ".jpg", filename
+      SQL.exec "UPDATE files SET thumbnail = ? WHERE filename = ?", filename + ".jpg", filename
     else
+      # TODO: Add some sort of message when the thumbnail is not generated
     end
   end
 
@@ -159,11 +161,11 @@ module Utils
     # Delete file
     File.delete("#{CONFIG.files}/#{fileinfo[:filename]}#{fileinfo[:extension]}")
     if fileinfo[:thumbnail]
-      # Delete thumbnail
       File.delete("#{CONFIG.thumbnails}/#{fileinfo[:thumbnail]}")
     end
     # Delete entry from db
-    SQL.exec "DELETE FROM #{CONFIG.dbTableName} WHERE delete_key = ?", env.params.query["key"]
+    SQL.exec "DELETE FROM files WHERE delete_key = ?", env.params.query["key"]
+
     LOGGER.debug "File '#{fileinfo[:filename]}' was deleted using key '#{env.params.query["key"]}'}"
     msg("File '#{fileinfo[:filename]}' deleted successfully")
   end

@@ -27,14 +27,16 @@ module Routing
     # There is a better way to do this
     if env.request.resource == "/upload"
       begin
-        ip_info = SQL.query_all("SELECT ip, count, date FROM #{CONFIG.ipTableName} WHERE ip = ?", Utils.ip_address(env), as: {ip: String, count: Int32, date: Int32})[0]
+        ip_info = SQL.query_all("SELECT ip, count, date FROM ips WHERE ip = ?", Utils.ip_address(env), as: {ip: String, count: Int32, date: Int32})[0]
         time_since_first_upload = Time.utc.to_unix - ip_info[:date]
         time_until_unban = ip_info[:date] - Time.utc.to_unix + CONFIG.rateLimitPeriod
         if time_since_first_upload > CONFIG.rateLimitPeriod
-          SQL.exec "DELETE FROM #{CONFIG.ipTableName} WHERE ip = ?", ip_info[:ip]
+          SQL.exec "DELETE FROM ips WHERE ip = ?", ip_info[:ip]
         end
-        if ip_info[:count] >= CONFIG.filesPerIP && time_since_first_upload < CONFIG.rateLimitPeriod
-          halt env, status_code: 401, response: error401("Rate limited! Try again in #{time_until_unban} seconds")
+        if CONFIG.filesPerIP > 0
+          if ip_info[:count] >= CONFIG.filesPerIP && time_since_first_upload < CONFIG.rateLimitPeriod
+            halt env, status_code: 401, response: error401("Rate limited! Try again in #{time_until_unban} seconds")
+          end
         end
       rescue ex
         LOGGER.error "Error when trying to enforce rate limits: #{ex.message}"
@@ -46,14 +48,14 @@ module Routing
   def register_all
     get "/" do |env|
       host = Utils.host(env)
-      files_hosted = SQL.query_one "SELECT COUNT (filename) FROM #{CONFIG.dbTableName}", as: Int32
+      files_hosted = SQL.query_one "SELECT COUNT (filename) FROM files", as: Int32
       render "src/views/index.ecr"
     end
 
     get "/chatterino" do |env|
       host = Utils.host(env)
       protocol = Utils.protocol(env)
-      files_hosted = SQL.query_one "SELECT COUNT (filename) FROM #{CONFIG.dbTableName}", as: Int32
+      files_hosted = SQL.query_one "SELECT COUNT (filename) FROM files", as: Int32
       render "src/views/chatterino.ecr"
     end
 

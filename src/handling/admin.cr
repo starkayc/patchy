@@ -17,7 +17,7 @@ module Handling::Admin
       file = file.to_s
       begin
         fileinfo = SQL.query_one("SELECT filename, extension, thumbnail
-        FROM #{CONFIG.dbTableName}
+        FROM files
         WHERE filename = ?",
           file,
           as: {filename: String, extension: String, thumbnail: String | Nil})
@@ -29,7 +29,7 @@ module Handling::Admin
           File.delete("#{CONFIG.thumbnails}/#{fileinfo[:thumbnail]}")
         end
         # Delete entry from db
-        SQL.exec "DELETE FROM #{CONFIG.dbTableName} WHERE filename = ?", file
+        SQL.exec "DELETE FROM files WHERE filename = ?", file
         LOGGER.debug "File '#{fileinfo[:filename]}' was deleted"
         successfull_files << file
       rescue ex : DB::NoResultsError
@@ -61,7 +61,7 @@ module Handling::Admin
       item = item.to_s
       begin
         # Delete entry from db
-        SQL.exec "DELETE FROM #{CONFIG.ipTableName} WHERE ip = ?", item
+        SQL.exec "DELETE FROM ips WHERE ip = ?", item
         LOGGER.debug "Rate limit for '#{item}' was deleted"
         successfull << item
       rescue ex : DB::NoResultsError
@@ -95,7 +95,7 @@ module Handling::Admin
       begin
         fileinfo = SQL.query_one("SELECT original_filename, filename, extension,
 	  uploaded_at, checksum, ip, delete_key, thumbnail
-	  FROM #{CONFIG.dbTableName}
+	  FROM files
 	  WHERE filename = ?",
           item,
           as: {original_filename: String, filename: String, extension: String,

@@ -18,7 +18,7 @@ Kemal.config.port = CONFIG.port
 Kemal.config.shutdown_message = false
 Kemal.config.app_name = "file-uploader-crystal"
 # https://github.com/iv-org/invidious/blob/90e94d4e6cc126a8b7a091d12d7a5556bfe369d5/src/invidious.cr#L136C1-L136C61
-LOGGER = LogHandler.new(STDOUT, CONFIG.log_level)
+LOGGER = LogHandler.new(STDOUT, CONFIG.log_level, CONFIG.colorize_logs)
 # Give me a 128 bit CPU
 # MAX_FILES = 58**CONFIG.fileameLength
 SQL = DB.open("sqlite3://#{CONFIG.db}")

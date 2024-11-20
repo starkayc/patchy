@@ -1,4 +1,6 @@
 # https://github.com/iv-org/invidious/blob/master/src/invidious/helpers/logger.cr
+require "colorize"
+
 enum LogLevel
   All   = 0
   Trace = 1
@@ -11,7 +13,9 @@ enum LogLevel
 end
 
 class LogHandler < Kemal::BaseLogHandler
-  def initialize(@io : IO = STDOUT, @level = LogLevel::Debug)
+  def initialize(@io : IO = STDOUT, @level = LogLevel::Debug, use_color : Bool = true)
+    Colorize.enabled = use_color
+    Colorize.on_tty_only!
   end
 
   def call(context : HTTP::Server::Context)
@@ -35,28 +39,27 @@ class LogHandler < Kemal::BaseLogHandler
     context
   end
 
-  def puts(message : String)
-    @io << message << '\n'
-    @io.flush
-  end
-
   def write(message : String)
     @io << message
     @io.flush
   end
 
-  def set_log_level(level : String)
-    @level = LogLevel.parse(level)
-  end
-
-  def set_log_level(level : LogLevel)
-    @level = level
+  def color(level)
+    case level
+    when LogLevel::Trace then :cyan
+    when LogLevel::Debug then :green
+    when LogLevel::Info  then :white
+    when LogLevel::Warn  then :yellow
+    when LogLevel::Error then :red
+    when LogLevel::Fatal then :magenta
+    else                      :default
+    end
   end
 
   {% for level in %w(trace debug info warn error fatal) %}
     def {{level.id}}(message : String)
       if LogLevel::{{level.id.capitalize}} >= @level
-        puts("#{Time.utc} [{{level.id}}] #{message}")
+        puts("#{Time.utc} [{{level.id}}] #{message}".colorize(color(LogLevel::{{level.id.capitalize}})))
       end
     end
   {% end %}

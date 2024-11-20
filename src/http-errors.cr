@@ -1,44 +1,33 @@
+macro http_error(status_code, message)
+  env.response.content_type = "application/json"
+  env.response.status_code = {{status_code}}
+  error_message = {"error" => {{message}}}.to_json    
+  error_message
+end
+
 macro error400(message)
-    env.response.content_type = "application/json"
-    env.response.status_code = 400
-    error_message = {"error" => {{message}}}.to_json
-    error_message
-  end
+  http_error(400, {{message}})
+end
 
 macro error401(message)
-    env.response.content_type = "application/json"
-    env.response.status_code = 401
-    error_message = {"error" => {{message}}}.to_json
-    error_message
-  end
+  http_error(401, {{message}})
+end
 
 macro error403(message)
-    env.response.content_type = "application/json"
-    env.response.status_code = 403
-    error_message = {"error" => {{message}}}.to_json
-    error_message
-  end
+  http_error(403, {{message}})
+end
 
 macro error404(message)
-    env.response.content_type = "application/json"
-    env.response.status_code = 404
-    error_message = {"error" => {{message}}}.to_json
-    error_message
-  end
+  http_error(404, {{message}})
+end
 
 macro error413(message)
-    env.response.content_type = "application/json"
-    env.response.status_code = 413
-    error_message = {"error" => {{message}}}.to_json
-    error_message
-  end
+  http_error(413, {{message}})
+end
 
 macro error500(message)
-    env.response.content_type = "application/json"
-    env.response.status_code = 500
-    error_message = {"error" => {{message}}}.to_json
-    error_message
-  end
+  http_error(500, {{message}})
+end
 
 macro msg(message)
   env.response.content_type = "application/json"
