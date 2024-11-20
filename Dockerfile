@@ -1,5 +1,5 @@
 # Based on https://github.com/iv-org/invidious/blob/master/docker/Dockerfile
-FROM crystallang/crystal:1.13.2-alpine AS builder
+FROM crystallang/crystal:1.14.0-alpine AS builder
 
 RUN apk add --no-cache sqlite-static yaml-static
 
@@ -19,8 +19,8 @@ RUN crystal build ./src/file-uploader-crystal.cr \
 	--release \
 	--static --warnings all
 
-RUN apk add --no-cache tini
-FROM alpine:3.18
+FROM alpine:3.20
+RUN apk add --no-cache tini ffmpeg
 WORKDIR /file-uploader-crystal
 RUN addgroup -g 1000 -S file-uploader-crystal && \
 	adduser -u 1000 -S file-uploader-crystal -G file-uploader-crystal

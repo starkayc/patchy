@@ -1,0 +1,12 @@
+services:
+  file-uploader:
+    image: git.nadeko.net/fijxu/file-uploader-crystal:latest
+    # If you want to use a custom config file, you can mount it here.
+    volumes:
+      # - ./config/config.yml:/file-uploader-crystal/config/config.yml
+      - ./files:/file-uploader-crystal/files
+      - ./thumbnails:/file-uploader-crystal/thumbnails
+      - ./db.sqlite3:/file-uploader-crystal/db.sqlite3
+      - ./torexitnodes.txt:/file-uploader-crystal/torexitnodes.txt
+    ports:
+      - 127.0.0.1:8080:8080

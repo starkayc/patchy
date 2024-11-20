@@ -222,7 +222,7 @@ module Utils
           begin
             File.open(CONFIG.torExitNodesFile, "w") { |output| IO.copy(res.body_io, output) }
           rescue ex
-            LOGGER.error "Failed to write to file: #{ex.message}"
+            LOGGER.error "Failed to save exit nodes list: #{ex.message}"
           end
         else
           LOGGER.error "Failed to retrieve exit nodes list. Status Code: #{res.status_code}"

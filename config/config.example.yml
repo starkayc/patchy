@@ -3,7 +3,6 @@ files: "./files"
 thumbnails: "./thumbnails"
 generateThumbnails: true
 db: "./db.sqlite3"
-dbTableName: "files"
 adminEnabled: true
 adminApiKey: "asd"
 fileameLength: 3
@@ -18,13 +17,12 @@ torExitNodesFile: "./torexitnodes.txt"
 torMessage: "TOR IS BLOCKED!"
 # Set this to 0 to disable rate limiting
 filesPerIP: 2
-ipTableName: "ips"
 rateLimitPeriod: 20
 rateLimitMessage: ""
 # If you define the unix socket, it will only listen on the socket and not the port.
 #unix_socket: "/tmp/file-uploader.sock"
 # In days
-deleteFilesAfter: 1
+deleteFilesAfter: 7
 # In seconds
 deleteFilesCheck: 1600
 deleteKeyLength: 4
