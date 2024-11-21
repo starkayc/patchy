@@ -17,6 +17,7 @@ module Jobs
     if !CONFIG.blockTorAddresses
       return
     end
+    LOGGER.info("Blocking Tor exit nodes")
     spawn do
       loop do
         Utils.retrieve_tor_exit_nodes

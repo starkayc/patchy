@@ -42,7 +42,7 @@ module Handling
         return error401("Extension '#{extension}' is not allowed")
       end
       filename = Utils.generate_filename
-      file_path = ::File.join ["#{CONFIG.files}", filename + extension]
+      file_path = "#{CONFIG.files}/#{filename}#{extension}"
       File.open(file_path, "w") do |output|
         IO.copy(upload.body, output)
       end
@@ -119,7 +119,7 @@ module Handling
       if CONFIG.deleteKeyLength > 0
         delete_key = Random.base58(CONFIG.deleteKeyLength)
       end
-      file_path = ::File.join ["#{CONFIG.files}", filename + extension]
+      file_path = "#{CONFIG.files}/#{filename}#{extension}"
       File.open(file_path, "w") do |output|
         begin
           HTTP::Client.get(url) do |res|
@@ -136,7 +136,7 @@ module Handling
       if extension.empty?
         extension = Utils.detect_extension(file_path)
         File.rename(file_path, file_path + extension)
-        file_path = ::File.join ["#{CONFIG.files}", filename + extension]
+        file_path = "#{CONFIG.files}/#{filename}#{extension}"
       end
       # The second one is faster and it uses less memory
       # original_filename = URI.parse("https://ayaya.beauty/PqC").path.split("/").last
@@ -202,7 +202,7 @@ module Handling
     if CONFIG.deleteKeyLength > 0
       delete_key = Random.base58(CONFIG.deleteKeyLength)
     end
-    file_path = ::File.join ["#{CONFIG.files}", filename + extension]
+    file_path = "#{CONFIG.files}/#{filename}#{extension}"
     File.open(file_path, "w") do |output|
       begin
         # TODO: Connect timeout to prevent possible Denial of Service to the external website spamming requests
@@ -219,7 +219,7 @@ module Handling
     if extension.empty?
       extension = Utils.detect_extension(file_path)
       File.rename(file_path, file_path + extension)
-      file_path = ::File.join ["#{CONFIG.files}", filename + extension]
+      file_path = "#{CONFIG.files}/#{filename}#{extension}"
     end
     # The second one is faster and it uses less memory
     # original_filename = URI.parse("https://ayaya.beauty/PqC").path.split("/").last
@@ -269,25 +269,16 @@ module Handling
     begin
       protocol = Utils.protocol(env)
       host = Utils.host(env)
-      fileinfo = SQL.query_all("SELECT filename, original_filename, uploaded_at, extension, checksum, thumbnail
+      fileinfo = SQL.query_one?("SELECT filename, original_filename, uploaded_at, extension, checksum, thumbnail
       FROM files
       WHERE filename = ?",
         env.params.url["filename"].split(".").first,
-        as: {filename: String, ofilename: String, up_at: String, ext: String, checksum: String, thumbnail: String | Nil})[0]
-      #   Benchmark.ips do |x|
-      #     x.report("header multiple") { headers(env, {"Content-Disposition" => "inline; filename*=UTF-8''#{fileinfo[:ofilename]}",
-      # 	"Last-Modified" => "#{fileinfo[:up_at]}",
-      # 	"ETag" => "#{fileinfo[:checksum]}"}) }
-      #     x.report("shorter sleep") do
-      # 		env.response.headers["Content-Disposition"] = "inline; filename*=UTF-8''#{fileinfo[:ofilename]}"
-      # 		env.response.headers["Last-Modified"] = "#{fileinfo[:up_at]}"
-      # 		env.response.headers["ETag"] = "#{fileinfo[:checksum]}"
-      # 	end
-      #   end
-      # `env.response.headers` is faster than `headers(env, Hash(String, String))`
-      # https://github.com/kemalcr/kemal/blob/3243b8e0e03568ad3bd9f0ad6f445c871605b821/src/kemal/helpers/helpers.cr#L102C1-L104C4
+        as: {filename: String, ofilename: String, up_at: String, ext: String, checksum: String, thumbnail: String | Nil})
+      if fileinfo.nil?
+        return error404("File '#{env.params.url["filename"]}' does not exist")
+      end
       env.response.headers["Content-Disposition"] = "inline; filename*=UTF-8''#{fileinfo[:ofilename]}"
-      #   env.response.headers["Last-Modified"] = "#{fileinfo[:up_at]}"
+      # env.response.headers["Last-Modified"] = "#{fileinfo[:up_at]}"
       env.response.headers["ETag"] = "#{fileinfo[:checksum]}"
 
       CONFIG.opengraphUseragents.each do |useragent|
@@ -310,8 +301,8 @@ module Handling
       end
       send_file env, "#{CONFIG.files}/#{fileinfo[:filename]}#{fileinfo[:ext]}"
     rescue ex
-      LOGGER.debug "File '#{env.params.url["filename"]}' does not exist: #{ex.message}"
-      return error403("File '#{env.params.url["filename"]}' does not exist")
+      LOGGER.debug "Error when retrieving file '#{env.params.url["filename"]}': #{ex.message}"
+      return error500("Error when retrieving file '#{env.params.url["filename"]}'")
     end
   end
 
@@ -331,7 +322,7 @@ module Handling
         json.object do
           json.field "stats" do
             json.object do
-              json.field "filesHosted", SQL.query_one "SELECT COUNT (filename) FROM files", as: Int32
+              json.field "filesHosted", SQL.query_one? "SELECT COUNT (filename) FROM files", as: Int32
               json.field "maxUploadSize", CONFIG.size_limit
               json.field "thumbnailGeneration", CONFIG.generateThumbnails
               json.field "filenameLength", CONFIG.fileameLength
