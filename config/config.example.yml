@@ -2,7 +2,7 @@ colorize_logs: true
 files: "./files"
 thumbnails: "./thumbnails"
 generateThumbnails: true
-db: "./db.sqlite3"
+db: "./db/db.sqlite3"
 adminEnabled: true
 adminApiKey: "asd"
 fileameLength: 3

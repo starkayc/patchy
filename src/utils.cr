@@ -60,6 +60,8 @@ module Utils
         SQL.exec "DELETE FROM files WHERE filename = ?", file[:filename]
       rescue ex
         LOGGER.error "#{ex.message}"
+        # Also delete the file entry from the DB if it doesn't exist.
+        SQL.exec "DELETE FROM files WHERE filename = ?", file[:filename]
       end
     end
   end
