@@ -37,7 +37,7 @@ module Handling::Admin
         failed_files << file
       rescue ex
         LOGGER.error "Unknown error: #{ex.message}"
-        error500 "Unknown error: #{ex.message}"
+        http_error 500,"Unknown error: #{ex.message}"
       end
     end
     json = JSON.build do |j|
@@ -69,7 +69,7 @@ module Handling::Admin
         failed << item
       rescue ex
         LOGGER.error "Unknown error: #{ex.message}"
-        error500 "Unknown error: #{ex.message}"
+        http_error 500, "Unknown error: #{ex.message}"
       end
     end
     json = JSON.build do |j|
@@ -107,7 +107,7 @@ module Handling::Admin
         failed << item
       rescue ex
         LOGGER.error "Unknown error: #{ex.message}"
-        error500 "Unknown error: #{ex.message}"
+        http_error 500,"Unknown error: #{ex.message}"
       end
     end
     json = JSON.build do |j|

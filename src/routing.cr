@@ -12,7 +12,31 @@ module Routing
 
   before_post "/api/admin/*" do |env|
     if env.request.headers.try &.["X-Api-Key"]? != CONFIG.adminApiKey || nil
-      halt env, status_code: 401, response: error401("Wrong API Key")
+      halt env, status_code: 401, response: http_error 401, "Wrong API Key"
+    end
+  end
+
+  before_post "/upload" do |env|
+    begin
+      ip_info = SQL.query_one?("SELECT ip, count, date FROM ips WHERE ip = ?", Utils.ip_address(env), as: {ip: String, count: Int32, date: Int32})
+    rescue ex
+      LOGGER.error "Error when trying to enforce rate limits: #{ex.message}"
+      next
+    end
+
+    if ip_info.nil?
+      next
+    end
+
+    time_since_first_upload = Time.utc.to_unix - ip_info[:date]
+    time_until_unban = ip_info[:date] - Time.utc.to_unix + CONFIG.rateLimitPeriod
+    if time_since_first_upload > CONFIG.rateLimitPeriod
+      SQL.exec "DELETE FROM ips WHERE ip = ?", ip_info[:ip]
+    end
+    if CONFIG.filesPerIP > 0
+      if ip_info[:count] >= CONFIG.filesPerIP && time_since_first_upload < CONFIG.rateLimitPeriod
+        halt env, status_code: 401, response: http_error 401, "Rate limited! Try again in #{time_until_unban} seconds"
+      end
     end
   end
 
@@ -22,7 +46,7 @@ module Routing
       next
     end
     if CONFIG.blockTorAddresses && @@exit_nodes.includes?(Utils.ip_address(env))
-      halt env, status_code: 401, response: error401(CONFIG.torMessage)
+      halt env, status_code: 401, response: http_error 401, CONFIG.torMessage
     end
   end
 
@@ -40,28 +64,6 @@ module Routing
     end
 
     post "/upload" do |env|
-      begin
-        ip_info = SQL.query_one?("SELECT ip, count, date FROM ips WHERE ip = ?", Utils.ip_address(env), as: {ip: String, count: Int32, date: Int32})
-      rescue ex
-        LOGGER.error "Error when trying to enforce rate limits: #{ex.message}"
-        next
-      end
-
-      if ip_info.nil?
-        next
-      end
-
-      time_since_first_upload = Time.utc.to_unix - ip_info[:date]
-      time_until_unban = ip_info[:date] - Time.utc.to_unix + CONFIG.rateLimitPeriod
-      if time_since_first_upload > CONFIG.rateLimitPeriod
-        SQL.exec "DELETE FROM ips WHERE ip = ?", ip_info[:ip]
-      end
-      if CONFIG.filesPerIP > 0
-        if ip_info[:count] >= CONFIG.filesPerIP && time_since_first_upload < CONFIG.rateLimitPeriod
-          halt env, status_code: 401, response: error401("Rate limited! Try again in #{time_until_unban} seconds")
-        end
-      end
-
       Handling.upload(env)
     end
 
@@ -121,5 +123,9 @@ module Routing
 
   get "/api/admin/torexitnodes" do |env|
     Handling::Admin.retrieve_tor_exit_nodes(env, @@exit_nodes)
+  end
+
+  error 404 do
+    "File not found"
   end
 end

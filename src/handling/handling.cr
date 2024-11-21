@@ -18,7 +18,7 @@ module Handling
     # which is inspecting the file directly (If I'm not wrong).
     if CONFIG.size_limit > 0
       if env.request.headers["Content-Length"].to_i > 1048576*CONFIG.size_limit
-        return error413("File is too big. The maximum size allowed is #{CONFIG.size_limit}MiB")
+        return http_error 413, "File is too big. The maximum size allowed is #{CONFIG.size_limit}MiB"
       end
     end
     filename = ""
@@ -33,13 +33,13 @@ module Handling
     HTTP::FormData.parse(env.request) do |upload|
       if upload.filename.nil? || upload.filename.to_s.empty?
         LOGGER.debug "No file provided by the user"
-        return error403("No file provided")
+        return http_error 403, "No file provided"
       end
       # TODO: upload.body is emptied when is copied or read
       # Utils.check_duplicate(upload.dup)
       extension = File.extname("#{upload.filename}")
       if CONFIG.blockedExtensions.includes?(extension.split(".")[1])
-        return error401("Extension '#{extension}' is not allowed")
+        return http_error 401, "Extension '#{extension}' is not allowed"
       end
       filename = Utils.generate_filename
       file_path = "#{CONFIG.files}/#{filename}#{extension}"
@@ -70,7 +70,7 @@ module Handling
       SQL.exec "UPDATE ips SET count = count + 1 WHERE ip = ('#{ip_address}')"
     rescue ex
       LOGGER.error "An error ocurred when trying to insert the data into the DB: #{ex.message}"
-      return error500("An error ocurred when trying to insert the data into the DB")
+      return http_error 500, "An error ocurred when trying to insert the data into the DB"
     end
     json = JSON.build do |j|
       j.object do
@@ -99,10 +99,10 @@ module Handling
       files = env.params.json["files"].as((Array(JSON::Any)))
     rescue ex : JSON::ParseException
       LOGGER.error "Body malformed: #{ex.message}"
-      return error400 "Body malformed: #{ex.message}"
+      return http_error 400, "Body malformed: #{ex.message}"
     rescue ex
       LOGGER.error "Unknown error: #{ex.message}"
-      return error500 "Unknown error"
+      return http_error 500, "Unknown error"
     end
     successfull_files = [] of NamedTuple(filename: String, extension: String, original_filename: String, checksum: String, delete_key: String | Nil)
     failed_files = [] of String
@@ -127,7 +127,7 @@ module Handling
           end
         rescue ex
           LOGGER.debug "Failed to download file '#{url}': #{ex.message}"
-          return error403("Failed to download file '#{url}'")
+          return http_error 403, "Failed to download file '#{url}'"
           failed_files << url
         end
       end
@@ -158,7 +158,7 @@ module Handling
                               checksum:          checksum}
       rescue ex
         LOGGER.error "An error ocurred when trying to insert the data into the DB: #{ex.message}"
-        return error500("An error ocurred when trying to insert the data into the DB")
+        return http_error 500, "An error ocurred when trying to insert the data into the DB"
       end
     end
     json = JSON.build do |j|
@@ -212,7 +212,7 @@ module Handling
         end
       rescue ex
         LOGGER.debug "Failed to download file '#{url}': #{ex.message}"
-        return error403("Failed to download file '#{url}': #{ex.message}")
+        return http_error 403, "Failed to download file '#{url}': #{ex.message}"
         failed_files << url
       end
     end
@@ -241,7 +241,7 @@ module Handling
                             checksum:          checksum}
     rescue ex
       LOGGER.error "An error ocurred when trying to insert the data into the DB: #{ex.message}"
-      return error500("An error ocurred when trying to insert the data into the DB")
+      return http_error 500, "An error ocurred when trying to insert the data into the DB"
     end
     json = JSON.build do |j|
       j.array do
@@ -266,25 +266,30 @@ module Handling
   end
 
   def retrieve_file(env)
+    protocol = Utils.protocol(env)
+    host = Utils.host(env)
     begin
-      protocol = Utils.protocol(env)
-      host = Utils.host(env)
       fileinfo = SQL.query_one?("SELECT filename, original_filename, uploaded_at, extension, checksum, thumbnail
       FROM files
       WHERE filename = ?",
         env.params.url["filename"].split(".").first,
         as: {filename: String, ofilename: String, up_at: String, ext: String, checksum: String, thumbnail: String | Nil})
       if fileinfo.nil?
-        return error404("File '#{env.params.url["filename"]}' does not exist")
+        # TODO: Switch this to 404, if I use 404, it will use the kemal error page (ANOYING!)
+        return http_error 418, "File '#{env.params.url["filename"]}' does not exist"
       end
-      env.response.headers["Content-Disposition"] = "inline; filename*=UTF-8''#{fileinfo[:ofilename]}"
-      # env.response.headers["Last-Modified"] = "#{fileinfo[:up_at]}"
-      env.response.headers["ETag"] = "#{fileinfo[:checksum]}"
+    rescue ex
+      LOGGER.debug "Error when retrieving file '#{env.params.url["filename"]}': #{ex.message}"
+      return http_error 500, "Error when retrieving file '#{env.params.url["filename"]}'"
+    end
+    env.response.headers["Content-Disposition"] = "inline; filename*=UTF-8''#{fileinfo[:ofilename]}"
+    # env.response.headers["Last-Modified"] = "#{fileinfo[:up_at]}"
+    env.response.headers["ETag"] = "#{fileinfo[:checksum]}"
 
-      CONFIG.opengraphUseragents.each do |useragent|
-        if env.request.headers.try &.["User-Agent"].includes?(useragent)
-          env.response.content_type = "text/html"
-          return %(
+    CONFIG.opengraphUseragents.each do |useragent|
+      if env.request.headers.try &.["User-Agent"].includes?(useragent)
+        env.response.content_type = "text/html"
+        return %(
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -297,13 +302,9 @@ module Handling
 </head>
 </html>
 )
-        end
       end
-      send_file env, "#{CONFIG.files}/#{fileinfo[:filename]}#{fileinfo[:ext]}"
-    rescue ex
-      LOGGER.debug "Error when retrieving file '#{env.params.url["filename"]}': #{ex.message}"
-      return error500("Error when retrieving file '#{env.params.url["filename"]}'")
     end
+    send_file env, "#{CONFIG.files}/#{fileinfo[:filename]}#{fileinfo[:ext]}"
   end
 
   def retrieve_thumbnail(env)
@@ -311,7 +312,7 @@ module Handling
       send_file env, "#{CONFIG.thumbnails}/#{env.params.url["thumbnail"]}"
     rescue ex
       LOGGER.debug "Thumbnail '#{env.params.url["thumbnail"]}' does not exist: #{ex.message}"
-      return error403("Thumbnail '#{env.params.url["thumbnail"]}' does not exist")
+      return http_error 403, "Thumbnail '#{env.params.url["thumbnail"]}' does not exist"
     end
   end
 
@@ -333,7 +334,7 @@ module Handling
       end
     rescue ex
       LOGGER.error "Unknown error: #{ex.message}"
-      return error500("Unknown error")
+      return http_error 500, "Unknown error"
     end
     json_data
   end
@@ -359,11 +360,11 @@ module Handling
         return msg("File '#{fileinfo[:filename]}' deleted successfully")
       rescue ex
         LOGGER.error("Unknown error: #{ex.message}")
-        return error500("Unknown error")
+        return http_error 500, "Unknown error"
       end
     else
       LOGGER.debug "Key '#{env.params.query["key"]}' does not exist"
-      return error401("Delete key '#{env.params.query["key"]}' does not exist. No files were deleted")
+      return http_error 401, "Delete key '#{env.params.query["key"]}' does not exist. No files were deleted"
     end
   end
 
