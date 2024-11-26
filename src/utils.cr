@@ -115,6 +115,12 @@ module Utils
   end
 
   def generate_thumbnail(filename, extension)
+    exts = [".jpg", ".jpeg", ".png", ".gif", ".bmp", ".tiff", ".webp", ".heic", ".jxl", ".avif", ".crw", ".dng",
+            ".mp4", ".mkv", ".webm", ".avi", ".wmv", ".flv", "m4v", ".mov", ".amv", ".3gp", ".mpg", ".mpeg", ".yuv"]
+	# To prevent thumbnail generation on non image extensions
+    return if exts.none? do |ext|
+      extension.downcase.includes?(ext)
+    end
     # Disable generation if false
     return if !CONFIG.generateThumbnails || !CONFIG.thumbnails
     LOGGER.debug "Generating thumbnail for #{filename + extension} in background"

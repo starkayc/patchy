@@ -85,5 +85,12 @@ class Config
       puts "Config: fileameLength cannot be #{config.fileameLength}"
       exit(1)
     end
+
+	if config.files.ends_with?('/')
+      config.files = config.files.chomp('/')
+    end
+	if config.thumbnails.ends_with?('/')
+		config.thumbnails = config.thumbnails.chomp('/')
+	end
   end
 end
