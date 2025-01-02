@@ -25,8 +25,10 @@ class Config
   property fileameLength : Int32 = 3
   # In MiB
   property size_limit : Int16 = 512
-  # TCP port
+  # Port on which the uploader will bind
   property port : Int32 = 8080
+  # IP address on which the uploader will bind
+  property host : String = "127.0.0.1"
   # A file path where do you want to place a unix socket (THIS WILL DISABLE ACCESS
   # BY IP ADDRESS)
   property unix_socket : String?
