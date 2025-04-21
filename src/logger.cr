@@ -25,15 +25,6 @@ class LogHandler < Kemal::BaseLogHandler
     # Default: full path with parameters
     requested_url = context.request.resource
 
-    # Try not to log search queries passed as GET parameters during normal use
-    # (They will still be logged if log level is 'Debug' or 'Trace')
-    if @level > LogLevel::Debug && (
-         requested_url.downcase.includes?("search") || requested_url.downcase.includes?("q=")
-       )
-      # Log only the path
-      requested_url = context.request.path
-    end
-
     info("#{context.response.status_code} #{context.request.method} #{requested_url} #{elapsed_text}")
 
     context

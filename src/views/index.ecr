@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title> <%= host %> </title>
-    <link rel="stylesheet" href="styles.css">
-    <link rel="icon" href="./favicon.gif" type="image/gif" />
+    <link rel="stylesheet" href="/styles.css">
+    <link rel="icon" href="./favicon.png" type="image/gif" />
     <script src="script.js"></script>
 </head>
 <body>
@@ -21,24 +21,22 @@
     </div>
     <div>
         <div style="text-align:center;">
-        <p>
-            <a href='./chatterino'>Chatterino Config</a> | 
-			<a href='./sharex.sxcu'>ShareX Config</a> | 
-			<a href='https://codeberg.org/Fijxu/file-uploader-crystal'>
-			file-uploader-crystal (BETA <%= CURRENT_TAG %> - <%= CURRENT_VERSION %> @ <%= CURRENT_BRANCH %>)
-			</a>
-        </p>
-        <p>Archivos alojados: <%= files_hosted %></p>
-        <% if CONFIG.blockTorAddresses %>
-        <p style="color: red"><%= CONFIG.torMessage %></p>
-        <% end %>
-		<% if !CONFIG.alternativeDomains.empty? %>
-		<p>
-		<% CONFIG.alternativeDomains.each do | domain | %>
-			<a href="https://<%= domain %>"><%= domain %></a> 
-		<% end %>
-        </p>
-        <% end %>
+            <p>
+                <a href='/info/chatterino'>Chatterino Config</a> |
+                <a href='/info/sharex.sxcu'>ShareX Config</a> |
+                <a href='https://codeberg.org/Fijxu/file-uploader-crystal'>
+                file-uploader-crystal (BETA <%= CURRENT_TAG %> - <%= CURRENT_VERSION %> @ <%= CURRENT_BRANCH %>)
+                </a>
+            </p>
+            <p>Archivos alojados: <%= files_hosted %></p>
+            <% if !CONFIG.alternative_domains.empty? %>
+            <p>
+            <% CONFIG.alternative_domains.each do | domain | %>
+                <a href="https://<%= domain %>"><%= domain %></a>
+            <% end %>
+            </p>
+            <% end %>
         </div>
+    </div>
 </body>
 </html>

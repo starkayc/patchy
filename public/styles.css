@@ -18,10 +18,7 @@
 
 html {
 	font-family: "FG";
-	background-image: linear-gradient(to bottom,
-			rgba(11, 11, 11, 0.92),
-			rgba(11, 11, 11, 0.92)),
-		url(./bliss-small.avif);
+	background: #111111;
 	background-attachment: fixed;
 	background-repeat: no-repeat;
 	background-size: cover;
@@ -29,8 +26,6 @@ html {
 
 
 body {
-	/*     font-family: Arial, sans-serif; */
-	/*     background-color: #111; */
 	margin: 0;
 	padding: 20px;
 }
@@ -53,11 +48,11 @@ h1 {
 
 a {
 	text-decoration: none;
+	color: #ffb6c1
 }
 
 .bottom {
 	font-size: 0.9em;
-	/*    margin-top: 1ch;*/
 	flex: 1;
 	text-align: center;
 }
@@ -73,31 +68,25 @@ a {
 .container {
 	max-width: 800px;
 	margin: auto;
-	/*     background: white; */
-	/*! padding: 20px; */
 	border-radius: 0px;
-	/*! box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); */
 }
 
+.container>img {
+	max-width: 100%;
+	max-height: 500px
+}
 
 #drop-area {
-	/*! border: 2px solid #00ff00; */
-	/*! border-radius: 6px; */
-	/*! padding-left: 10px; */
-	/*! padding-right: 10px; */
 	text-align: center;
 	position: relative;
 	width: fit-content;
 	margin: 0 auto;
-	/* Center the element */
 	display: block;
-	/* Ensure it behaves as a block-level element */
 	background: rgba(202, 230, 190, .75);
 	border: 1px solid #b7d1a0;
 	border-radius: 4px;
 	color: #468847;
 	cursor: pointer;
-	/*! display: inline-block; */
 	font-size: 24px;
 	padding: 28px 48px;
 	text-shadow: 0 1px hsla(0, 0%, 100%, .5);
@@ -107,11 +96,9 @@ a {
 .button {
 	display: inline-block;
 	padding: 10px 20px;
-	/*     background: #; */
 	color: white;
 	border-radius: 5px;
 	cursor: pointer;
-	/*     margin-top: 10px; */
 }
 
 .upload-status {
@@ -128,101 +115,59 @@ nav>ul {
 
 #upload-status {
 	margin: 20px;
-	/* Adjust as needed */
 }
 
 .upload-status {
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
-	border: 2px solid #999;
-	/* Optional styling for the status box */
+	border: 1px solid #ffffff;
 	padding: 5px;
-	/* Optional padding */
-	/*! border-radius: 6px; */
-	/* Optional rounded corners */
-	/*! background-color: #f9f9f9; */
-	/* Optional background color */
 }
 
 .link-container {
 	display: flex;
 	align-items: center;
 	margin-left: auto;
-	/* Pushes the link and button to the right */
 }
 
 .link {
 	color: #ffb6c1;
 	text-decoration: none;
-	/* Remove underline from link */
 	margin-right: 5px;
-	/* Space between link and button */
 }
 
 .link:hover {
 	text-decoration: underline;
-	/* Optional: underline on hover */
+}
+
+.button {
+	display: inline;
+	color: rgb(255, 255, 255);
+	border: none;
+	border-radius: 3px;
+	padding: 5px 10px;
+	cursor: pointer;
+	font-weight: bold;
 }
 
 .copy-button {
-	display: inline;
-	background-color: #7a6fff;
-	/* Button background color */
-	color: white;
-	/* Button text color */
-	border: none;
-	/* Remove border */
-	border-radius: 3px;
-	/* Rounded corners for the button */
-	padding: 5px 10px;
-	/* Button padding */
-	cursor: pointer;
-	/* Pointer cursor on hover */
-	font-weight: bold;
+	background-color: #1e8a1a;
 }
 
 .delete-button {
-	display: inline;
-	background-color: #ff6f6f;
-	/* Button background color */
-	color: white;
-	/* Button text color */
-	border: none;
-	/* Remove border */
-	border-radius: 3px;
-	/* Rounded corners for the button */
-	padding: 5px 10px;
-	/* Button padding */
-	cursor: pointer;
-	/* Pointer cursor on hover */
-	margin-left: 6px;
-	font-weight: bold;
+	background-color: #b83434;
+	margin-left: 6px
 }
 
-
 .copy-button:hover {
-	background-color: #6057ce;
-	/* Darker shade on hover */
+	background-color: #156412;
 }
 
 .delete-button:hover {
-	background-color: #ce5757;
-	/* Darker shade on hover */
+	background-color: #912a2a;
 }
 
 .status {
 	color: rgb(255, 132, 0);
-}
-
-a:link {
-	color: #ffb6c1
-}
-
-a:visited {
-	color: #ffb6c1
-}
-
-a:hover {
-	color: #ffb6c1
 }

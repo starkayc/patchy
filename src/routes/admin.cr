@@ -1,6 +1,4 @@
-require "../http-errors"
-
-module Handling::Admin
+module Routes::Admin
   extend self
 
   #   private macro json_fill(named_tuple, field_name)
@@ -37,7 +35,7 @@ module Handling::Admin
         failed_files << file
       rescue ex
         LOGGER.error "Unknown error: #{ex.message}"
-        http_error 500,"Unknown error: #{ex.message}"
+        http_error 500, "Unknown error: #{ex.message}"
       end
     end
     json = JSON.build do |j|
@@ -69,7 +67,7 @@ module Handling::Admin
         failed << item
       rescue ex
         LOGGER.error "Unknown error: #{ex.message}"
-        http_error 500, "Unknown error: #{ex.message}"
+        Macros.ee 500, "Unknown error: #{ex.message}"
       end
     end
     json = JSON.build do |j|
@@ -107,7 +105,7 @@ module Handling::Admin
         failed << item
       rescue ex
         LOGGER.error "Unknown error: #{ex.message}"
-        http_error 500,"Unknown error: #{ex.message}"
+        Macros.ee 500, "Unknown error: #{ex.message}"
       end
     end
     json = JSON.build do |j|

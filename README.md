@@ -1,5 +1,8 @@
 # file-uploader
 
+> [!WARNING]  
+> Project being rewritten, some features like the admin API and some upload endpoints are unavailable on 0.9.5
+
 Simple file uploader made on Crystal.
 ~~I'm making this to replace my current File uploader hosted on https://ayaya.beauty which uses https://github.com/nokonoko/uguu~~
 Already replaced lol.
@@ -9,7 +12,7 @@ Already replaced lol.
 - Temporary file uploads like Uguu
 - File deletion link (not available in frontend for now)
 - Chatterino and ShareX support
-- Video Thumbnails for Chatterino and FrankerFaceZ (Requires `ffmpeg` to be installed, can be disabled.)
+- Video Thumbnails for Chatterino and FrankerFaceZ (Requires `ffmpeg` to be installed, disabled by default)
 - Rate Limiting
 - [Small Admin API](./src/handling/admin.cr) that allows you to delete files, reset rate limits and more (Needs to be enabled in the configuration)
 - Unix socket support if you don't want to deal with all the TCP overhead
@@ -37,7 +40,7 @@ server {
         proxy_pass http://127.0.0.1:8080;
         # This if you want to use a UNIX socket instead
 		#proxy_pass http://unix:/tmp/file-uploader.sock;
-        proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;
+        proxy_set_header X-Real-IP   $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
         proxy_set_header X-Forwarded-Host  $host;
 		proxy_pass_request_headers      on;
@@ -69,20 +72,3 @@ WorkingDirectory=%h/file-uploader-crystal/
 [Install]
 WantedBy=default.target
 ```
-
-## TODO
-
-- ~~Add file size limit~~ ADDED
-- ~~Fix error when accessing `http://127.0.0.1:8080` with an empty DB.~~ Fixed somehow.
-- Better frontend...
-- ~~Disable file deletion if `deleteFilesCheck` or `deleteFilesAfter` is set to `0`~~ DONE
-- ~~Disable delete key if `deleteKeyLength` is `0`~~ DONE (But I think there is a better way to do it)
-- ~~Exit if `fileameLength` is `0`~~ DONE
-- ~~Disable file limit if `size_limit` is `0`~~ DONE
-- ~~Prevent files from being overwritten in the event of a name collision~~ DONE
-- Dockerfile and Docker image (Crystal doesn't has dependency hell like other languages so is not really necessary to do, but useful for people that want instant deploy)
-- Custom file expiration using headers (Like rustypaste)
-- Small CLI to upload files (like `rpaste` from rustypaste)
-- Add more endpoints to Admin API
-
-- 

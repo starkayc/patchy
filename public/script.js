@@ -89,18 +89,18 @@ document.addEventListener("DOMContentLoaded", () => {
     uploadContainer.className = "upload-status"; // Use the existing CSS class for styling
     uploadContainer.appendChild(uploadText);
     uploadContainer.appendChild(statusLink);
-	buttons.appendChild(copyButton)
-	buttons.appendChild(deleteButton)
-	uploadContainer.appendChild(buttons)
+    buttons.appendChild(copyButton)
+    buttons.appendChild(deleteButton)
+    uploadContainer.appendChild(buttons)
     uploadStatus.appendChild(uploadContainer);
 
     // Update upload text
     uploadText.innerHTML = "0%";
     uploadText.className = "percent";
     statusLink.className = "status";
-    copyButton.className = "copy-button"; // Add class for styling
+    copyButton.className = "button copy-button"; // Add class for styling
     copyButton.innerHTML = "Copiar"; // Set button text
-    deleteButton.className = "delete-button";
+    deleteButton.className = "button delete-button";
     deleteButton.innerHTML = "Borrar";
     copyButton.style.display = "none";
     deleteButton.style.display = "none";

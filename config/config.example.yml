@@ -1,11 +1,11 @@
 colorize_logs: true
 files: "./files"
 thumbnails: "./thumbnails"
-generateThumbnails: true
+generate_thumbnails: true
 db: "./db/db.sqlite3"
 adminEnabled: true
 adminApiKey: "asd"
-fileameLength: 3
+filename_length: 3
 # In MiB
 size_limit: 512
 port: 8080
@@ -42,5 +42,5 @@ opengraphUseragents:
   - "Mastodon/"
 
 # You can leave it empty, or add your own domains.
-alternativeDomains:
+alternative_domains:
   - "example.com"
