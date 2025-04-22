@@ -1,8 +1,7 @@
 name: 'File-uploader-crystal CI'
 
 on:
-  # workflow_dispatch:
-  #   inputs: {}
+  workflow_dispatch:
   schedule:
     - cron: '0 7 * * 0'
   push:
@@ -28,14 +27,14 @@ jobs:
 
     - name: Docker meta
       id: meta
-      uses: https://github.com/docker/metadata-action@v5
+      uses: https://github.com/docker/metadata-action@v6
       with:
         images: git.nadeko.net/fijxu/file-uploader-crystal
         tags: |
           type=sha,format=short,prefix={{date 'YYYY.MM.DD'}}-,enable=${{ github.ref == format('refs/heads/{0}', 'main') }}
           type=raw,value=latest,enable=${{ github.ref == format('refs/heads/{0}', 'main') }}
 
-    - uses: https://code.forgejo.org/docker/build-push-action@v5
+    - uses: https://code.forgejo.org/docker/build-push-action@v6
       name: Build images
       with:
         context: .
@@ -43,5 +42,5 @@ jobs:
         tags: ${{ steps.meta.outputs.tags }}
         platforms: linux/amd64
         push: true
-        build-args: |
-          "release=1"
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
