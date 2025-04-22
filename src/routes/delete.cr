@@ -5,7 +5,7 @@ module Routes::Deletion
     key = env.params.query["key"]?
 
     if !key || key.empty?
-      ee 400, "No delete key suplied"
+      ee 400, "No delete key supplied"
     end
 
     file = Database::Files.select_with_key(key)

@@ -4,7 +4,7 @@ module Routes::Retrieve
   def retrieve_file(env)
     host = env.request.headers["X-Forwarded-Host"]? || env.request.headers["Host"]?
     scheme = env.request.headers["X-Forwarded-Proto"]? || "http"
-    ip_addr = env.request.headers["X-Real-IP"]? || env.request.remote_address
+    ip_addr = env.request.headers["X-Real-IP"]? || env.request.remote_address.as?(Socket::IPAddress).try &.address
     filename = env.params.url["filename"].split(".").first
 
     begin
@@ -23,18 +23,16 @@ module Routes::Retrieve
     CONFIG.opengraphUseragents.each do |useragent|
       env.response.content_type = "text/html"
 
-      if env.request.headers.["User-Agent"]?.try &.includes?(useragent)
+      if env.request.headers["User-Agent"]?.try &.includes?(useragent)
         return %(
 <!DOCTYPE html>
 <html lang="en">
-<head>
+  <head>
     <meta charset="UTF-8">
     <meta property="og:title" content="#{file.filename}">
     <meta property="og:url" content="#{scheme}://#{host}/#{file.filename}">
-    #{if file.thumbnail
-        %(<meta property="og:image" content="#{scheme}://#{host}/thumbnail/#{file.filename}.jpg">)
-      end}
-</head>
+    #{%(<meta property="og:image" content="#{scheme}://#{host}/thumbnail/#{file.filename}.jpg">) if file.thumbnail}
+  </head>
 </html>
 )
       end
@@ -44,7 +42,6 @@ module Routes::Retrieve
 
   def retrieve_thumbnail(env)
     thumbnail = env.params.url["thumbnail"]?
-    pp "#{CONFIG.thumbnails}/#{thumbnail}"
 
     begin
       send_file env, "#{CONFIG.thumbnails}/#{thumbnail}"

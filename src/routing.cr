@@ -41,24 +41,26 @@ module Routing
   end
 
   before_post "/upload" do |env|
-    begin
-      ip_info = SQL.query_one?("SELECT ip, count, date FROM ips WHERE ip = ?", Headers.ip_addr, as: {ip: String, count: Int32, date: Int32})
-    rescue ex
-      LOGGER.error "Error when trying to enforce rate limits for ip #{Headers.ip_addr}: #{ex.message}"
-      next
+    ip = Headers.ip_addr
+    if !ip
+      halt env, status_code: 401, response: "X-Real-IP header not present. Contact the admin to fix this!"
     end
+
+    ip_info = Database::IP.select(ip)
 
     if ip_info.nil?
       next
     end
 
-    time_since_first_upload = Time.utc.to_unix - ip_info[:date]
-    time_until_unban = ip_info[:date] - Time.utc.to_unix + CONFIG.rateLimitPeriod
-    if time_since_first_upload > CONFIG.rateLimitPeriod
-      SQL.exec "DELETE FROM ips WHERE ip = ?", ip_info[:ip]
-    end
     if CONFIG.filesPerIP > 0
-      if ip_info[:count] >= CONFIG.filesPerIP && time_since_first_upload < CONFIG.rateLimitPeriod
+      time_since_first_upload = Time.utc.to_unix - ip_info.date
+      time_until_unban = ip_info.date - Time.utc.to_unix + CONFIG.rateLimitPeriod
+
+      if time_since_first_upload > CONFIG.rateLimitPeriod
+        Database::IP.delete(ip_info.ip)
+      end
+
+      if ip_info.count >= CONFIG.filesPerIP && time_since_first_upload < CONFIG.rateLimitPeriod
         halt env, status_code: 401, response: "Rate limited! Try again in #{time_until_unban} seconds"
       end
     end
@@ -69,8 +71,6 @@ module Routing
     get "/info/chatterino", Routes::Views, :chatterino
 
     post "/upload", Routes::Upload, :upload
-    # get "/upload", Routes::Upload, :upload_url
-    # post "/api/uploadurl", Routes::Upload, :upload_url
 
     get "/:filename", Routes::Retrieve, :retrieve_file
     get "/thumbnail/:thumbnail", Routes::Retrieve, :retrieve_thumbnail

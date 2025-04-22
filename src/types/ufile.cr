@@ -3,21 +3,21 @@ struct UFile
   # SQL queries
   include DB::Serializable
 
-  property original_filename : String = ""
-  property filename : String = ""
-  property extension : String = ""
-  property uploaded_at : String = ""
-  property checksum : String = ""
-  property ip : String = ""
-  property delete_key : String = ""
+  property original_filename : String
+  property filename : String
+  property extension : String
+  property uploaded_at : Int64
+  property checksum : String?
+  property ip : String
+  property delete_key : String
   property thumbnail : String?
 
   def initialize(
     @original_filename = "",
     @filename = "",
     @extension = "",
-    @uploaded_at = "",
-    @checksum = "",
+    @uploaded_at = 0,
+    @checksum = nil,
     @ip = "",
     @delete_key = "",
     @thumbnail = nil,

@@ -1,16 +1,16 @@
-struct IP
-  # Without this, this class will not be able to be used as `as: UFile` on
+struct UIP
+  # Without this, this class will not be able to be used as `as: IP` on
   # SQL queries
   include DB::Serializable
 
   property ip : String
   property count : Int32
-  property unix_date : Int32
+  property date : Int64
 
   def initialize(
-    @ip,
-    @count,
-    @unix_date,
+    @ip = "",
+    @count = 1,
+    @date = 0,
   )
   end
 

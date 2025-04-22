@@ -1,39 +1,37 @@
 colorize_logs: true
+log_level: "debug"
+
+# File paths
 files: "./files"
 thumbnails: "./thumbnails"
-generate_thumbnails: true
-db: "./db/db.sqlite3"
-adminEnabled: true
-adminApiKey: "asd"
-filename_length: 3
-# In MiB
-size_limit: 512
-port: 8080
+db: "./db.sqlite3"
+
+# Tor
 blockTorAddresses: true
-# Every hour
 torExitNodesCheck: 1600
 torExitNodesUrl: "https://check.torproject.org/exit-addresses"
-torExitNodesFile: "./torexitnodes.txt"
 torMessage: "TOR IS BLOCKED!"
-# Set this to 0 to disable rate limiting
+
+generate_thumbnails: true
+adminEnabled: true
+adminApiKey: "asd"
+size_limit: 512
+enable_checksums: false
+port: 8080
 filesPerIP: 2
 rateLimitPeriod: 20
 rateLimitMessage: ""
-# If you define the unix socket, it will only listen on the socket and not the port.
-#unix_socket: "/tmp/file-uploader.sock"
-# In days
+filename_length: 3
 deleteFilesAfter: 7
-# In seconds
-deleteFilesCheck: 1600
+deleteFilesCheck: 1800
 deleteKeyLength: 4
+
 siteInfo: "Whatever you want to put here"
 siteWarning: "WARNING!"
-log_level: "debug"
- 
+
 blockedExtensions:
   - "exe"
 
-# List of useragents that use OpenGraph to gather file information
 opengraphUseragents:
   - "chatterino-api-cache/"
   - "FFZBot/"
@@ -41,6 +39,5 @@ opengraphUseragents:
   - "Synapse/"
   - "Mastodon/"
 
-# You can leave it empty, or add your own domains.
-alternative_domains:
-  - "example.com"
+# alternative_domains:
+#   - "example.com"

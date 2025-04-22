@@ -26,7 +26,7 @@ class Config
   property adminEnabled : Bool = false
   # The API key for admin routes. It's passed as a "X-Api-Key" header to the
   # request
-  property adminApiKey : String? = ""
+  property adminApiKey : String? = nil
 
   # Not implemented
   property incrementalfilename_length : Bool = true
@@ -34,6 +34,7 @@ class Config
   property filename_length : Int32 = 3
   # In MiB
   property size_limit : Int16 = 512
+  property enable_checksums : Bool = true
 
   # A file path where do you want to place a unix socket (THIS WILL DISABLE ACCESS
   # BY IP ADDRESS)
@@ -41,7 +42,7 @@ class Config
 
   # True if you want this program to block IP addresses coming from the Tor
   # network
-  property blockTorAddresses : Bool? = false
+  property blockTorAddresses : Bool = false
   # How often (in seconds) should this program download the exit nodes list
   property torExitNodesCheck : Int32 = 3600
   # Only https://check.torproject.org/exit-addresses is supported
@@ -51,7 +52,8 @@ class Config
   # tries to upload a file using curl or any other tool
   property torMessage : String? = "Tor is blocked!"
 
-  # How many files an IP address can upload to the server
+  # How many files an IP address can upload to the server. Setting this to 0
+  # disables rate limits
   property filesPerIP : Int32 = 32
   # How often is the file limit per IP reset? (in seconds)
   property rateLimitPeriod : Int32 = 600
@@ -83,14 +85,6 @@ class Config
   # and in `/api/stats`
   property alternative_domains : Array(String) = [] of String
 
-  def self.load
-    config_file = "config/config.yml"
-    config_yaml = File.read(config_file)
-    config = Config.from_yaml(config_yaml)
-    check_config(config)
-    config
-  end
-
   def self.check_config(config : Config)
     if config.filename_length <= 0
       puts "Config: filename_length cannot be less or equal to 0"
@@ -103,5 +97,12 @@ class Config
     if config.thumbnails.ends_with?('/')
       config.thumbnails = config.thumbnails.chomp('/')
     end
+  end
+
+  def self.load(config_file : String = "config/config.yml")
+    config_yaml = File.read(config_file)
+    config = Config.from_yaml(config_yaml)
+    check_config(config)
+    config
   end
 end

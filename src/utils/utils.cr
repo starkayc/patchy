@@ -2,14 +2,70 @@ module Utils
   extend self
 
   def create_db
-    if !SQL.query_one "SELECT EXISTS (SELECT 1 FROM sqlite_schema WHERE type='table' AND name='files')
-		AND EXISTS (SELECT 1 FROM sqlite_schema WHERE type='table' AND name='ips');", as: Bool
-      LOGGER.info "Creating sqlite3 database at '#{CONFIG.db}'"
+    files_table = <<-SQL
+      CREATE TABLE
+      IF NOT EXISTS files
+      (
+      original_filename text not null,
+      filename text not null,
+      extension text not null,
+      uploaded_at integer not null,
+      checksum text,
+      ip text not null,
+      delete_key text not null,
+      thumbnail text,
+      PRIMARY KEY(filename)
+      )
+    SQL
+
+    ip_table = <<-SQL
+      CREATE TABLE
+      IF NOT EXISTS ips
+      (
+      ip text,
+      count integer DEFAULT 0,
+      date integer,
+      PRIMARY KEY(ip)
+      )
+    SQL
+
+    files_table_check = <<-SQL
+      SELECT EXISTS
+      (
+      SELECT 1 FROM
+      sqlite_schema
+      WHERE type='table'
+      AND name='files'
+      )
+    SQL
+
+    ip_table_check = <<-SQL
+      SELECT EXISTS
+      (
+      SELECT 1 FROM
+      sqlite_schema
+      WHERE type='table'
+      AND name='ips'
+      )
+    SQL
+
+    files_table_exists = SQL.query_one(files_table_check, as: Bool)
+    ip_table_exists = SQL.query_one(ip_table_check, as: Bool)
+
+    if (!files_table_exists)
+      LOGGER.info "create_db: Creating table 'files'"
       begin
-        SQL.exec "CREATE TABLE IF NOT EXISTS files
-		(original_filename text, filename text, extension text, uploaded_at text, checksum text, ip text, delete_key text, thumbnail text)"
-        SQL.exec "CREATE TABLE IF NOT EXISTS ips
-		(ip text UNIQUE, count integer DEFAULT 0, date integer)"
+        SQL.exec(files_table)
+      rescue ex
+        LOGGER.fatal "#{ex.message}"
+        exit(1)
+      end
+    end
+
+    if (!ip_table_exists)
+      LOGGER.info "create_db: Creating table 'ips'"
+      begin
+        SQL.exec(ip_table)
       rescue ex
         LOGGER.fatal "#{ex.message}"
         exit(1)
