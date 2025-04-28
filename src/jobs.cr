@@ -1,27 +1,27 @@
 # Pretty cool way to write background jobs! :)
 module Jobs
   def self.check_old_files
-    if CONFIG.deleteFilesCheck <= 0
+    if CONFIG.delete_files_check <= 0
       LOGGER.info "File deletion is disabled"
       return
     end
     spawn do
       loop do
         Utils.check_old_files
-        sleep CONFIG.deleteFilesCheck.seconds
+        sleep CONFIG.delete_files_check.seconds
       end
     end
   end
 
   def self.retrieve_tor_exit_nodes
-    if !CONFIG.blockTorAddresses
+    if !CONFIG.block_tor_addresses
       return
     end
     LOGGER.info("Blocking Tor exit nodes")
     spawn do
       loop do
         Utils::Tor.refresh_exit_nodes
-        sleep CONFIG.torExitNodesCheck.seconds
+        sleep CONFIG.tor_exit_nodes_check.seconds
       end
     end
   end

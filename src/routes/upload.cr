@@ -58,12 +58,17 @@ module Routes::Upload
         ee 403, "No file provided"
       end
 
-      file.extension = File.extname("#{upload.filename}")
       file.filename = Utils.generate_filename
+
+      if file.original_filename == "control_v.png"
+        file.original_filename = file.filename
+      end
+
+      file.extension = File.extname("#{upload.filename}")
       full_filename = file.filename + file.extension
       file_path = "#{CONFIG.files}/#{full_filename}"
 
-      if CONFIG.blockedExtensions.includes?(file.extension.split(".")[1])
+      if CONFIG.blocked_extensions.includes?(file.extension.split(".")[1])
         ee 401, "Extension '#{file.extension}' is not allowed"
       end
 
@@ -82,8 +87,8 @@ module Routes::Upload
     ip.ip = file.ip
     ip.date = file.uploaded_at
 
-    if CONFIG.deleteKeyLength > 0
-      file.delete_key = Random.base58(CONFIG.deleteKeyLength)
+    if CONFIG.delete_key_length > 0
+      file.delete_key = Random.base58(CONFIG.delete_key_length)
     end
 
     begin

@@ -7,32 +7,32 @@ thumbnails: "./thumbnails"
 db: "./db.sqlite3"
 
 # Tor
-blockTorAddresses: true
-torExitNodesCheck: 1600
-torExitNodesUrl: "https://check.torproject.org/exit-addresses"
-torMessage: "TOR IS BLOCKED!"
+block_tor_addresses: true
+tor_exit_nodes_check: 1600
+tor_exit_nodes_url: "https://check.torproject.org/exit-addresses"
+tor_message: "TOR IS BLOCKED!"
 
 generate_thumbnails: true
-adminEnabled: true
-adminApiKey: "asd"
+admin_enabled: true
+admin_api_key: "asd"
 size_limit: 512
 enable_checksums: false
 port: 8080
-filesPerIP: 2
-rateLimitPeriod: 20
-rateLimitMessage: ""
+files_per_ip: 2
+rate_limit_period: 20
+rate_limit_message: ""
 filename_length: 3
-deleteFilesAfter: 7
-deleteFilesCheck: 1800
-deleteKeyLength: 4
+delete_files_after: 7
+delete_files_check: 1800
+delete_key_length: 4
 
-siteInfo: "Whatever you want to put here"
-siteWarning: "WARNING!"
+site_info: "Whatever you want to put here"
+site_warning: "WARNING!"
 
-blockedExtensions:
+blocked_extensions:
   - "exe"
 
-opengraphUseragents:
+opengraph_useragents:
   - "chatterino-api-cache/"
   - "FFZBot/"
   - "Twitterbot/"

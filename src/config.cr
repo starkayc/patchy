@@ -23,10 +23,10 @@ class Config
   property db : String = "./db.sqlite3"
 
   # Enable or disable the admin API
-  property adminEnabled : Bool = false
+  property admin_enabled : Bool = false
   # The API key for admin routes. It's passed as a "X-Api-Key" header to the
   # request
-  property adminApiKey : String? = nil
+  property admin_api_key : String? = nil
 
   # Not implemented
   property incrementalfilename_length : Bool = true
@@ -42,43 +42,43 @@ class Config
 
   # True if you want this program to block IP addresses coming from the Tor
   # network
-  property blockTorAddresses : Bool = false
+  property block_tor_addresses : Bool = false
   # How often (in seconds) should this program download the exit nodes list
-  property torExitNodesCheck : Int32 = 3600
+  property tor_exit_nodes_check : Int32 = 3600
   # Only https://check.torproject.org/exit-addresses is supported
-  property torExitNodesUrl : String = "https://check.torproject.org/exit-addresses"
+  property tor_exit_nodes_url : String = "https://check.torproject.org/exit-addresses"
   # Message that will be displayed to the Tor user.
   # It will be shown on the Frontend and shown in the error 401 when a user
   # tries to upload a file using curl or any other tool
-  property torMessage : String? = "Tor is blocked!"
+  property tor_message : String? = "Tor is blocked!"
 
   # How many files an IP address can upload to the server. Setting this to 0
-  # disables rate limits
-  property filesPerIP : Int32 = 32
+  # disables rate limits in the rate limit period
+  property files_per_ip : Int32 = 32
   # How often is the file limit per IP reset? (in seconds)
-  property rateLimitPeriod : Int32 = 600
+  property rate_limit_period : Int32 = 600
   # TODO: UNUSED CONSTANT
-  property rateLimitMessage : String = ""
+  property rate_limit_message : String = ""
 
   # Delete the files after how many days?
-  property deleteFilesAfter : Int32 = 14
+  property delete_files_after : Int32 = 14
   # How often should the check of old files be performed? (in seconds)
-  property deleteFilesCheck : Int32 = 1800
+  property delete_files_check : Int32 = 1800
   # The lenght of the delete key
-  property deleteKeyLength : Int32 = 6
+  property delete_key_length : Int32 = 6
 
-  property siteInfo : String = "xd"
+  property site_info : String = "xd"
   # TODO: UNUSED CONSTANT
-  property siteWarning : String? = ""
+  property site_warning : String? = ""
 
   # Blocked extensions that are not allowed to be uploaded to the server
-  property blockedExtensions : Array(String) = [] of String
+  property blocked_extensions : Array(String) = [] of String
 
   # A list of OpenGraph user agents. If the request contains one of those User
   # agents when trying to retrieve a file from the server; the server will
   # reply with an HTML with OpenGraph tags, pointing to the media thumbnail
   # (if it was generated successfully) and the name of the file as title
-  property opengraphUseragents : Array(String) = [] of String
+  property opengraph_useragents : Array(String) = [] of String
 
   # Since this program detects the Host header of the client it can be used
   # with multiple domains. You can display the domains in the frontend

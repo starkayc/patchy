@@ -12,7 +12,7 @@ module Utils::Tor
     LOGGER.debug "retrieve_tor_exit_nodes: Retrieving Tor exit nodes list"
     ips = [] of String
 
-    HTTP::Client.get(CONFIG.torExitNodesUrl) do |res|
+    HTTP::Client.get(CONFIG.tor_exit_nodes_url) do |res|
       begin
         if res.success? && res.status_code == 200
           res.body_io.each_line do |line|
@@ -25,7 +25,7 @@ module Utils::Tor
           LOGGER.error "retrieve_tor_exit_nodes: Failed to retrieve exit nodes list. Status Code: #{res.status_code}"
         end
       rescue ex : Socket::ConnectError
-        LOGGER.error "retrieve_tor_exit_nodes: Failed to connect to #{CONFIG.torExitNodesUrl}: #{ex.message}"
+        LOGGER.error "retrieve_tor_exit_nodes: Failed to connect to #{CONFIG.tor_exit_nodes_url}: #{ex.message}"
       rescue ex
         LOGGER.error "retrieve_tor_exit_nodes: Unknown error: #{ex.message}"
       end

@@ -21,7 +21,7 @@ module Routing
   # before_post "/api/admin/*" do |env|
   #   env.response.content_type = "application/json"
 
-  #   if env.request.headers.try &.["X-Api-Key"]? != CONFIG.adminApiKey || nil
+  #   if env.request.headers.try &.["X-Api-Key"]? != CONFIG.admin_api_key || nil
   #     halt env, status_code: 401, response: "Wrong API Key"
   #   end
   # end
@@ -31,12 +31,12 @@ module Routing
     api_key = env.request.headers["X-Api-Key"]?
 
     # Skips Tor blocking and Rate limits if the API key matches
-    if api_key == CONFIG.adminApiKey
+    if api_key == CONFIG.admin_api_key
       next
     end
 
-    if CONFIG.blockTorAddresses && tor_exit_nodes.includes?(Headers.ip_addr)
-      halt env, status_code: 401, response: CONFIG.torMessage
+    if CONFIG.block_tor_addresses && tor_exit_nodes.includes?(Headers.ip_addr)
+      halt env, status_code: 401, response: CONFIG.tor_message
     end
   end
 
@@ -52,15 +52,15 @@ module Routing
       next
     end
 
-    if CONFIG.filesPerIP > 0
+    if CONFIG.files_per_ip > 0
       time_since_first_upload = Time.utc.to_unix - ip_info.date
-      time_until_unban = ip_info.date - Time.utc.to_unix + CONFIG.rateLimitPeriod
+      time_until_unban = ip_info.date - Time.utc.to_unix + CONFIG.rate_limit_period
 
-      if time_since_first_upload > CONFIG.rateLimitPeriod
+      if time_since_first_upload > CONFIG.rate_limit_period
         Database::IP.delete(ip_info.ip)
       end
 
-      if ip_info.count >= CONFIG.filesPerIP && time_since_first_upload < CONFIG.rateLimitPeriod
+      if ip_info.count >= CONFIG.files_per_ip && time_since_first_upload < CONFIG.rate_limit_period
         halt env, status_code: 401, response: "Rate limited! Try again in #{time_until_unban} seconds"
       end
     end
@@ -81,7 +81,7 @@ module Routing
     get "/info/sharex.sxcu", Routing::Misc, :sharex_config
     get "/info/chatterinoconfig", Routing::Misc, :chatterino_config
 
-    # if CONFIG.adminEnabled
+    # if CONFIG.admin_enabled
     #   self.register_admin
     # end
   end
