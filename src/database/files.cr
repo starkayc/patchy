@@ -64,9 +64,9 @@ module Database::Files
 
   def old_files : Array(UFile)
     request = <<-SQL
-      SELECT filename, extension, thumbnail
+      SELECT *
       FROM files
-      WHERE uploaded_at < strftime('%s', 'now') - #{CONFIG.deleteFilesAfter * 3600}
+      WHERE uploaded_at < strftime('%s', 'now') - #{CONFIG.delete_files_after * 3600}
     SQL
 
     SQL.query_all(request, as: UFile)
