@@ -18,7 +18,7 @@ module Routing::Misc
     property alternative_domains : Array(String)
 
     def initialize
-      @files_hosted = SQL.query_one("SELECT COUNT (filename) FROM files", as: Int32)
+      @files_hosted = Database::Files.file_count
       @max_upload_size = CONFIG.size_limit.to_s
       @thumbnail_generation = CONFIG.generate_thumbnails
       @filename_length = CONFIG.filename_length
