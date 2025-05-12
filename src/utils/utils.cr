@@ -89,16 +89,13 @@ module Utils
         if thumbnail
           File.delete("#{CONFIG.thumbnails}/#{thumbnail}")
         end
-
-        Database::Files.delete(f.filename)
       rescue File::NotFoundError
-        LOGGER.error "check_old_files: File '#{full_filename}' doesn't seem to exist on the '#{CONFIG.files}', folder, deleting it from the database"
-        Database::Files.delete(f.filename)
+        LOGGER.error "check_old_files: File '#{full_filename}' doesn't exist on the '#{CONFIG.files}', folder, deleting it from the database"
       rescue ex : File::AccessDeniedError
-        LOGGER.error "check_old_files: File '#{full_filename}' failed to be deleted due to bad permissions, deleting it from the database: #{ex.message}"
-        Database::Files.delete(f.filename)
+        LOGGER.error "check_old_files: File '#{full_filename}' failed to be deleted due to bad permissions, deleting it from the database, error: #{ex.message}"
       rescue ex
-        LOGGER.error "check_old_files: File '#{full_filename}' failed to be deleted, deleting it from the database: #{ex.message}"
+        LOGGER.error "check_old_files: File '#{full_filename}' failed to be deleted, deleting it from the database, error: #{ex.message}"
+      ensure
         Database::Files.delete(f.filename)
       end
     end
