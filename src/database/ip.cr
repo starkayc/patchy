@@ -2,6 +2,39 @@ module Database::IP
   extend self
 
   # -------------------
+  #  Database checking
+  # -------------------
+
+  def exists? : Bool?
+    request = <<-SQL
+      SELECT EXISTS
+      (
+      SELECT 1 FROM
+      sqlite_schema
+      WHERE type='table'
+      AND name='ips'
+      )
+    SQL
+
+    SQL.query_one(request, as: Bool?)
+  end
+
+  def create_table : Nil
+    request = <<-SQL
+      CREATE TABLE
+      IF NOT EXISTS ips
+      (
+      ip text,
+      count integer DEFAULT 0,
+      date integer,
+      PRIMARY KEY(ip)
+      )
+    SQL
+
+    SQL.exec(request)
+  end
+
+  # -------------------
   #  Insert / Delete
   # -------------------
 

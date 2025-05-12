@@ -2,6 +2,44 @@ module Database::Files
   extend self
 
   # -------------------
+  #  Database checking
+  # -------------------
+
+  def exists? : Bool?
+    request = <<-SQL
+      SELECT EXISTS
+      (
+      SELECT 1 FROM
+      sqlite_schema
+      WHERE type='table'
+      AND name='files'
+      )
+    SQL
+
+    SQL.query_one(request, as: Bool?)
+  end
+
+  def create_table : Nil
+    request = <<-SQL
+      CREATE TABLE
+      IF NOT EXISTS files
+      (
+      original_filename text not null,
+      filename text not null,
+      extension text not null,
+      uploaded_at integer not null,
+      checksum text,
+      ip text not null,
+      delete_key text not null,
+      thumbnail text,
+      PRIMARY KEY(filename)
+      )
+    SQL
+
+    SQL.exec(request)
+  end
+
+  # -------------------
   #  Insert / Delete
   # -------------------
 

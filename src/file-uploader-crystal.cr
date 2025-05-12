@@ -32,7 +32,7 @@ CURRENT_VERSION = {{ "#{`git log -1 --format=%ci | awk '{print $1}' | sed s/-/./
 CURRENT_TAG     = {{ "#{`git describe --long --abbrev=7 --tags | sed 's/([^-]*)-g.*/r\1/;s/-/./g'`.strip}" }}
 
 Utils.check_dependencies
-Utils.create_db
+Utils.create_tables
 Utils.create_files_dir
 Utils.create_thumbnails_dir
 Routing.register_all

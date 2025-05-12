@@ -1,73 +1,23 @@
 module Utils
   extend self
 
-  def create_db
-    files_table = <<-SQL
-      CREATE TABLE
-      IF NOT EXISTS files
-      (
-      original_filename text not null,
-      filename text not null,
-      extension text not null,
-      uploaded_at integer not null,
-      checksum text,
-      ip text not null,
-      delete_key text not null,
-      thumbnail text,
-      PRIMARY KEY(filename)
-      )
-    SQL
-
-    ip_table = <<-SQL
-      CREATE TABLE
-      IF NOT EXISTS ips
-      (
-      ip text,
-      count integer DEFAULT 0,
-      date integer,
-      PRIMARY KEY(ip)
-      )
-    SQL
-
-    files_table_check = <<-SQL
-      SELECT EXISTS
-      (
-      SELECT 1 FROM
-      sqlite_schema
-      WHERE type='table'
-      AND name='files'
-      )
-    SQL
-
-    ip_table_check = <<-SQL
-      SELECT EXISTS
-      (
-      SELECT 1 FROM
-      sqlite_schema
-      WHERE type='table'
-      AND name='ips'
-      )
-    SQL
-
-    files_table_exists = SQL.query_one(files_table_check, as: Bool)
-    ip_table_exists = SQL.query_one(ip_table_check, as: Bool)
-
-    if (!files_table_exists)
-      LOGGER.info "create_db: Creating table 'files'"
+  def create_tables
+    if !Database::Files.exists?
       begin
-        SQL.exec(files_table)
+        Database::Files.create_table
+        LOGGER.info "create_tables: Created table 'files'"
       rescue ex
-        LOGGER.fatal "#{ex.message}"
+        LOGGER.fatal "create_tables: Failed to create 'files' table: #{ex.message}"
         exit(1)
       end
     end
 
-    if (!ip_table_exists)
-      LOGGER.info "create_db: Creating table 'ips'"
+    if !Database::IP.exists?
       begin
-        SQL.exec(ip_table)
+        Database::IP.create_table
+        LOGGER.info "create_tables: Created table 'ips'"
       rescue ex
-        LOGGER.fatal "#{ex.message}"
+        LOGGER.fatal "create_tables: Failed to create 'ips' table: #{ex.message}"
         exit(1)
       end
     end
