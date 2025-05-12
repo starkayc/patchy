@@ -31,6 +31,9 @@ CURRENT_COMMIT  = {{ "#{`git rev-list HEAD --max-count=1 --abbrev-commit`.strip}
 CURRENT_VERSION = {{ "#{`git log -1 --format=%ci | awk '{print $1}' | sed s/-/./g`.strip}" }}
 CURRENT_TAG     = {{ "#{`git describe --long --abbrev=7 --tags | sed 's/([^-]*)-g.*/r\1/;s/-/./g'`.strip}" }}
 
+# Show current configuration
+LOGGER.debug("Current configuration: \n#{CONFIG.to_yaml}")
+
 Utils.check_dependencies
 Utils.create_tables
 Utils.create_files_dir
