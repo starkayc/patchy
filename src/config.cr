@@ -102,6 +102,53 @@ class Config
   def self.load(config_file : String = "config/config.yml")
     config_yaml = File.read(config_file)
     config = Config.from_yaml(config_yaml)
+
+    # https://github.com/iv-org/invidious/blob/master/src/invidious/config.cr#L215
+    # Update config from env vars (upcased and prefixed with "UPLOADER_")
+    {% for ivar in Config.instance_vars %}
+        {% env_id = "UPLOADER_#{ivar.id.upcase}" %}
+
+        if ENV.has_key?({{env_id}})
+            env_value = ENV.fetch({{env_id}})
+            success = false
+
+            # Use YAML converter if specified
+            {% ann = ivar.annotation(::YAML::Field) %}
+            {% if ann && ann[:converter] %}
+                config.{{ivar.id}} = {{ann[:converter]}}.from_yaml(YAML::ParseContext.new, YAML::Nodes.parse(ENV.fetch({{env_id}})).nodes[0])
+                success = true
+
+            # Use regular YAML parser otherwise
+            {% else %}
+                {% ivar_types = ivar.type.union? ? ivar.type.union_types : [ivar.type] %}
+                # Sort types to avoid parsing nulls and numbers as strings
+                {% ivar_types = ivar_types.sort_by { |ivar_type| ivar_type == Nil ? 0 : ivar_type == Int32 ? 1 : 2 } %}
+                {{ivar_types}}.each do |ivar_type|
+                    if !success
+                        begin
+                            config.{{ivar.id}} = ivar_type.from_yaml(env_value)
+                            success = true
+                        rescue
+                            # nop
+                        end
+                    end
+                end
+            {% end %}
+
+            # Exit on fail
+            if !success
+                puts %(Config: Config.{{ivar.id}} failed to parse #{env_value} as {{ivar.type}})
+                exit(1)
+            end
+        end
+
+        # Warn when any config attribute is set to "CHANGE_ME!!"
+        if config.{{ivar.id}} == "CHANGE_ME!!"
+          puts "Config: The value of '#{ {{ivar.stringify}} }' needs to be changed!!"
+          exit(1)
+        end
+    {% end %}
+
     check_config(config)
     config
   end
