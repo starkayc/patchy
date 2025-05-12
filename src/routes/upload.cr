@@ -68,8 +68,11 @@ module Routes::Upload
       full_filename = file.filename + file.extension
       file_path = "#{CONFIG.files}/#{full_filename}"
 
-      if CONFIG.blocked_extensions.includes?(file.extension.split(".")[1])
-        ee 401, "Extension '#{file.extension}' is not allowed"
+      # Allow uploads without extension
+      if !file.extension.empty?
+        if CONFIG.blocked_extensions.includes?(file.extension.split(".")[1])
+          ee 401, "Extension '#{file.extension}' is not allowed"
+        end
       end
 
       File.open(file_path, "w") do |output|
