@@ -52,13 +52,13 @@ module Utils
   def delete_file(env)
     key = env.params.query["key"]
     file = SQL.select_with_key(key)
-    full_filename = file.filename + file.extension
-    thumbnail = file.thumbnail
+    full_filename = fileinfo.filename + fileinfo.extension
+    thumbnail = fileinfo.thumbnail
 
     # Delete file
     File.delete("#{CONFIG.files}/#{full_filename}")
 
-    if file.thumbnail
+    if fileinfo.thumbnail
       File.delete("#{CONFIG.thumbnails}/#{thumbnail}")
     end
 

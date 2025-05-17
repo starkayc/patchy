@@ -1,3 +1,5 @@
+require "../ext/kemal_send_file_raw"
+
 module Routes::Retrieve
   extend self
 
@@ -8,8 +10,8 @@ module Routes::Retrieve
     filename = env.params.url["filename"].split(".").first
 
     begin
-      file = Database::Files.select(filename)
-      if file.nil?
+      fileinfo = Database::Files.select(filename)
+      if fileinfo.nil?
         ee 404, "File '#{filename}' does not exist"
       end
     rescue ex
@@ -17,8 +19,8 @@ module Routes::Retrieve
       ee 500, "Error when retrieving file '#{filename}'"
     end
 
-    env.response.headers["Content-Disposition"] = "inline; filename*=UTF-8''#{file.original_filename}"
-    env.response.headers["ETag"] = "#{file.checksum}"
+    env.response.headers["Content-Disposition"] = "inline; filename*=UTF-8''#{fileinfo.original_filename}"
+    env.response.headers["ETag"] = "#{fileinfo.checksum}"
 
     CONFIG.opengraph_useragents.each do |useragent|
       env.response.content_type = "text/html"
@@ -28,9 +30,9 @@ module Routes::Retrieve
 <html lang="en">
   <head>
     <meta charset="UTF-8">
-    <meta property="og:title" content="#{file.original_filename}">
-    <meta property="og:url" content="#{scheme}://#{host}/#{file.filename}">
-    #{%(<meta property="og:image" content="#{scheme}://#{host}/thumbnail/#{file.filename}.jpg">) if file.thumbnail}
+    <meta property="og:title" content="#{fileinfo.original_filename}">
+    <meta property="og:url" content="#{scheme}://#{host}/#{fileinfo.filename}">
+    #{%(<meta property="og:image" content="#{scheme}://#{host}/thumbnail/#{fileinfo.filename}.jpg">) if fileinfo.thumbnail}
   </head>
 </html>)
       end

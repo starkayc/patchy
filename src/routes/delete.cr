@@ -8,17 +8,17 @@ module Routes::Deletion
       ee 400, "No delete key supplied"
     end
 
-    file = Database::Files.select_with_key(key)
+    fileinfo = Database::Files.select_with_key(key)
 
-    if file
-      full_filename = file.filename + file.extension
-      thumbnail = file.thumbnail
+    if fileinfo
+      full_filename = fileinfo.filename + fileinfo.extension
+      thumbnail = fileinfo.thumbnail
 
       begin
         # Delete file
         File.delete("#{CONFIG.files}/#{full_filename}")
 
-        if file.thumbnail
+        if fileinfo.thumbnail
           File.delete("#{CONFIG.thumbnails}/#{thumbnail}")
         end
 

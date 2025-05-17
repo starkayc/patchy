@@ -43,14 +43,14 @@ module Database::Files
   #  Insert / Delete
   # -------------------
 
-  def insert(file : UFile) : Nil
+  def insert(fileinfo : UFile) : Nil
     request = <<-SQL
       INSERT INTO files
       VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
       ON CONFLICT DO NOTHING
     SQL
 
-    SQL.exec(request, *file.to_tuple)
+    SQL.exec(request, *fileinfo.to_tuple)
   end
 
   def delete(filename : String) : Nil

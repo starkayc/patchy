@@ -12,7 +12,7 @@ module Routes::Admin
     successfull_files = [] of String
     failed_files = [] of String
     files.each do |file|
-      file = file.to_s
+      file = fileinfo.to_s
       begin
         fileinfo = SQL.query_one("SELECT filename, extension, thumbnail
         FROM files

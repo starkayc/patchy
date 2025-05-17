@@ -16,15 +16,15 @@ module Routes::Upload
     @[JSON::Field(key: "deleteLink")]
     property delete_link : String
 
-    def initialize(file : UFile, scheme : String, host : String?)
-      @link = "#{scheme}://#{host}/#{file.filename}"
-      @link_ext = "#{scheme}://#{host}/#{file.filename}#{file.extension}"
-      @id = file.filename
-      @ext = file.extension
-      @name = file.original_filename
-      @checksum = file.checksum
-      @delete_key = file.delete_key
-      @delete_link = "#{scheme}://#{host}/delete?key=#{file.delete_key}"
+    def initialize(fileinfo : UFile, scheme : String, host : String?)
+      @link = "#{scheme}://#{host}/#{fileinfo.filename}"
+      @link_ext = "#{scheme}://#{host}/#{fileinfo.filename}#{fileinfo.extension}"
+      @id = fileinfo.filename
+      @ext = fileinfo.extension
+      @name = fileinfo.original_filename
+      @checksum = fileinfo.checksum
+      @delete_key = fileinfo.delete_key
+      @delete_link = "#{scheme}://#{host}/delete?key=#{fileinfo.delete_key}"
     end
   end
 
@@ -45,33 +45,33 @@ module Routes::Upload
       end
     end
 
-    file = UFile.new
+    fileinfo = UFile.new
     ip = UIP.new
 
     HTTP::FormData.parse(env.request) do |upload|
       upload_filename = upload.filename
 
       if upload_filename
-        file.original_filename = upload_filename
+        fileinfo.original_filename = upload_filename
       else
         LOGGER.debug "No file provided by the user"
         ee 403, "No file provided"
       end
 
-      file.filename = Utils.generate_filename
+      fileinfo.filename = Utils.generate_filename
 
-      if file.original_filename == "control_v.png"
-        file.original_filename = file.filename
+      if fileinfo.original_filename == "control_v.png"
+        fileinfo.original_filename = fileinfo.filename
       end
 
-      file.extension = File.extname("#{upload.filename}")
-      full_filename = file.filename + file.extension
+      fileinfo.extension = File.extname("#{upload.filename}")
+      full_filename = fileinfo.filename + fileinfo.extension
       file_path = "#{CONFIG.files}/#{full_filename}"
 
       # Allow uploads without extension
-      if !file.extension.empty?
-        if CONFIG.blocked_extensions.includes?(file.extension.split(".")[1])
-          ee 401, "Extension '#{file.extension}' is not allowed"
+      if !fileinfo.extension.empty?
+        if CONFIG.blocked_extensions.includes?(fileinfo.extension.split(".")[1])
+          ee 401, "Extension '#{fileinfo.extension}' is not allowed"
         end
       end
 
@@ -79,29 +79,29 @@ module Routes::Upload
         IO.copy(upload.body, output)
       end
 
-      file.uploaded_at = Time.utc.to_unix
+      fileinfo.uploaded_at = Time.utc.to_unix
 
       if CONFIG.enable_checksums
-        file.checksum = Utils::Hashing.hash_file(file_path)
+        fileinfo.checksum = Utils::Hashing.hash_file(file_path)
       end
     end
 
-    file.ip = ip_addr.to_s
-    ip.ip = file.ip
-    ip.date = file.uploaded_at
+    fileinfo.ip = ip_addr.to_s
+    ip.ip = fileinfo.ip
+    ip.date = fileinfo.uploaded_at
 
     if CONFIG.delete_key_length > 0
-      file.delete_key = Random.base58(CONFIG.delete_key_length)
+      fileinfo.delete_key = Random.base58(CONFIG.delete_key_length)
     end
 
     begin
-      spawn { Utils.generate_thumbnail(file.filename, file.extension) }
+      spawn { Utils.generate_thumbnail(fileinfo.filename, fileinfo.extension) }
     rescue ex
       LOGGER.error "An error ocurred when trying to generate a thumbnail: #{ex.message}"
     end
 
     begin
-      Database::Files.insert(file)
+      Database::Files.insert(fileinfo)
       exists = Database::IP.insert(ip).rows_affected == 0
       Database::IP.increase_count(ip) if exists
     rescue ex
@@ -109,7 +109,7 @@ module Routes::Upload
       ee 500, "An error ocurred when trying to insert the data into the DB"
     end
 
-    res = Response.new(file, scheme, host)
+    res = Response.new(fileinfo, scheme, host)
     res.to_json
   end
 end
