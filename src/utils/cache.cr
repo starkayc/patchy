@@ -1,25 +1,30 @@
 module Utils::Cache
   extend self
 
+  # TODO: Find a way to not allocate FileCache if cache is disabled
   FileCache = LRU.new
 
-  # Based on 
+  # Based on
   # https://git.nadeko.net/Fijxu/invidious/src/commit/0dd11b2e0fe00b0a9ccc68c38a69366e77c5e6d8/src/invidious/database/videos.cr#L37
   class LRU
     @max_size : Int32
+    @max_allowed_filesize : Int32
     @lru = {} of String => {UFile, Bytes}
     @access = [] of String
 
-    def initialize(@max_size = CONFIG.cache.max_size)
-      LOGGER.info "File Cache: Using in memory LRU to store files"
-      LOGGER.info "File Cache: LRU cache max size set to #{@max_size}"
+    def initialize(@max_size = CONFIG.cache.max_size, @max_allowed_filesize = CONFIG.cache.max_allowed_filesize)
+      if CONFIG.cache.enable
+        LOGGER.info "File Cache: Using in memory LRU to store files smaller than #{(@max_allowed_filesize * 1000).humanize_bytes}"
+        LOGGER.info "File Cache: Maximum amount of files the cache can hold: #{@max_size}"
+        LOGGER.info "File Cache: Max bytes that the cache can hold: #{(@max_size * @max_allowed_filesize * 1000).humanize_bytes}"
+      end
     end
 
     # TODO: Handle expire_time with a Job
     def set(fileinfo : UFile, file : File, expire_time) : Nil
       file_size = file.size
 
-      if file_size > CONFIG.cache.max_allowed_filesize &* 1000
+      if file_size > @max_allowed_filesize &* 1000
         LOGGER.trace("File Cache: Not caching '#{fileinfo.filename}', size too big to be cached, size: #{file_size}")
         return
       end
