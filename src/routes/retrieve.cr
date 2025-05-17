@@ -37,7 +37,14 @@ module Routes::Retrieve
 </html>)
       end
     end
-    send_file env, "#{CONFIG.files}/#{file.filename}#{file.extension}"
+
+    if cached_file = Utils::Cache.select(fileinfo)
+      send_file_raw env, cached_file[0], cached_file[1]
+    else
+      file_path = "#{CONFIG.files}/#{fileinfo.filename}#{fileinfo.extension}"
+      Utils::Cache.insert(fileinfo, file_path)
+      send_file env, file_path
+    end
   end
 
   def retrieve_thumbnail(env)

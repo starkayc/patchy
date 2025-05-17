@@ -29,6 +29,14 @@ delete_key_length: 4
 site_info: "Whatever you want to put here"
 site_warning: "WARNING!"
 
+# Uses more memory, but improves files retrieval and reduces stress on the drive
+cache:
+  enable: false
+  # Number of files that can be cached
+  max_size: 256
+  # In KiB, files bigger than this will not be cached
+  max_allowed_filesize: 512
+
 blocked_extensions:
   - "exe"
 

@@ -18,6 +18,7 @@ Already replaced lol.
 - Unix socket support if you don't want to deal with all the TCP overhead
 - Automatic protocol detection (HTTPS or HTTP)
 - Low memory usage: Between 6MB at idle and 25MB if a file is being uploaded or retrieved. It will depend of your traffic.
+- Cache files on memory to reduce stress on the drive using [LRU](https://en.wikipedia.org/wiki/Cache_replacement_policies#LRU), more information on [config.example.yml](./config/config.example.yml)
 
 ## Usage
 

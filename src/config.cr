@@ -36,6 +36,25 @@ class Config
   property size_limit : Int16 = 512
   property enable_checksums : Bool = true
 
+  # Uses more memory, but improves files retrieval and reduces stress
+  # on the drive by caching the files into memory using LRU cache algorithm
+  # If you are a techy person and you want to test if this works, then use
+  # `sudo strace -e trace=open,openat -p $(pidof file-uploader-crystal)`
+  # With cache disabled, it will open the file each time is being retrieved
+  # by the client, and with cache enabled, the cached file will be read from
+  # memory!!
+  property cache : Cache = Cache.from_yaml("")
+
+  struct Cache
+    include YAML::Serializable
+
+    property enable : Bool = false
+    # Number of files that can be cached
+    property max_size : Int32 = 256
+    # In KiB, files bigger than this will not be cached
+    property max_allowed_filesize : Int32 = 512
+  end
+
   # A file path where do you want to place a unix socket (THIS WILL DISABLE ACCESS
   # BY IP ADDRESS)
   property unix_socket : String?
