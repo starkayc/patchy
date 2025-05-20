@@ -107,8 +107,4 @@ module Routing
   #   Routes::Admin.retrieve_tor_exit_nodes(env, @@exit_nodes)
   # end
 
-  error 404 do |env|
-    env.response.content_type = "text/plain"
-    "File not found.\nArchivo no encontrado."
-  end
 end
