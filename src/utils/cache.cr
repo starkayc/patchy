@@ -9,7 +9,7 @@ module Utils::Cache
   class LRU
     @max_size : Int32
     @max_allowed_filesize : Int32
-    @lru = {} of String => {UFile, Bytes}
+    getter lru = {} of String => {fileinfo: UFile, data: Bytes, filesize: Int64}
     @access = [] of String
 
     def initialize(@max_size = CONFIG.cache.max_size, @max_allowed_filesize = CONFIG.cache.max_allowed_filesize)
@@ -31,7 +31,7 @@ module Utils::Cache
 
       slice = Bytes.new(file_size)
       file.read_fully(slice)
-      self[fileinfo.filename] = {fileinfo, slice}
+      self[fileinfo.filename] = {fileinfo: fileinfo, data: slice, filesize: file_size}
       LOGGER.trace("File Cache: Inserted file '#{fileinfo.filename}' to memory")
     end
 
@@ -43,7 +43,7 @@ module Utils::Cache
       data = self[fileinfo.filename]
       if data
         LOGGER.trace("File Cache: Retrieved file '#{fileinfo.filename}' from memory")
-        return {data[0], data[1]}
+        return {data[:fileinfo], data[:data]}
       else
         return nil
       end

@@ -64,7 +64,8 @@ module Routes::Upload
         fileinfo.original_filename = fileinfo.filename
       end
 
-      fileinfo.extension = File.extname("#{upload.filename}")
+      fileinfo.extension = File.extname("#{upload_filename}")
+      fileinfo.extension = Utils.detect_extension(upload_filename) if fileinfo.extension == ""
       full_filename = fileinfo.filename + fileinfo.extension
       file_path = "#{CONFIG.files}/#{full_filename}"
 

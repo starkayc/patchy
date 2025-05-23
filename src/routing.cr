@@ -1,5 +1,6 @@
 require "./macros"
 require "./routes/**"
+require "./operations/*"
 
 module Routing
   extend self
@@ -18,39 +19,33 @@ module Routing
 
   {% end %}
 
-  # before_post "/api/admin/*" do |env|
-  #   env.response.content_type = "application/json"
+  before_all "/api/admin/*" do |env|
+    env.response.content_type = "application/json"
 
-  #   if env.request.headers.try &.["X-Api-Key"]? != CONFIG.admin_api_key || nil
-  #     halt env, status_code: 401, response: "Wrong API Key"
-  #   end
-  # end
-
-  before_post do |env|
-    tor_exit_nodes = Utils::Tor.exit_nodes
-    api_key = env.request.headers["X-Api-Key"]?
-
-    # Skips Tor blocking and Rate limits if the API key matches
-    if api_key == CONFIG.admin_api_key
-      next
-    end
-
-    if CONFIG.block_tor_addresses && tor_exit_nodes.includes?(Headers.ip_addr)
-      halt env, status_code: 401, response: CONFIG.tor_message
+    res = {"error" => "Wrong API Key"}.to_json
+    if env.request.headers.try &.["X-Api-Key"]? != CONFIG.admin_api_key || nil
+      halt env, status_code: 401, response: res
     end
   end
 
   before_post "/upload" do |env|
+    tor_exit_nodes = Utils::Tor.exit_nodes
     ip = Headers.ip_addr
+    api_key = env.request.headers["X-Api-Key"]?
+
+    # Skips Tor blocking and Rate limits if the API key matches
+    next if api_key == CONFIG.admin_api_key
+
+    if CONFIG.block_tor_addresses && tor_exit_nodes.includes?(Headers.ip_addr)
+      halt env, status_code: 401, response: CONFIG.tor_message
+    end
+
     if !ip
       halt env, status_code: 401, response: "X-Real-IP header not present. Contact the admin to fix this!"
     end
 
     ip_info = Database::IP.select(ip)
-
-    if ip_info.nil?
-      next
-    end
+    next if ip_info.nil?
 
     if CONFIG.files_per_ip > 0
       time_since_first_upload = Time.utc.to_unix - ip_info.date
@@ -75,36 +70,19 @@ module Routing
     get "/:filename", Routes::Retrieve, :retrieve_file
     get "/thumbnail/:thumbnail", Routes::Retrieve, :retrieve_thumbnail
 
-    get "/delete", Routes::Deletion, :delete_file
+    get "/delete", Routes::Delete, :delete_file
 
     get "/api/stats", Routing::Misc, :stats
     get "/info/sharex.sxcu", Routing::Misc, :sharex_config
     get "/info/chatterinoconfig", Routing::Misc, :chatterino_config
 
-    # if CONFIG.admin_enabled
-    #   self.register_admin
-    # end
+    self.register_admin if CONFIG.admin_enabled
   end
 
-  # def register_admin
-  #   #   post "/api/admin/upload" do |env|
-  #   #     Routes::Admin.delete_ip_limit(env)
-  #   #   end
-  #   post "/api/admin/delete" do |env|
-  #     Routes::Admin.delete_file(env)
-  #   end
-  # end
-
-  # post "/api/admin/deleteiplimit" do |env|
-  #   Routes::Admin.delete_ip_limit(env)
-  # end
-
-  # post "/api/admin/fileinfo" do |env|
-  #   Routes::Admin.retrieve_file_info(env)
-  # end
-
-  # get "/api/admin/torexitnodes" do |env|
-  #   Routes::Admin.retrieve_tor_exit_nodes(env, @@exit_nodes)
-  # end
-
+  def register_admin
+    post "/api/admin/delete", Routes::Admin, :delete_file
+    post "/api/admin/fileinfo", Routes::Admin, :retrieve_file_info
+    get "/api/admin/torexitnodes", Routes::Admin, :tor_exit_nodes
+    get "/api/admin/cachedfiles", Routes::Admin, :cached_files
+  end
 end

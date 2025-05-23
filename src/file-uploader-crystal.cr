@@ -5,6 +5,8 @@ require "db"
 require "sqlite3"
 require "digest"
 
+# require "./ext/kemal_custom_exception_handler"
+
 require "./logger"
 require "./routing"
 require "./config"
@@ -13,6 +15,9 @@ require "./utils/*"
 require "./lib/*"
 require "./types/*"
 require "./database/*"
+
+module FileUploaderCrystal
+end
 
 CONFIG = Config.load
 Kemal.config.port = CONFIG.port
@@ -40,7 +45,6 @@ Utils.create_files_dir
 Utils.create_thumbnails_dir
 Routing.register_all
 
-Utils.delete_socket
 Jobs.run
 
 {% if flag?(:release) || flag?(:production) %}
@@ -48,14 +52,6 @@ Jobs.run
 {% end %}
 
 if !CONFIG.unix_socket.nil?
-  sleep 1.second
-  LOGGER.info "Changing socket permissions to 777"
-  begin
-    File.chmod("#{CONFIG.unix_socket}", File::Permissions::All)
-  rescue ex
-    LOGGER.fatal "#{ex.message}"
-    exit(1)
-  end
 end
 
 sleep

@@ -2,6 +2,7 @@ struct UFile
   # Without this, this class will not be able to be used as `as: UFile` on
   # SQL queries
   include DB::Serializable
+  include JSON::Serializable
 
   property original_filename : String
   property filename : String

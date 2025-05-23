@@ -1,6 +1,6 @@
 require "./spec_helper"
 
-describe File::Uploader do
+describe Config do
   # TODO: Write tests
 
   it "works" do

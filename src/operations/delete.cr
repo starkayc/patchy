@@ -1,0 +1,68 @@
+class DeletionKeyNotFound < Exception
+  def message
+    return "Deletion key not found."
+  end
+end
+
+class FileNotFound < Exception
+  def message
+    return "File not found in the database."
+  end
+end
+
+module OP::Delete
+  extend self
+
+  def delete_file(fileinfo : UFile) : Nil
+    full_filename = fileinfo.filename + fileinfo.extension
+    thumbnail = fileinfo.thumbnail
+
+    # Delete file
+    File.delete("#{CONFIG.files}/#{full_filename}")
+
+    # Delete thumbnail if it was generated
+    if fileinfo.thumbnail
+      File.delete("#{CONFIG.thumbnails}/#{thumbnail}")
+    end
+  end
+
+  def delete_file_by_key(deletion_key : String) : String?
+    fileinfo = Database::Files.select_with_key(deletion_key)
+    if fileinfo
+      full_filename = fileinfo.filename + fileinfo.extension
+      thumbnail = fileinfo.thumbnail
+      begin
+        delete_file(fileinfo)
+        # Delete entry from db
+        Database::Files.delete_with_key(deletion_key)
+        LOGGER.debug "delete_file (deletion_key): File '#{full_filename}' was deleted using key '#{deletion_key}'}"
+        return full_filename
+      rescue ex
+        LOGGER.error("delete_file (deletion_key): Unknown error: #{ex.message}")
+        raise ex
+      end
+    else
+      return nil
+    end
+  end
+
+  def delete_file(filename : String) : String?
+    fileinfo = Database::Files.select(filename)
+    if fileinfo
+      full_filename = fileinfo.filename + fileinfo.extension
+      thumbnail = fileinfo.thumbnail
+      begin
+        delete_file(fileinfo)
+        # Delete entry from db
+        Database::Files.delete(filename)
+        LOGGER.debug "delete_file (filename): File '#{full_filename}' was deleted"
+        return full_filename
+      rescue ex
+        LOGGER.error("delete_file (filename): Unknown error: #{ex.message}")
+        raise ex
+      end
+    else
+      return nil
+    end
+  end
+end

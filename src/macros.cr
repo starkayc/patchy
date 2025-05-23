@@ -3,6 +3,7 @@ macro ee(status_code, message)
   env.response.status_code = {{status_code}}
   msg = {"error" => {{message}}}.to_json
   return msg
+  # https://github.com/kemalcr/kemal/issues/249#issuecomment-259763562
 end
 
 macro msg(message)

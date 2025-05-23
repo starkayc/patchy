@@ -1,6 +1,8 @@
 # Pretty cool way to write background jobs! :)
 module Jobs
-  def self.check_old_files
+  extend self
+
+  def check_old_files
     if CONFIG.delete_files_check <= 0
       LOGGER.info "File deletion is disabled"
       return
@@ -13,7 +15,7 @@ module Jobs
     end
   end
 
-  def self.retrieve_tor_exit_nodes
+  def retrieve_tor_exit_nodes
     if !CONFIG.block_tor_addresses
       return
     end
@@ -26,17 +28,25 @@ module Jobs
     end
   end
 
-  def self.kemal
+  def kemal
     spawn do
       if !CONFIG.unix_socket.nil?
+        Utils.delete_socket
         Kemal.run &.server.not_nil!.bind_unix "#{CONFIG.unix_socket}"
+        LOGGER.info "Changing socket permissions to 777"
+        begin
+          File.chmod("#{CONFIG.unix_socket}", File::Permissions::All)
+        rescue ex
+          LOGGER.fatal "Failed to set unix socket permissions to 777: #{ex.message}"
+          exit(1)
+        end
       else
         Kemal.run
       end
     end
   end
 
-  def self.run
+  def run
     check_old_files
     retrieve_tor_exit_nodes
     kemal

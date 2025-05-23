@@ -1,10 +1,11 @@
 # file-uploader
 
-> [!WARNING]  
+> [!WARNING]
 > Project being rewritten, some features like the admin API and some upload endpoints are unavailable on 0.9.5
 
 Simple file uploader made on Crystal.
 ~~I'm making this to replace my current File uploader hosted on https://ayaya.beauty which uses https://github.com/nokonoko/uguu~~
+
 Already replaced lol.
 
 ## Features
@@ -12,9 +13,9 @@ Already replaced lol.
 - Temporary file uploads like Uguu
 - File deletion link (not available in frontend for now)
 - Chatterino and ShareX support
-- Video Thumbnails for Chatterino and FrankerFaceZ (Requires `ffmpeg` to be installed, disabled by default)
+- Thumbnails for Chatterino and FrankerFaceZ (Requires `ffmpeg` to be installed, disabled by default)
 - Rate Limiting
-- [Small Admin API](./src/handling/admin.cr) that allows you to delete files, reset rate limits and more (Needs to be enabled in the configuration)
+- [Small Admin API](./src/routes/admin/) that allows you to delete files, reset rate limits and more (Needs to be enabled in the configuration)
 - Unix socket support if you don't want to deal with all the TCP overhead
 - Automatic protocol detection (HTTPS or HTTP)
 - Low memory usage: Between 6MB at idle and 25MB if a file is being uploaded or retrieved. It will depend of your traffic.

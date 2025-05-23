@@ -2,7 +2,7 @@ require "mime"
 
 def send_file_raw(env : HTTP::Server::Context, fileinfo : UFile, file : Bytes) : Nil
   config = Kemal.config.serve_static
-  mime_type = MIME.from_filename(fileinfo.original_filename, "application/octet-stream")
+  mime_type = MIME.from_extension(fileinfo.extension, "application/octet-stream")
   env.response.content_type = mime_type
   env.response.headers["Accept-Ranges"] = "bytes"
   env.response.headers["X-Content-Type-Options"] = "nosniff"
