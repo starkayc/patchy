@@ -106,8 +106,8 @@ module Utils
     dependencies.each do |dep|
       next if !CONFIG.generate_thumbnails
       if !Process.find_executable(dep)
-        LOGGER.fatal("'#{dep}' was not found.")
-        exit(1)
+        LOGGER.fatal("'#{dep}' was not found. Thumbnails for OpenGraph user agents will not be generated.")
+        CONFIG.generate_thumbnails = false
       end
     end
   end
