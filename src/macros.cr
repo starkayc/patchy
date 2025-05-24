@@ -2,8 +2,11 @@ macro ee(status_code, message)
   env.response.content_type = "application/json"
   env.response.status_code = {{status_code}}
   msg = {"error" => {{message}}}.to_json
-  return msg
+  # We close the response instantly
   # https://github.com/kemalcr/kemal/issues/249#issuecomment-259763562
+  env.response.print msg
+  env.response.close
+  return
 end
 
 macro msg(message)
