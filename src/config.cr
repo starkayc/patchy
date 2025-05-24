@@ -119,8 +119,14 @@ class Config
   end
 
   def self.load(config_file : String = "config/config.yml")
-    config_yaml = File.read(config_file)
-    config = Config.from_yaml(config_yaml)
+    begin
+      config_yaml = File.read(config_file)
+      config = Config.from_yaml(config_yaml)
+    rescue File::NotFoundError
+      puts "Config: Config file '#{config_file}' was not found, using the default uploader configuration"
+      puts "Config, Note: You can ignore this error safely if you use environment variables to configure the uploader!"
+      config = Config.from_yaml("")
+    end
 
     # https://github.com/iv-org/invidious/blob/master/src/invidious/config.cr#L215
     # Update config from env vars (upcased and prefixed with "UPLOADER_")
