@@ -86,7 +86,7 @@ class Config
   # The lenght of the delete key
   property delete_key_length : Int32 = 6
 
-  property site_info : String = "xd"
+  property site_info : String = "Welcome to the file-uploader-crystal uploader!"
   # TODO: UNUSED CONSTANT
   property site_warning : String? = ""
 
