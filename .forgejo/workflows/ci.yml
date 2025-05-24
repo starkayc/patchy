@@ -27,7 +27,7 @@ jobs:
 
     - name: Docker meta
       id: meta
-      uses: https://github.com/docker/metadata-action@v6
+      uses: https://code.forgejo.org/docker/metadata-action@v5
       with:
         images: git.nadeko.net/fijxu/file-uploader-crystal
         tags: |
