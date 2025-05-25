@@ -6,12 +6,9 @@ services:
     cpus: 0.5
     # If you want to use a custom config file, you can mount it here.
     volumes:
-      # - ./config/config.yml:/file-uploader-crystal/config/config.yml
-      - ./public:/file-uploader-crystal/public
-      - ./files:/file-uploader-crystal/files
-      - ./thumbnails:/file-uploader-crystal/thumbnails
-      - ./db:/file-uploader-crystal/db
-      - ./torexitnodes.txt:/file-uploader-crystal/torexitnodes.txt
+      # You need to create the data folder first:
+      # mkdir /data && sudo chown -R 10000:10000 /data
+      - ./data:/data
     ports:
-      - 127.0.0.1:8080:8080
+      - 8080:8080
 

@@ -14,6 +14,9 @@ COPY ./src/ ./src/
 # See definition of CURRENT_BRANCH, CURRENT_COMMIT and CURRENT_VERSION.
 COPY ./.git/ ./.git/
 
+# Copy public folder to image
+COPY ./public/ ./public/
+
 RUN --mount=type=cache,target=/root/.cache/crystal \
 	crystal build ./src/file-uploader-crystal.cr \
 	-O3 -Drelease \
@@ -26,14 +29,22 @@ FROM alpine:3.21
 # by that package.
 # This is subject to change with
 # https://github.com/crystal-lang/crystal/issues/15763
-RUN apk add --no-cache tini ffmpeg shared-mime-info
+RUN apk add --no-cache tini ffmpeg mailcap
 
 WORKDIR /file-uploader-crystal
+
+# Default environment variables for the container
+ENV UPLOADER_THUMBNAILS=/data/files
+ENV UPLOADER_THUMBNAILS=/data/thumbnails
+ENV UPLOADER_DB=/data/db/db.sqlite3
 
 RUN addgroup -g 10000 -S file-uploader-crystal && \
 	adduser -u 10000 -S file-uploader-crystal -G file-uploader-crystal
 
+RUN mkdir -p /data && chown -R 10000:10000 /data
+
 COPY --from=builder /file-uploader-crystal/file-uploader-crystal /file-uploader-crystal
+COPY --from=builder /file-uploader-crystal/public ./public
 
 RUN chmod o+rX -R /file-uploader-crystal/file-uploader-crystal
 
