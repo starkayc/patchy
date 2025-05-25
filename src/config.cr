@@ -10,17 +10,17 @@ class Config
   # Port on which the uploader will bind
   property port : Int32 = 8080
   # IP address on which the uploader will bind
-  property host : String = "127.0.0.1"
+  property host : String = "0.0.0.0"
 
   # Where the uploaded files will be located
-  property files : String = "./files"
+  property files : String = "./data/files"
   # Where the thumbnails will be located when they are successfully generated
-  property thumbnails : String = "./thumbnails"
+  property thumbnails : String = "./data/thumbnails"
   # Generate thumbnails for OpenGraph compatible platforms like Chatterino
   # Whatsapp, Facebook, Discord, etc.
   property generate_thumbnails : Bool = false
   # Where the SQLITE3 database will be located
-  property db : String = "./db.sqlite3"
+  property db : String = "./data/db/"
 
   # Enable or disable the admin API
   property admin_enabled : Bool = false

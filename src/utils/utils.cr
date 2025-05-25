@@ -27,7 +27,7 @@ module Utils
     if !Dir.exists?("#{CONFIG.files}")
       LOGGER.info "Creating files folder under '#{CONFIG.files}'"
       begin
-        Dir.mkdir("#{CONFIG.files}")
+        Dir.mkdir_p("#{CONFIG.files}")
       rescue ex
         LOGGER.fatal "#{ex.message}"
         exit(1)
@@ -40,11 +40,23 @@ module Utils
       if !Dir.exists?("#{CONFIG.thumbnails}")
         LOGGER.info "Creating thumbnails folder under '#{CONFIG.thumbnails}'"
         begin
-          Dir.mkdir("#{CONFIG.thumbnails}")
+          Dir.mkdir_p("#{CONFIG.thumbnails}")
         rescue ex
           LOGGER.fatal "#{ex.message}"
           exit(1)
         end
+      end
+    end
+  end
+
+  def create_db_dir
+    if !Dir.exists?("#{CONFIG.db}")
+      LOGGER.info "Creating db folder under '#{CONFIG.db}'"
+      begin
+        Dir.mkdir_p("#{CONFIG.db}")
+      rescue ex
+        LOGGER.fatal "#{ex.message}"
+        exit(1)
       end
     end
   end
