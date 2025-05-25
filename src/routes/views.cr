@@ -6,13 +6,13 @@ module Routes::Views
     scheme = env.request.headers["X-Forwarded-Proto"]? || "http"
     files_hosted = Database::Files.file_count
 
-    render "src/views/index.ecr"
+    templated "index"
   end
 
   def uploader_configs(env)
     host = env.request.headers["X-Forwarded-Host"]? || env.request.headers["Host"]?
     scheme = env.request.headers["X-Forwarded-Proto"]? || "http"
 
-    render "src/views/uploader_configs.ecr"
+    templated "uploader_configs"
   end
 end

@@ -1,31 +1,20 @@
-<!DOCTYPE html>
-<html lang="en">
+<% content_for "head" do %>
+<title> <%= host %> - Uploader configs!</title>
+<% end %>
 
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title> <%= host %> </title>
-  <link rel="stylesheet" href="/styles.css">
-  <link rel="icon" href="/favicon.png" type="image/png" />
-</head>
-
-<body>
-  <div class="container">
-    <a href='/'>Go back</a>
-    <hr>
-    <h2>Chatterino</h2>
-      <p>
-        You can use this uploader setting the following fields on Settings > External tools > Image uploader
-        <p>Request URL: <a><%= scheme %>://<%= host %>/upload</a></p>
-        <p>Form field: <a>data</a></p>
-        <p>Image link: <a>{link}</a></p>
-        <p>Delete link: <a>{deleteLink}</a></p>
-      </p>
-    <h2>ShareX</h2>
-      <p>
-        Download the configuration here: <a href='./sharex.sxcu'>sharex.sxcu</a>
-      </p>
-  </div>
-</body>
-
-</html>
+<div class="container">
+  <a href='/'>Go back</a>
+  <hr>
+  <h2>Chatterino</h2>
+    <p>
+      You can use this uploader setting the following fields on Settings > External tools > Image uploader
+      <p>Request URL: <a><%= scheme %>://<%= host %>/upload</a></p>
+      <p>Form field: <a>data</a></p>
+      <p>Image link: <a>{link}</a></p>
+      <p>Delete link: <a>{deleteLink}</a></p>
+    </p>
+  <h2>ShareX</h2>
+    <p>
+      Download the configuration here: <a href='./sharex.sxcu'>sharex.sxcu</a>
+    </p>
+</div>

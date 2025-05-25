@@ -15,6 +15,19 @@ macro msg(message)
   return msg
 end
 
+# https://github.com/iv-org/invidious/blob/4b37d47ebbc4d3a0a55c8febaca2b28a68e1d9b5/src/invidious/helpers/macros.cr#L51
+# https://kemalcr.com/guide/#views-templates
+macro templated(_filename, template = "template", navbar_search = true, buffer_footer = false)
+  navbar_search = {{navbar_search}}
+  buffer_footer = {{buffer_footer}}
+
+  {{ filename = "src/views/" + _filename + ".ecr" }}
+  {{ layout = "src/views/" + template + ".ecr" }}
+
+  __content_filename__ = {{filename}}
+  render {{filename}}, {{layout}}
+end
+
 module Headers
   macro host
     env.request.headers["X-Forwarded-Host"]? || env.request.headers["Host"]?

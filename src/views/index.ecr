@@ -1,27 +1,18 @@
-<!DOCTYPE html>
-<html lang="en">
+<% content_for "head" do %>
+<title> <%= host %> - Temporary file uploader!</title>
+<script src="/script.js"></script>
+<% end %>
 
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title> <%= host %> </title>
-  <link rel="stylesheet" href="/styles.css">
-  <link rel="icon" href="/favicon.png" type="image/png" />
-  <script src="/script.js"></script>
-</head>
-
-<body>
-  <div class="container">
-    <h1><%= host %></h1>
-    <p class="site-info"><%= CONFIG.site_info %></p>
-    <div class="drop-area" id="drop-area">
-      <form action="/upload?nojs=1" method="post" enctype="multipart/form-data" id="form">
-        <input name="file" type="file" id="file"/>
-        <input type="submit" value="Upload" id="upload-box">
-      </form>
-    </div>
-    <div id="upload-status"></div>
+<div class="container">
+  <h1><%= host %></h1>
+  <p class="site-info"><%= CONFIG.site_info %></p>
+  <div class="drop-area" id="drop-area">
+    <form action="/upload?nojs=1" method="post" enctype="multipart/form-data" id="form">
+      <input name="file" type="file" id="file"/>
+      <input type="submit" value="Upload" id="upload-box">
+    </form>
   </div>
+  <div id="upload-status"></div>
   <div class="footer">
     <a>Files hosted: <%= files_hosted %></a>
     <div class="alternative-domains">
@@ -40,6 +31,4 @@
       <a href='mailto:<%= CONFIG.abuse_email %>'>Abuse email</a>
     <% end %>
   </div>
-</body>
-
-</html>
+</div>
