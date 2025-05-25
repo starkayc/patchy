@@ -4,10 +4,17 @@
 <% end %>
 
 <div class="container">
+  <div class="navbar">
+    <a href='/-/info/configs'>Configurations for uploaders</a>
+    <span class="end-of-flex"></span>
+    <a href='/-/admin'>Admin Panel</a>
+    <a href='/-/login'>Login</a>
+  </div>
+  <hr>
   <h1><%= host %></h1>
   <p class="site-info"><%= CONFIG.site_info %></p>
   <div class="drop-area" id="drop-area">
-    <form action="/upload?nojs=1" method="post" enctype="multipart/form-data" id="form">
+    <form action="/-/upload?nojs=1" method="post" enctype="multipart/form-data" id="form">
       <input name="file" type="file" id="file"/>
       <input type="submit" value="Upload" id="upload-box">
     </form>
@@ -23,7 +30,6 @@
         <% end %>
       <% end %>
     </div>
-    <a href='/info/configs'>Configurations for uploaders</a>
     <a href='https://codeberg.org/Fijxu/file-uploader-crystal'>
       file-uploader-crystal (<%= CURRENT_TAG %> - <%= CURRENT_VERSION %> @ <%= CURRENT_BRANCH %>)
     </a>

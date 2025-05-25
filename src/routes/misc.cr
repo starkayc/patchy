@@ -42,7 +42,7 @@ module Routes::Misc
 "Version": "14.0.1",
 "DestinationType": "ImageUploader, FileUploader",
 "RequestMethod": "POST",
-"RequestURL": "#{scheme}://#{host}/upload",
+"RequestURL": "#{scheme}://#{host}/-/upload",
 "Body": "MultipartFormData",
 "FileFormName": "file",
 "URL": "{json:link}",

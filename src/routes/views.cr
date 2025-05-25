@@ -15,4 +15,18 @@ module Routes::Views
 
     templated "uploader_configs"
   end
+
+  def admin(env)
+    host = env.request.headers["X-Forwarded-Host"]? || env.request.headers["Host"]?
+    scheme = env.request.headers["X-Forwarded-Proto"]? || "http"
+
+    templated "admin"
+  end
+
+  def login(env)
+    host = env.request.headers["X-Forwarded-Host"]? || env.request.headers["Host"]?
+    scheme = env.request.headers["X-Forwarded-Proto"]? || "http"
+
+    templated "login"
+  end
 end

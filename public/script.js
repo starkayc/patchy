@@ -50,7 +50,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function uploadFile(file) {
-    const url = "upload";
+    const url = "/-/upload";
     const xhr = new XMLHttpRequest();
 
     const uploadContainer = document.createElement("div");

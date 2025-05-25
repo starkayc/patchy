@@ -24,7 +24,7 @@ module Routes::Upload
       @name = fileinfo.original_filename
       @checksum = fileinfo.checksum
       @delete_key = fileinfo.delete_key
-      @delete_link = "#{scheme}://#{host}/delete?key=#{fileinfo.delete_key}"
+      @delete_link = "#{scheme}://#{host}/-/delete?key=#{fileinfo.delete_key}"
     end
   end
 

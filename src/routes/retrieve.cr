@@ -32,7 +32,7 @@ module Routes::Retrieve
     <meta charset="UTF-8">
     <meta property="og:title" content="#{fileinfo.original_filename}">
     <meta property="og:url" content="#{scheme}://#{host}/#{fileinfo.filename}">
-    #{%(<meta property="og:image" content="#{scheme}://#{host}/thumbnail/#{fileinfo.filename}.jpg">) if fileinfo.thumbnail}
+    #{%(<meta property="og:image" content="#{scheme}://#{host}/-/thumbnail/#{fileinfo.filename}.jpg">) if fileinfo.thumbnail}
   </head>
 </html>)
       end

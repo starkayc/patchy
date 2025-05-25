@@ -64,29 +64,32 @@ module Routing
   def register_all
     # Views
     get "/", Routes::Views, :root
-    get "/info/configs", Routes::Views, :uploader_configs
+    get "/-/info/configs", Routes::Views, :uploader_configs
+    get "/-/admin", Routes::Views, :admin
+    get "/-/login", Routes::Views, :login
 
     # Upload
     post "/upload", Routes::Upload, :upload
+    post "/-/upload", Routes::Upload, :upload
 
     # Retrieve
     get "/:filename", Routes::Retrieve, :retrieve_file
-    get "/thumbnail/:thumbnail", Routes::Retrieve, :retrieve_thumbnail
+    get "/-/thumbnail/:thumbnail", Routes::Retrieve, :retrieve_thumbnail
 
     # Delete
-    get "/delete", Routes::Delete, :delete_file
+    get "/-/delete", Routes::Delete, :delete_file
 
     # Misc
-    get "/api/stats", Routes::Misc, :stats
-    get "/info/sharex.sxcu", Routes::Misc, :sharex_config
+    get "/-/api/stats", Routes::Misc, :stats
+    get "/-/info/sharex.sxcu", Routes::Misc, :sharex_config
 
     self.register_admin if CONFIG.admin_enabled
   end
 
   def register_admin
-    post "/api/admin/delete", Routes::Admin, :delete_file
-    post "/api/admin/fileinfo", Routes::Admin, :retrieve_file_info
-    get "/api/admin/torexitnodes", Routes::Admin, :tor_exit_nodes
-    get "/api/admin/cachedfiles", Routes::Admin, :cached_files
+    post "/-/api/admin/delete", Routes::Admin, :delete_file
+    post "/-/api/admin/fileinfo", Routes::Admin, :retrieve_file_info
+    get "/-/api/admin/torexitnodes", Routes::Admin, :tor_exit_nodes
+    get "/-/api/admin/cachedfiles", Routes::Admin, :cached_files
   end
 end

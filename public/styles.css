@@ -52,6 +52,8 @@ h1 {
 	font-size: 68px;
 	text-align: center;
 	margin: 20px;
+	max-width: 100%;
+	overflow-wrap: break-word;
 }
 
 p,
@@ -63,13 +65,12 @@ h5 {
 	color: var(--fg3)
 }
 
-h1 {
-	max-width: 100%;
-	overflow-wrap: break-word;
-}
-
 a {
 	color: var(--fg3);
+}
+
+hr {
+	border-color: var(--bg4);
 }
 
 a[href] {
@@ -80,6 +81,16 @@ a[href] {
 a[href]:hover {
 	text-decoration: underline;
 	color: var(--blue-dim)
+}
+
+.navbar {
+	display: flex;
+	flex-direction: row;
+	gap: 1rem;
+}
+
+.navbar>.end-of-flex {
+	margin-left: auto;
 }
 
 .site-info {
