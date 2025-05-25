@@ -25,7 +25,7 @@ module Utils::Cache
       file_size = file.size
 
       if file_size > @max_allowed_filesize &* 1000
-        LOGGER.trace("File Cache: Not caching '#{fileinfo.filename}', size too big to be cached, size: #{file_size}")
+        LOGGER.trace("File Cache: Not caching '#{fileinfo.filename}', size too big to be cached, size: #{file_size.humanize_bytes}")
         return
       end
 
