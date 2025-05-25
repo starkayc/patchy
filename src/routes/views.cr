@@ -9,10 +9,10 @@ module Routes::Views
     render "src/views/index.ecr"
   end
 
-  def chatterino(env)
+  def uploader_configs(env)
     host = env.request.headers["X-Forwarded-Host"]? || env.request.headers["Host"]?
     scheme = env.request.headers["X-Forwarded-Proto"]? || "http"
 
-    render "src/views/chatterino.ecr"
+    render "src/views/uploader_configs.ecr"
   end
 end

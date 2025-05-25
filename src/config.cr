@@ -90,6 +90,9 @@ class Config
   # TODO: UNUSED CONSTANT
   property site_warning : String? = ""
 
+  # Abuse email that is going to be displayed on the website of the uploader
+  property abuse_email : String?
+
   # Blocked extensions that are not allowed to be uploaded to the server
   property blocked_extensions : Array(String) = [] of String
 
@@ -103,6 +106,7 @@ class Config
   # with multiple domains. You can display the domains in the frontend
   # and in `/api/stats`
   property alternative_domains : Array(String) = [] of String
+
 
   def self.check_config(config : Config)
     if config.filename_length <= 0

@@ -1,6 +1,6 @@
 require "http/client"
 
-module Routing::Misc
+module Routes::Misc
   extend self
 
   struct Stats

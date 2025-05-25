@@ -1,42 +1,45 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title> <%= host %> </title>
-    <link rel="stylesheet" href="/styles.css">
-    <link rel="icon" href="./favicon.png" type="image/gif" />
-    <script src="script.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title> <%= host %> </title>
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="icon" href="/favicon.png" type="image/png" />
+  <script src="/script.js"></script>
 </head>
+
 <body>
-    <div class="container">
-        <h1 style="font-size: 68px; text-align: center; margin: 20px;"><%= host %></h1>
-        <p style="text-align: center; font-size: 22px;"><%= CONFIG.site_info %></p>
-        <div id="drop-area">
-            <p style='padding: 0;margin: 0; color: #123718bf;'>Arrastra, Pega o Selecciona archivos.</p>
-            <input type="file" id="fileElem" accept="*/*" style="display: none;">
-            <!-- <label for="fileElem" class="button">Select File</label> -->
-        </div>
-        <div id="upload-status"></div>
+  <div class="container">
+    <h1><%= host %></h1>
+    <p class="site-info"><%= CONFIG.site_info %></p>
+    <div class="drop-area" id="drop-area">
+      <form action="/upload?nojs=1" method="post" enctype="multipart/form-data" id="form">
+        <input name="file" type="file" id="file"/>
+        <input type="submit" value="Upload" id="upload-box">
+      </form>
     </div>
-    <div>
-        <div style="text-align:center;">
-            <p>
-                <a href='/info/chatterino'>Chatterino Config</a> |
-                <a href='/info/sharex.sxcu'>ShareX Config</a> |
-                <a href='https://codeberg.org/Fijxu/file-uploader-crystal'>
-                file-uploader-crystal (BETA <%= CURRENT_TAG %> - <%= CURRENT_VERSION %> @ <%= CURRENT_BRANCH %>)
-                </a>
-            </p>
-            <p>Archivos alojados: <%= files_hosted %></p>
-            <% if !CONFIG.alternative_domains.empty? %>
-            <p>
-            <% CONFIG.alternative_domains.each do | domain | %>
-                <a href="https://<%= domain %>"><%= domain %></a>
-            <% end %>
-            </p>
-            <% end %>
-        </div>
+    <div id="upload-status"></div>
+  </div>
+  <div class="footer">
+    <a>Files hosted: <%= files_hosted %></a>
+    <div class="alternative-domains">
+      <a>Alternative domains: </a>
+      <% if !CONFIG.alternative_domains.empty? %>
+        <% CONFIG.alternative_domains.each do | domain | %>
+          <a href="https://<%= domain %>"><%= domain %></a>
+        <% end %>
+      <% end %>
     </div>
+    <a href='/info/configs'>Configurations for uploaders</a>
+    <a href='https://codeberg.org/Fijxu/file-uploader-crystal'>
+      file-uploader-crystal (<%= CURRENT_TAG %> - <%= CURRENT_VERSION %> @ <%= CURRENT_BRANCH %>)
+    </a>
+    <% if CONFIG.abuse_email && CONFIG.abuse_email != "" %>
+      <a href='mailto:<%= CONFIG.abuse_email %>'>Abuse email</a>
+    <% end %>
+  </div>
 </body>
+
 </html>

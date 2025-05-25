@@ -1,29 +1,18 @@
 // By chatgpt becuase I hate frontend and javascript kill me
 document.addEventListener("DOMContentLoaded", () => {
   const dropArea = document.getElementById("drop-area");
-  const fileInput = document.getElementById("fileElem");
+  const fileInput = document.getElementById("file");
+  const form = document.getElementById("form");
   const uploadStatus = document.getElementById("upload-status");
+  form.style.display = "none";
 
-  // Prevent default drag behaviors
-  ["dragenter", "dragover", "dragleave", "drop"].forEach((eventName) => {
-    dropArea.addEventListener(eventName, preventDefaults, false);
-    document.body.addEventListener(eventName, preventDefaults, false);
-  });
+  const dropAreaText = document.createElement("p");
+  dropAreaText.textContent = "Click here to upload a file"
+  dropArea.appendChild(dropAreaText)
 
-  // Highlight drop area when item is dragged over
-  ["dragenter", "dragover"].forEach((eventName) => {
-    dropArea.addEventListener(eventName, highlight, false);
-  });
-
-  ["dragleave", "drop"].forEach((eventName) => {
-    dropArea.addEventListener(eventName, unhighlight, false);
-  });
-
-  // Handle dropped files
   dropArea.addEventListener("drop", handleDrop, false);
   dropArea.addEventListener("click", () => fileInput.click());
 
-  // Handle file selection
   fileInput.addEventListener(
     "change",
     () => {
@@ -33,21 +22,7 @@ document.addEventListener("DOMContentLoaded", () => {
     false
   );
 
-  // Handle pasted files
   document.addEventListener("paste", handlePaste, false);
-
-  function preventDefaults(e) {
-    e.preventDefault();
-    e.stopPropagation();
-  }
-
-  function highlight() {
-    dropArea.classList.add("highlight");
-  }
-
-  function unhighlight() {
-    dropArea.classList.remove("highlight");
-  }
 
   function handleDrop(e) {
     const dt = e.dataTransfer;
@@ -75,18 +50,17 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function uploadFile(file) {
-    const url = "upload"; // Replace with your upload URL
+    const url = "upload";
     const xhr = new XMLHttpRequest();
 
-    // Create a new upload status container and link elements
     const uploadContainer = document.createElement("div");
     const statusLink = document.createElement("div");
-    const uploadText = document.createElement("span");
+    const uploadText = document.createElement("a");
     const buttons = document.createElement("div");
     const copyButton = document.createElement("button");
     const deleteButton = document.createElement("button");
 
-    uploadContainer.className = "upload-status"; // Use the existing CSS class for styling
+    uploadContainer.className = "upload-status";
     uploadContainer.appendChild(uploadText);
     uploadContainer.appendChild(statusLink);
     buttons.appendChild(copyButton)
@@ -94,22 +68,20 @@ document.addEventListener("DOMContentLoaded", () => {
     uploadContainer.appendChild(buttons)
     uploadStatus.appendChild(uploadContainer);
 
-    // Update upload text
     uploadText.innerHTML = "0%";
     uploadText.className = "percent";
     statusLink.className = "status";
-    copyButton.className = "button copy-button"; // Add class for styling
-    copyButton.innerHTML = "Copiar"; // Set button text
+    copyButton.className = "button copy-button";
+    copyButton.innerHTML = "Copy";
     deleteButton.className = "button delete-button";
-    deleteButton.innerHTML = "Borrar";
+    deleteButton.innerHTML = "Delete";
     copyButton.style.display = "none";
     deleteButton.style.display = "none";
 
-    // Update progress text
     xhr.upload.addEventListener("progress", (e) => {
       if (e.lengthComputable) {
         const percentComplete = Math.round((e.loaded / e.total) * 100);
-        uploadText.innerHTML = `${percentComplete}%`; // Update the text with the percentage
+        uploadText.innerHTML = `${percentComplete}%`;
       }
     });
 
@@ -119,8 +91,6 @@ document.addEventListener("DOMContentLoaded", () => {
     };
 
     xhr.onload = () => {
-      //   console.log("Response Status:", xhr.status);
-      //   console.log("Response Text:", xhr.responseText);
       if (xhr.status === 200) {
         try {
           const response = JSON.parse(xhr.responseText);
@@ -155,15 +125,7 @@ document.addEventListener("DOMContentLoaded", () => {
     xhr.send(formData);
   }
 
-  // Function to copy the link to the clipboard
   function copyToClipboard(text) {
-    navigator.clipboard
-      .writeText(text)
-      .then(() => {
-        // alert("Link copied to clipboard!"); // Notify the user
-      })
-      .catch((err) => {
-        console.error("Failed to copy: ", err);
-      });
+    navigator.clipboard.writeText(text)
   }
 });

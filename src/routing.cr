@@ -62,19 +62,23 @@ module Routing
   end
 
   def register_all
+    # Views
     get "/", Routes::Views, :root
-    get "/info/chatterino", Routes::Views, :chatterino
+    get "/info/configs", Routes::Views, :uploader_configs
 
+    # Upload
     post "/upload", Routes::Upload, :upload
 
+    # Retrieve
     get "/:filename", Routes::Retrieve, :retrieve_file
     get "/thumbnail/:thumbnail", Routes::Retrieve, :retrieve_thumbnail
 
+    # Delete
     get "/delete", Routes::Delete, :delete_file
 
-    get "/api/stats", Routing::Misc, :stats
-    get "/info/sharex.sxcu", Routing::Misc, :sharex_config
-    get "/info/chatterinoconfig", Routing::Misc, :chatterino_config
+    # Misc
+    get "/api/stats", Routes::Misc, :stats
+    get "/info/sharex.sxcu", Routes::Misc, :sharex_config
 
     self.register_admin if CONFIG.admin_enabled
   end

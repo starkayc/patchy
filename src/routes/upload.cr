@@ -32,6 +32,8 @@ module Routes::Upload
     host = env.request.headers["X-Forwarded-Host"]? || env.request.headers["Host"]?
     scheme = env.request.headers["X-Forwarded-Proto"]? || "http"
     ip_addr = env.request.headers["X-Real-IP"]? || env.request.remote_address.as?(Socket::IPAddress).try &.address
+    user_agent = env.request.headers["User-Agent"]?
+    no_js = env.params.query.has_key?("nojs")
     env.response.content_type = "application/json"
 
     # You can modify this if you want to allow files smaller than 1MiB.
@@ -108,6 +110,11 @@ module Routes::Upload
     rescue ex
       LOGGER.error "An error ocurred when trying to insert the data into the DB: #{ex.message}"
       ee 500, "An error ocurred when trying to insert the data into the DB"
+    end
+
+    # Redirect to uploaded file if it's a browser
+    if no_js
+      return env.redirect fileinfo.filename
     end
 
     res = Response.new(fileinfo, scheme, host)

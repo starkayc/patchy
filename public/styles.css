@@ -1,33 +1,57 @@
-@font-face {
-	font-family: "FG";
-	font-weight: 500;
-	src: url('framd.ttf');
-}
+:root {
+	/* https://github.com/YV31/gruvbox-css */
+	--bg_h: #1d2021;
+	--bg: #282828;
+	--bg_s: #32302f;
+	--bg1: #3c3836;
+	--bg2: #504945;
+	--bg3: #665c54;
+	--bg4: #7c6f64;
 
-@font-face {
-	font-family: "FG";
-	font-weight: 900;
-	src: url('frahv.ttf');
-}
+	--fg: #fbf1c7;
+	--fg1: #ebdbb2;
+	--fg2: #d5c4a1;
+	--fg3: #bdae93;
+	--fg4: #a89984;
 
-@font-face {
-	font-family: "XFG";
-	font-weight: 900;
-	src: url('frahvmod.ttf');
+	--red: #fb4934;
+	--green: #b8bb26;
+	--yellow: #fabd2f;
+	--blue: #83a598;
+	--purple: #d3869b;
+	--aqua: #8ec07c;
+	--gray: #928374;
+	--orange: #fe8019;
+
+	--red-dim: #cc2412;
+	--green-dim: #98971a;
+	--yellow-dim: #d79921;
+	--blue-dim: #458588;
+	--purple-dim: #b16286;
+	--aqua-dim: #689d6a;
+	--gray-dim: #a89984;
+	--orange-dim: #d65d0e;
 }
 
 html {
-	font-family: "FG";
-	background: #111111;
+	font-family: "Monospace";
+	font-weight: 500;
+	letter-spacing: -1.5px;
+	background: var(--bg_h);
 	background-attachment: fixed;
 	background-repeat: no-repeat;
 	background-size: cover;
 }
 
-
 body {
 	margin: 0;
 	padding: 20px;
+}
+
+h1 {
+	font-size: 68px;
+	text-align: center;
+	margin: 20px;
 }
 
 p,
@@ -36,19 +60,38 @@ h2,
 h3,
 h4,
 h5 {
-	color: aliceblue
+	color: var(--fg3)
 }
 
 h1 {
-	font-family: "FG";
-	font-weight: 200;
 	max-width: 100%;
 	overflow-wrap: break-word;
 }
 
 a {
+	color: var(--fg3);
+}
+
+a[href] {
 	text-decoration: none;
-	color: #ffb6c1
+	color: var(--blue)
+}
+
+a[href]:hover {
+	text-decoration: underline;
+	color: var(--blue-dim)
+}
+
+.site-info {
+	text-align: center;
+	font-size: 22px;
+}
+
+.footer {
+	text-align: center;
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
 }
 
 .bottom {
@@ -62,7 +105,7 @@ a {
 }
 
 .percent {
-	color: aliceblue
+	color: var(--fg1)
 }
 
 .container {
@@ -76,33 +119,61 @@ a {
 	max-height: 500px
 }
 
-#drop-area {
+.drop-area {
 	text-align: center;
 	position: relative;
 	width: fit-content;
 	margin: 0 auto;
 	display: block;
-	background: rgba(202, 230, 190, .75);
-	border: 1px solid #b7d1a0;
+	background: var(--bg1);
+	border: 1px solid var(--bg2);
 	border-radius: 4px;
-	color: #468847;
+	/* color: var; */
 	cursor: pointer;
-	font-size: 24px;
-	padding: 28px 48px;
-	text-shadow: 0 1px hsla(0, 0%, 100%, .5);
-	transition: background-color .25s, width .5s, height .5s;
+	padding: 28px 32px;
+	/* text-shadow: 0 1px hsla(0, 0%, 100%, .5); */
+	/* transition: background-color .25s, width .5s, height .5s; */
+}
+
+form {
+	display: flex;
+	flex-direction: column;
+	gap: 1rem;
+}
+
+input[type="file"] {
+	background-color: var(--gray-dim);
+	border: 1px solid var(--gray);
+	border-radius: 4px;
+	padding: 1rem;
+	width: 100%;
+	box-sizing: border-box;
+	cursor: pointer;
+}
+
+input[type="file"]:hover {
+	background-color: var(--gray);
+}
+
+input[type="submit"] {
+	background-color: var(--gray-dim);
+	border-radius: 4px;
+	border: none;
+	padding: 0.75rem 1rem;
+	font-weight: bold;
+	cursor: pointer;
+}
+
+input[type="submit"]:hover {
+	background-color: var(--gray);
 }
 
 .button {
+	color: var(--white);
 	display: inline-block;
 	padding: 10px 20px;
-	color: white;
 	border-radius: 5px;
 	cursor: pointer;
-}
-
-.upload-status {
-	margin-top: 10px;
 }
 
 nav a,
@@ -114,14 +185,18 @@ nav>ul {
 }
 
 #upload-status {
-	margin: 20px;
+	margin: 10px;
 }
 
 .upload-status {
+	background: var(--bg1);
+	border: 1px solid var(--bg2);
+	margin-top: 10px;
 	display: flex;
-	align-items: center;
+	border-radius: 4px;
+	flex-direction: row;
+	width: 100%;
 	justify-content: space-between;
-	border: 1px solid #ffffff;
 	padding: 5px;
 }
 
@@ -131,41 +206,30 @@ nav>ul {
 	margin-left: auto;
 }
 
-.link {
-	color: #ffb6c1;
-	text-decoration: none;
-	margin-right: 5px;
-}
-
-.link:hover {
-	text-decoration: underline;
-}
-
 .button {
 	display: inline;
-	color: rgb(255, 255, 255);
 	border: none;
-	border-radius: 3px;
+	border-radius: 4px;
 	padding: 5px 10px;
 	cursor: pointer;
 	font-weight: bold;
 }
 
 .copy-button {
-	background-color: #1e8a1a;
-}
-
-.delete-button {
-	background-color: #b83434;
-	margin-left: 6px
+	background-color: var(--purple);
 }
 
 .copy-button:hover {
-	background-color: #156412;
+	background-color: var(--purple-dim);
+}
+
+.delete-button {
+	background-color: var(--yellow);
+	margin-left: 6px
 }
 
 .delete-button:hover {
-	background-color: #912a2a;
+	background-color: var(--yellow-dim);
 }
 
 .status {
