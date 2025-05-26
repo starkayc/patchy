@@ -1,45 +1,88 @@
 # file-uploader
 
-> [!WARNING]
-> Project being rewritten, some features like the admin API and some upload
-> endpoints are unavailable on 0.9.5
+A temporary file uploader easy to host that I did to replace
+[Uguu](https://github.com/nokonoko/uguu), which is not easy to host due to PHP.
 
-Simple file uploader made on Crystal. ~~I'm making this to replace my current
-File uploader hosted on https://ayaya.beauty which uses
-https://github.com/nokonoko/uguu~~
+Uses a low amount of memory, it works without JS, it can be used on other
+software like Chatterino2 and ShareX and it has other features that are listed
+bellow
 
-Already replaced lol.
+There is an instance of this software running at
+[ayaya.beauty](https://ayaya.beauty)
+
+## Screenshots
+
+### Javascript enabled
+
+![](./screenshots/demo.png)
+
+### Javascript disabled
+
+![](./screenshots/demo-nojs.png)
 
 ## Features
 
 - Temporary file uploads like Uguu
-- File deletion link (not available in frontend for now)
+- File deletion link (not available on the noJS until I find a way)
 - Chatterino and ShareX support
-- Thumbnails for Chatterino and FrankerFaceZ (Requires `ffmpeg` to be installed,
+- Thumbnails for OpenGraph User-Agents (Requires `ffmpeg` to be installed,
   disabled by default)
-- Rate Limiting
-- [Small Admin API](./src/routes/admin/) that allows you to delete files, reset
-  rate limits and more (Needs to be enabled in the configuration)
+- File upload rate limits (based on the IP address)
+- [Small Admin API](./src/routes/admin/) that allows you to delete files, gather
+  file information, see cached files on RAM and more (Needs to be enabled in the
+  configuration)
 - Unix socket support if you don't want to deal with all the TCP overhead
 - Automatic protocol detection (HTTPS or HTTP)
-- Low memory usage: Between 6MB at idle and 25MB if a file is being uploaded or
-  retrieved. It will depend of your traffic.
 - Cache files on memory to reduce stress on the drive using
   [LRU](https://en.wikipedia.org/wiki/Cache_replacement_policies#LRU), more
   information on [config.example.yml](./config/config.example.yml)
+- Low memory usage: Between 6MB at idle and 25MB if a file is being uploaded or
+  retrieved. It will depend of your traffic and if Cache is enabled
 
-# TODO
+## TODO
 
 - Admin panel for easy deletion of files and user management for authenticated
   uploads
 - S3 bucket support
 - Authenticated upload
 
-## Usage
+## Hosting
 
-- Clone this repository, compile it using `shards build --release` and execute
-  the server using `./bin/file-uploader`.
-- Change the settings file `./config/config.yml` acording to what you need.
+### Containers
+
+#### Docker Compose / Podman Compose
+
+- Create a folder with the name you want
+- Download the [docker-compose.yml](./docker-compose.yml) file into the folder
+  you created
+- **If you are using docker**, create the data folder using
+  `mkdir ./data && sudo
+  chown -R 10000:10000 ./data`
+- Run it using `docker compose up` if using docker or `podman compose up` if
+  using Podman. If it works fine, then you can append the `-d` argument next to
+  leave the container running on the background
+
+### Native (Compiling it yourself)
+
+- Create a user for the uploader: `sudo useradd -u 10000 file-uploader-crystal`
+  (you can replace the username with whatever you want)
+- Clone this repository on something like `/opt/file-uploader-crystal`
+- Install Crystal and compile the uploader using `shards build --release`
+- Change the settings file `./config/config.yml` according to what you need.
+- Setup a systemd service to keep the uploader running. Copy
+  [file-uploader-crystal.service](./file-uploader-crystal.service) into
+  `/etc/systemd/system/file-uploader-crystal.service`
+- Give permissions to the `/opt/file-uploader-crystal` folder to the user
+  `file-uploader-crystal` using
+  `sudo chown -R 10000:10000 /opt/file-uploader-crystal`
+- Start the uploader using `sudo systemctl start file-uploader-crystal`
+
+> [!WARNING]
+> This was not tested, if you have any issues with it, please open an issue!
+
+#### Kubernetes
+
+**TODO**
 
 ## NGINX Server block
 
@@ -48,46 +91,26 @@ this example server block.
 
 ```
 server {
-    # You can keep the domain prefixed with `~.` if you want
-    # to allow users to use any domain to upload and retrieve
-    # files. Like xdxd.example.com or lolol.example.com .
-    # This will only work if you have a wildcard domain.
-	server_name ~.example.com example.com;
+  # You can keep the domain prefixed with `~.` if you want
+  # to allow users to use any domain to upload and retrieve
+  # files. Like xdxd.example.com or lolol.example.com
+  # This will only work if you have a wildcard domain and certificate.
+  server_name ~.example.com example.com;
 
-	location / {
-        proxy_pass http://127.0.0.1:8080;
-        # This if you want to use a UNIX socket instead
-		#proxy_pass http://unix:/tmp/file-uploader.sock;
-        proxy_set_header X-Real-IP   $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-        proxy_set_header X-Forwarded-Host  $host;
-		proxy_pass_request_headers      on;
-	}
+  location / {
+    proxy_pass http://127.0.0.1:8080;
+    # This if you want to use a UNIX socket instead
+    #proxy_pass http://unix:/tmp/file-uploader.sock;
+    proxy_set_header X-Real-IP   $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+    proxy_set_header X-Forwarded-Host  $host;
+    proxy_pass_request_headers      on;
+  }
 
-    # This should be the size_limit value (from config.yml)
-	client_max_body_size 512M;
+  # This should be the size_limit value (from config.yml)
+  client_max_body_size 512M;
 
-	listen 443 ssl;
-	http2 on;
+  listen 443 ssl;
+  http2 on;
 }
-```
-
-## Systemd user service example
-
-```
-[Unit]
-Description=file-uploader-crystal
-After=network.target
-
-[Service]
-Type=simple
-Restart=always
-RestartSec=2
-LimitNOFILE=4096
-Environment="KEMAL_ENV=production"
-ExecStart=%h/file-uploader-crystal/bin/file-uploader
-WorkingDirectory=%h/file-uploader-crystal/
-
-[Install]
-WantedBy=default.target
 ```
