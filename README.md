@@ -1,4 +1,4 @@
-# file-uploader
+# Patchy
 
 A temporary file uploader easy to host that I did to replace
 [Uguu](https://github.com/nokonoko/uguu), which is not easy to host due to PHP.
@@ -64,18 +64,18 @@ There is an instance of this software running at
 
 ### Native (Compiling it yourself)
 
-- Create a user for the uploader: `sudo useradd -u 10000 file-uploader-crystal`
+- Create a user for the uploader: `sudo useradd -u 10000 patchy`
   (you can replace the username with whatever you want)
-- Clone this repository on something like `/opt/file-uploader-crystal`
+- Clone this repository on something like `/opt/patchy`
 - Install Crystal and compile the uploader using `shards build --release`
 - Change the settings file `./config/config.yml` according to what you need.
 - Setup a systemd service to keep the uploader running. Copy
-  [file-uploader-crystal.service](./file-uploader-crystal.service) into
-  `/etc/systemd/system/file-uploader-crystal.service`
-- Give permissions to the `/opt/file-uploader-crystal` folder to the user
-  `file-uploader-crystal` using
-  `sudo chown -R 10000:10000 /opt/file-uploader-crystal`
-- Start the uploader using `sudo systemctl start file-uploader-crystal`
+  [patchy.service](./patchy.service) into
+  `/etc/systemd/system/patchy.service`
+- Give permissions to the `/opt/patchy` folder to the user
+  `patchy` using
+  `sudo chown -R 10000:10000 /opt/patchy`
+- Start the uploader using `sudo systemctl start patchy`
 
 > [!WARNING]
 > This was not tested, if you have any issues with it, please open an issue!
@@ -100,7 +100,7 @@ server {
   location / {
     proxy_pass http://127.0.0.1:8080;
     # This if you want to use a UNIX socket instead
-    #proxy_pass http://unix:/tmp/file-uploader.sock;
+    #proxy_pass http://unix:/tmp/patchy.sock;
     proxy_set_header X-Real-IP   $proxy_add_x_forwarded_for;
     proxy_set_header X-Forwarded-Proto $scheme;
     proxy_set_header X-Forwarded-Host  $host;

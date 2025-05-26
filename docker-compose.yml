@@ -1,6 +1,6 @@
 services:
-  file-uploader:
-    image: git.nadeko.net/fijxu/file-uploader-crystal:latest
+  patchy:
+    image: git.nadeko.net/fijxu/patchy:latest
     # This program should never use that many memory and more than 50% of the CPU
     mem_limit: 512MB
     cpus: 0.5

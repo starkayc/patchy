@@ -3,7 +3,7 @@ FROM crystallang/crystal:1.16.3-alpine AS builder
 
 RUN apk add --no-cache sqlite-static yaml-static
 
-WORKDIR /file-uploader-crystal
+WORKDIR /patchy
 
 COPY ./shard.yml ./shard.yml
 COPY ./shard.lock ./shard.lock
@@ -18,7 +18,7 @@ COPY ./.git/ ./.git/
 COPY ./public/ ./public/
 
 RUN --mount=type=cache,target=/root/.cache/crystal \
-	crystal build ./src/file-uploader-crystal.cr \
+	crystal build ./src/patchy.cr \
 	-O3 -Drelease \
 	--static --warnings all -s -p -t
 
@@ -31,29 +31,29 @@ FROM alpine:3.21
 # https://github.com/crystal-lang/crystal/issues/15763
 RUN apk add --no-cache tini ffmpeg mailcap
 
-WORKDIR /file-uploader-crystal
+WORKDIR /patchy
 
 # Default environment variables for the container
 ENV UPLOADER_THUMBNAILS=/data/files
 ENV UPLOADER_THUMBNAILS=/data/thumbnails
 ENV UPLOADER_DB=/data/db/db.sqlite3
 
-RUN addgroup -g 10000 -S file-uploader-crystal && \
-	adduser -u 10000 -S file-uploader-crystal -G file-uploader-crystal
+RUN addgroup -g 10000 -S patchy && \
+	adduser -u 10000 -S patchy -G patchy
 
 RUN mkdir -p /data && chown -R 10000:10000 /data
 
-COPY --from=builder /file-uploader-crystal/file-uploader-crystal /file-uploader-crystal
-COPY --from=builder /file-uploader-crystal/public ./public
+COPY --from=builder /patchy/patchy /patchy
+COPY --from=builder /patchy/public ./public
 
-RUN chmod o+rX -R /file-uploader-crystal/file-uploader-crystal
+RUN chmod o+rX -R /patchy/patchy
 
-RUN chown file-uploader-crystal: -R /file-uploader-crystal
+RUN chown patchy: -R /patchy
 
 EXPOSE 8080
 
-USER file-uploader-crystal
+USER patchy
 
 ENTRYPOINT ["/sbin/tini", "--"]
 
-CMD [ "/file-uploader-crystal/file-uploader-crystal" ]
+CMD [ "/patchy/patchy" ]

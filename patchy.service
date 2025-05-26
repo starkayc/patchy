@@ -1,16 +1,16 @@
 [Unit]
-Description=file-uploader-crystal - Temporary file uploader
+Description=patchy - Temporary file uploader
 After=network.target
 
 [Service]
 Type=simple
 Restart=always
 RestartSec=5
-ExecStart=/opt/file-uploader-crystal/bin/file-uploader-crystal
-WorkingDirectory=/opt/file-uploader-crystal
+ExecStart=/opt/patchy/bin/patchy
+WorkingDirectory=/opt/patchy
 
-User=file-uploader-crystal
-Group=file-uploader-crystal
+User=patchy
+Group=patchy
 
 # Security options! Do not change any of those unless you really need it!
 CapabilityBoundingSet=~CAP_SETUID CAP_SETGID CAP_SETPCAP

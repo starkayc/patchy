@@ -1,12 +1,12 @@
-name: file-uploader-crystal
+name: patchy
 version: 0.9.8
 
 authors:
   - Fijxu <fijxu@nadeko.net>
 
 targets:
-  file-uploader-crystal:
-    main: src/file-uploader-crystal.cr
+  patchy:
+    main: src/patchy.cr
 
 dependencies:
   kemal:

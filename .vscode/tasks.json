@@ -4,7 +4,7 @@
     {
       "label": "crystal: build current file (debug)",
       "type": "shell",
-      "command": "crystal build --debug src/file-uploader-crystal.cr -o ${fileBasenameNoExtension}"
+      "command": "crystal build --debug src/patchy.cr -o ${fileBasenameNoExtension}"
     }
   ]
 }

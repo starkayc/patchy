@@ -39,7 +39,7 @@ class Config
   # Uses more memory, but improves files retrieval and reduces stress
   # on the drive by caching the files into memory using LRU cache algorithm
   # If you are a techy person and you want to test if this works, then use
-  # `sudo strace -e trace=open,openat -p $(pidof file-uploader-crystal)`
+  # `sudo strace -e trace=open,openat -p $(pidof patchy)`
   # With cache disabled, it will open the file each time is being retrieved
   # by the client, and with cache enabled, the cached file will be read from
   # memory!!
@@ -86,7 +86,7 @@ class Config
   # The lenght of the delete key
   property delete_key_length : Int32 = 6
 
-  property site_info : String = "Welcome to the file-uploader-crystal uploader!"
+  property site_info : String = "Welcome to Patchy - A temporary file uploader"
   # TODO: UNUSED CONSTANT
   property site_warning : String? = ""
 

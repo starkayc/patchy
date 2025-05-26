@@ -10,7 +10,7 @@ db: "./data/db/"
 host: 0.0.0.0
 port: 8080
 # Enabling the unix socket will disable port binding
-#unix_socket: "/tmp/file-uploader.sock"
+#unix_socket: "/tmp/patchy.sock"
 
 # Tor
 block_tor_addresses: true
