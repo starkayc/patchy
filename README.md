@@ -10,6 +10,21 @@ bellow
 There is an instance of this software running at
 [ayaya.beauty](https://ayaya.beauty)
 
+## Why is called Patchy?
+
+At first I wanted to call it "Patchouli", from
+[Patchouli Knowledge](https://en.touhouwiki.net/wiki/Patchouli_Knowledge), but
+there was already some projects that already used that name, probably because of
+the same reason as me (they like Touhou). So I went with **Patchy**, which is
+how [Remi](https://en.touhouwiki.net/wiki/Remilia_Scarlet) calls Patchouli.
+
+So, why is called Patchy and how it's related to a file uploader service? Think
+about it, Patchy is a librarian, take the books as files, and Patchy as the
+software that manages them ;)
+
+![](./screenshots/patchy.jpg)
+  > https://safebooru.org/index.php?page=post&s=view&id=905633
+
 ## Screenshots
 
 ### Javascript enabled
@@ -64,16 +79,14 @@ There is an instance of this software running at
 
 ### Native (Compiling it yourself)
 
-- Create a user for the uploader: `sudo useradd -u 10000 patchy`
-  (you can replace the username with whatever you want)
+- Create a user for the uploader: `sudo useradd -u 10000 patchy` (you can
+  replace the username with whatever you want)
 - Clone this repository on something like `/opt/patchy`
 - Install Crystal and compile the uploader using `shards build --release`
 - Change the settings file `./config/config.yml` according to what you need.
 - Setup a systemd service to keep the uploader running. Copy
-  [patchy.service](./patchy.service) into
-  `/etc/systemd/system/patchy.service`
-- Give permissions to the `/opt/patchy` folder to the user
-  `patchy` using
+  [patchy.service](./patchy.service) into `/etc/systemd/system/patchy.service`
+- Give permissions to the `/opt/patchy` folder to the user `patchy` using
   `sudo chown -R 10000:10000 /opt/patchy`
 - Start the uploader using `sudo systemctl start patchy`
 
