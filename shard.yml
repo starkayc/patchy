@@ -1,11 +1,11 @@
 name: file-uploader-crystal
-version: 0.9.5
+version: 0.9.8
 
 authors:
   - Fijxu <fijxu@nadeko.net>
 
 targets:
-  file-uploader:
+  file-uploader-crystal:
     main: src/file-uploader-crystal.cr
 
 dependencies:
