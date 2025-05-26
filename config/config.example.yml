@@ -1,10 +1,16 @@
 colorize_logs: true
 log_level: "debug"
 
-# File paths
-files: "./files"
-thumbnails: "./thumbnails"
-db: "./db.sqlite3"
+# File paths, you generally don't need to change this
+files: "./data/files/"
+thumbnails: "./data/thumbnails/"
+db: "./data/db/"
+
+# http server
+host: 0.0.0.0
+port: 8080
+# Enabling the unix socket will disable port binding
+#unix_socket: "/tmp/file-uploader.sock"
 
 # Tor
 block_tor_addresses: true
@@ -17,7 +23,6 @@ admin_enabled: true
 admin_api_key: "asd"
 size_limit: 512
 enable_checksums: false
-port: 8080
 files_per_ip: 2
 rate_limit_period: 20
 rate_limit_message: ""
