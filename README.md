@@ -60,6 +60,7 @@ software that manages them ;)
   uploads
 - S3 bucket support
 - Authenticated upload
+- Locale config to support different languages
 
 ## Hosting
 
