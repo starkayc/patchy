@@ -1,0 +1,76 @@
+Documentation/DocumentationAdmonition:
+  Enabled: false
+
+Lint/NotNil:
+  Description: Identifies usage of `not_nil!` calls
+  Excluded:
+    - src/jobs.cr
+  Enabled: true
+  Severity: Warning
+
+Lint/ShadowingOuterLocalVar:
+  Description: Disallows the usage of the same name as outer local variables for block
+    or proc arguments
+  Excluded:
+    - src/lib/**
+  Enabled: true
+  Severity: Warning
+
+Lint/UselessAssign:
+  Description: Disallows useless variable assignments
+  ExcludeTypeDeclarations: false
+  Excluded:
+    - src/routes/views.cr
+  Enabled: true
+  Severity: Warning
+
+Naming/QueryBoolMethods:
+  Description: Reports boolean properties without the `?` suffix
+  Enabled: false
+  Severity: Convention
+
+Style/RedundantReturn:
+  Description: Reports redundant return expressions
+  AllowMultiReturn: true
+  AllowEmptyReturn: true
+  Enabled: false
+  Severity: Convention
+
+Metrics/CyclomaticComplexity:
+  Description: Disallows methods with a cyclomatic complexity higher than `MaxComplexity`
+  MaxComplexity: 10
+  Enabled: true
+  Severity: Warning
+
+Naming/BlockParameterName:
+  Description: Disallows non-descriptive block parameter names
+  MinNameLength: 3
+  AllowNamesEndingInNumbers: true
+  AllowedNames:
+  - e
+  - i
+  - j
+  - k
+  - v
+  - x
+  - y
+  - ex
+  - io
+  - ws
+  - op
+  - tx
+  - id
+  - ip
+  - k1
+  - k2
+  - v1
+  - v2
+  ForbiddenNames: []
+  Enabled: false
+  Severity: Convention
+
+Lint/Formatting:
+  Description: Reports not formatted sources
+  FailOnError: false
+  Enabled: true
+  Severity: Warning
