@@ -107,7 +107,6 @@ class Config
   # and in `/api/stats`
   property alternative_domains : Array(String) = [] of String
 
-
   def self.check_config(config : Config)
     if config.filename_length <= 0
       puts "Config: filename_length cannot be less or equal to 0"
