@@ -19,10 +19,10 @@ module Jobs
     if !CONFIG.block_tor_addresses
       return
     end
-    LOGGER.info("Blocking Tor exit nodes")
+    LOGGER.info "Blocking Tor exit nodes"
     spawn do
       loop do
-        Utils::Tor.refresh_exit_nodes
+        Utils::Tor.update_tor_exit_nodes
         sleep CONFIG.tor_exit_nodes_check.seconds
       end
     end

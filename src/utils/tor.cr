@@ -2,33 +2,40 @@ module Utils::Tor
   extend self
   @@exit_nodes : Array(String) = [] of String
 
-  def refresh_exit_nodes
-    LOGGER.debug "reload_exit_nodes: Updating Tor exit nodes list"
-    retrieve_tor_exit_nodes
-    LOGGER.debug "reload_exit_nodes: IPs inside the Tor exit nodes list: #{@@exit_nodes.size}"
-  end
-
-  def retrieve_tor_exit_nodes
-    LOGGER.debug "retrieve_tor_exit_nodes: Retrieving Tor exit nodes list"
+  def update_tor_exit_nodes
+    LOGGER.debug "update_tor_exit_nodes: Updating Tor exit nodes list"
     ips = [] of String
 
-    HTTP::Client.get(CONFIG.tor_exit_nodes_url) do |res|
-      begin
-        if res.success? && res.status_code == 200
-          res.body_io.each_line do |line|
-            if line.includes?("ExitAddress")
-              ips << line.split(" ")[1]
-            end
-          end
-          @@exit_nodes = ips
-        else
-          LOGGER.error "retrieve_tor_exit_nodes: Failed to retrieve exit nodes list. Status Code: #{res.status_code}"
+    uri = URI.parse(CONFIG.tor_exit_nodes_url)
+    client = HTTP::Client.new(uri)
+    client.dns_timeout = 5.seconds
+    client.connect_timeout = 5.seconds
+    client.read_timeout = 5.seconds
+
+    begin
+      res = client.get(uri.request_target)
+    rescue ex : Socket::ConnectError
+      LOGGER.error "update_tor_exit_nodes: Failed to connect to #{CONFIG.tor_exit_nodes_url}: #{ex.message}"
+      return
+    rescue ex : IO::TimeoutError
+      LOGGER.error "update_tor_exit_nodes: Timeout trying to pull nodes: #{ex.message}"
+      return
+    rescue ex
+      LOGGER.error "update_tor_exit_nodes: Unknown error: #{ex.message}"
+      return
+    end
+
+    if res.success? && res.status_code == 200
+      res.body.each_line do |line|
+        if line.includes?("ExitAddress")
+          ips << line.split(" ")[1]
         end
-      rescue ex : Socket::ConnectError
-        LOGGER.error "retrieve_tor_exit_nodes: Failed to connect to #{CONFIG.tor_exit_nodes_url}: #{ex.message}"
-      rescue ex
-        LOGGER.error "retrieve_tor_exit_nodes: Unknown error: #{ex.message}"
       end
+      @@exit_nodes = ips
+      LOGGER.debug "update_tor_exit_nodes: Update done, IPs inside the Tor exit nodes list: #{@@exit_nodes.size}"
+    else
+      LOGGER.error "update_tor_exit_nodes: Failed to retrieve exit nodes list. Status Code from '#{CONFIG.tor_exit_nodes_url}': #{res.status_code}"
+      return
     end
   end
 
