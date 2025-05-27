@@ -63,7 +63,6 @@ module Utils
 
   def delete_file(env)
     key = env.params.query["key"]
-    file = SQL.select_with_key(key)
     full_filename = fileinfo.filename + fileinfo.extension
     thumbnail = fileinfo.thumbnail
 

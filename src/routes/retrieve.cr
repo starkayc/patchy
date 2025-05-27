@@ -6,7 +6,6 @@ module Routes::Retrieve
   def retrieve_file(env)
     host = env.request.headers["X-Forwarded-Host"]? || env.request.headers["Host"]?
     scheme = env.request.headers["X-Forwarded-Proto"]? || "http"
-    ip_addr = env.request.headers["X-Real-IP"]? || env.request.remote_address.as?(Socket::IPAddress).try &.address
     filename = env.params.url["filename"].split(".").first
 
     begin

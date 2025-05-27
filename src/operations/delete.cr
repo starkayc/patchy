@@ -30,7 +30,6 @@ module OP::Delete
     fileinfo = Database::Files.select_with_key(deletion_key)
     if fileinfo
       full_filename = fileinfo.filename + fileinfo.extension
-      thumbnail = fileinfo.thumbnail
       begin
         delete_file(fileinfo)
         # Delete entry from db
@@ -50,7 +49,6 @@ module OP::Delete
     fileinfo = Database::Files.select(filename)
     if fileinfo
       full_filename = fileinfo.filename + fileinfo.extension
-      thumbnail = fileinfo.thumbnail
       begin
         delete_file(fileinfo)
         # Delete entry from db

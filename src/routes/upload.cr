@@ -32,7 +32,6 @@ module Routes::Upload
     host = env.request.headers["X-Forwarded-Host"]? || env.request.headers["Host"]?
     scheme = env.request.headers["X-Forwarded-Proto"]? || "http"
     ip_addr = env.request.headers["X-Real-IP"]? || env.request.remote_address.as?(Socket::IPAddress).try &.address
-    user_agent = env.request.headers["User-Agent"]?
     no_js = env.params.query.has_key?("nojs")
     env.response.content_type = "application/json"
 
