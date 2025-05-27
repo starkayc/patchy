@@ -21,7 +21,7 @@ module Routing
 
   before_all "/api/admin/*" do |env|
     env.response.content_type = "application/json"
-    api_key = env.request.headers.try &.["X-Api-Key"]?
+    api_key = env.request.headers["X-Api-Key"]?
 
     res = {"error" => "Wrong API Key"}.to_json
     if api_key != CONFIG.admin_api_key
