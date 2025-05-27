@@ -30,14 +30,14 @@ end
 
 module Headers
   macro host
-    env.request.headers["X-Forwarded-Host"]? || env.request.headers["Host"]?
+    env.get("host").as(String)
   end
 
   macro scheme
-    env.request.headers["X-Forwarded-Proto"]? || "http"
+    env.get("scheme").as(String)
   end
 
   macro ip_addr
-    env.request.headers["X-Real-IP"]? || env.request.remote_address.as?(Socket::IPAddress).try &.address
+    env.get("ip").as(String)
   end
 end

@@ -5,6 +5,8 @@ require "./operations/*"
 module Routing
   extend self
 
+  private ADMIN_API_ROUTE_PATH = "/-/api/admin"
+
   {% for http_method in {"get", "post", "delete", "options", "patch", "put"} %}
 
     macro {{http_method.id}}(path, controller, method = :handle)
@@ -19,34 +21,41 @@ module Routing
 
   {% end %}
 
-  before_all "/api/admin/*" do |env|
-    env.response.content_type = "application/json"
-    api_key = env.request.headers["X-Api-Key"]?
+  before_all do |env|
+    env.set "host", env.request.headers["X-Forwarded-Host"]? || env.request.headers["Host"]? || nil
+    env.set "scheme", env.request.headers["X-Forwarded-Proto"]? || "http"
+    env.set "ip", env.request.headers["X-Real-IP"]? || env.request.remote_address.as?(Socket::IPAddress).try &.address || nil
 
-    res = {"error" => "Wrong API Key"}.to_json
-    if api_key != CONFIG.admin_api_key
-      halt env, status_code: 401, response: res
+    if env.request.resource.starts_with?(ADMIN_API_ROUTE_PATH)
+      env.response.content_type = "application/json"
+
+      api_key = env.request.headers["X-Api-Key"]?
+
+      res = {"error" => "Wrong API Key"}.to_json
+      if api_key != CONFIG.admin_api_key
+        halt env, status_code: 401, response: res
+      end
     end
   end
 
-  before_post "/upload" do |env|
+  private def before_upload(env)
     tor_exit_nodes = Utils::Tor.exit_nodes
     ip = Headers.ip_addr
     api_key = env.request.headers["X-Api-Key"]?
 
     # Skips Tor blocking and Rate limits if the API key matches
-    next if api_key == CONFIG.admin_api_key
+    return if api_key == CONFIG.admin_api_key
 
-    if CONFIG.block_tor_addresses && tor_exit_nodes.includes?(Headers.ip_addr)
-      halt env, status_code: 401, response: CONFIG.tor_message
+    if CONFIG.block_tor_addresses && tor_exit_nodes.includes?(ip)
+      ee 401, CONFIG.tor_message
     end
 
     if !ip
-      halt env, status_code: 401, response: "X-Real-IP header not present. Contact the admin to fix this!"
+      ee 401, "X-Real-IP header not present. Contact the admin to fix this!"
     end
 
     ip_info = Database::IP.select(ip)
-    next if ip_info.nil?
+    return if ip_info.nil?
 
     if CONFIG.files_per_ip > 0
       time_since_first_upload = Time.utc.to_unix - ip_info.date
@@ -57,10 +66,13 @@ module Routing
       end
 
       if ip_info.count >= CONFIG.files_per_ip && time_since_first_upload < CONFIG.rate_limit_period
-        halt env, status_code: 401, response: "Rate limited! Try again in #{time_until_unban} seconds"
+        ee 401, "Rate limited! Try again in #{time_until_unban} seconds"
       end
     end
   end
+
+  before_post "/upload" { |env| before_upload(env) }
+  before_post "/-/upload" { |env| before_upload(env) }
 
   def register_all
     # Views
@@ -88,9 +100,9 @@ module Routing
   end
 
   def register_admin
-    post "/-/api/admin/delete", Routes::Admin, :delete_file
-    post "/-/api/admin/fileinfo", Routes::Admin, :retrieve_file_info
-    get "/-/api/admin/torexitnodes", Routes::Admin, :tor_exit_nodes
-    get "/-/api/admin/cachedfiles", Routes::Admin, :cached_files
+    post "#{ADMIN_API_ROUTE_PATH}/delete", Routes::Admin, :delete_file
+    post "#{ADMIN_API_ROUTE_PATH}/fileinfo", Routes::Admin, :retrieve_file_info
+    get "#{ADMIN_API_ROUTE_PATH}/torexitnodes", Routes::Admin, :tor_exit_nodes
+    get "#{ADMIN_API_ROUTE_PATH}/cachedfiles", Routes::Admin, :cached_files
   end
 end

@@ -4,8 +4,8 @@ module Routes::Retrieve
   extend self
 
   def retrieve_file(env)
-    host = env.request.headers["X-Forwarded-Host"]? || env.request.headers["Host"]?
-    scheme = env.request.headers["X-Forwarded-Proto"]? || "http"
+    host = Headers.host
+    scheme = Headers.scheme
     filename = env.params.url["filename"].split(".").first
 
     begin

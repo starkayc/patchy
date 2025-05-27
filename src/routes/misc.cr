@@ -32,8 +32,9 @@ module Routes::Misc
   end
 
   def sharex_config(env)
-    host = env.request.headers["X-Forwarded-Host"]? || env.request.headers["Host"]?
-    scheme = env.request.headers["X-Forwarded-Proto"]? || "http"
+    host = Headers.host
+    scheme = Headers.scheme
+
     env.response.content_type = "application/json"
     # So it's able to download the file instead of displaying it
     env.response.headers["Content-Disposition"] = "attachment; filename=\"#{host}.sxcu\""
@@ -52,8 +53,9 @@ module Routes::Misc
   end
 
   def chatterino_config(env)
-    host = env.request.headers["X-Forwarded-Host"]? || env.request.headers["Host"]?
-    scheme = env.request.headers["X-Forwarded-Proto"]? || "http"
+    host = Headers.host
+    scheme = Headers.scheme
+
     env.response.content_type = "application/json"
 
     return %({
