@@ -47,68 +47,15 @@ module Routes::Upload
     end
 
     fileinfo = UFile.new
-    ip = UIP.new
 
     HTTP::FormData.parse(env.request) do |upload|
-      upload_filename = upload.filename
-
-      if upload_filename
-        fileinfo.original_filename = upload_filename
-      else
-        LOGGER.debug "No file provided by the user"
-        ee 403, "No file provided"
+      begin
+        up = OP::Upload.new(upload, ip_addr)
+        up.process
+        fileinfo = up.fileinfo
+      rescue ex
+        ee 403, "Failed to process upload: #{ex.message}"
       end
-
-      fileinfo.filename = Utils.generate_filename
-
-      if fileinfo.original_filename == "control_v.png"
-        fileinfo.original_filename = fileinfo.filename
-      end
-
-      fileinfo.extension = File.extname("#{upload_filename}")
-      fileinfo.extension = Utils.detect_extension(upload_filename) if fileinfo.extension == ""
-      full_filename = fileinfo.filename + fileinfo.extension
-      file_path = "#{CONFIG.files}/#{full_filename}"
-
-      # Allow uploads without extension
-      if !fileinfo.extension.empty?
-        if CONFIG.blocked_extensions.includes?(fileinfo.extension.split(".")[1])
-          ee 401, "Extension '#{fileinfo.extension}' is not allowed"
-        end
-      end
-
-      File.open(file_path, "w") do |output|
-        IO.copy(upload.body, output)
-      end
-
-      fileinfo.uploaded_at = Time.utc.to_unix
-
-      if CONFIG.enable_checksums
-        fileinfo.checksum = Utils::Hashing.hash_file(file_path)
-      end
-    end
-
-    fileinfo.ip = ip_addr.to_s
-    ip.ip = fileinfo.ip
-    ip.date = fileinfo.uploaded_at
-
-    if CONFIG.delete_key_length > 0
-      fileinfo.delete_key = Random.base58(CONFIG.delete_key_length)
-    end
-
-    begin
-      spawn { Utils.generate_thumbnail(fileinfo.filename, fileinfo.extension) }
-    rescue ex
-      LOGGER.error "An error ocurred when trying to generate a thumbnail: #{ex.message}"
-    end
-
-    begin
-      Database::Files.insert(fileinfo)
-      exists = Database::IP.insert(ip).rows_affected == 0
-      Database::IP.increase_count(ip) if exists
-    rescue ex
-      LOGGER.error "An error ocurred when trying to insert the data into the DB: #{ex.message}"
-      ee 500, "An error ocurred when trying to insert the data into the DB"
     end
 
     # Redirect to uploaded file if it's a browser
