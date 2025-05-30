@@ -12,7 +12,11 @@ end
 macro msg(message)
   env.response.content_type = "application/json"
   msg = {"message" => {{message}}}.to_json
-  return msg
+  # We close the response instantly
+  # https://github.com/kemalcr/kemal/issues/249#issuecomment-259763562
+  env.response.print msg
+  env.response.close
+  return
 end
 
 # https://github.com/iv-org/invidious/blob/4b37d47ebbc4d3a0a55c8febaca2b28a68e1d9b5/src/invidious/helpers/macros.cr#L51
