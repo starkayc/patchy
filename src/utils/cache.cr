@@ -1,8 +1,7 @@
 module Utils::Cache
   extend self
 
-  # TODO: Find a way to not allocate FileCache if cache is disabled
-  FileCache = LRU.new
+  FileCache = CONFIG.cache.enable ? LRU.new : nil
 
   # Based on
   # https://git.nadeko.net/Fijxu/invidious/src/commit/0dd11b2e0fe00b0a9ccc68c38a69366e77c5e6d8/src/invidious/database/videos.cr#L37
@@ -77,16 +76,19 @@ module Utils::Cache
   end
 
   def insert(fileinfo : UFile, file_path : String)
+    return if FileCache.nil?
     file = File.open(file_path)
-    FileCache.set(fileinfo: fileinfo, file: file, expire_time: 14400) if CONFIG.cache.enable
+    FileCache.as(LRU).set(fileinfo: fileinfo, file: file, expire_time: 14400)
     file.close
   end
 
   def delete(fileinfo : UFile)
-    FileCache.del(fileinfo)
+    return if FileCache.nil?
+    FileCache.as(LRU).del(fileinfo)
   end
 
   def select(fileinfo : UFile)
-    FileCache.get(fileinfo)
+    return if FileCache.nil?
+    FileCache.as(LRU).get(fileinfo)
   end
 end

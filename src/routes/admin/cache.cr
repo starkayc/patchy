@@ -1,5 +1,3 @@
-require "benchmark"
-
 module Routes::Admin
   extend self
 
@@ -7,7 +5,7 @@ module Routes::Admin
     include JSON::Serializable
 
     @[JSON::Field(key: "cachedFiles")]
-    property cached_files : Int32 = Utils::Cache::FileCache.lru.size
+    property cached_files : Int32 = Utils::Cache::FileCache.as(Utils::Cache::LRU).lru.size
     @[JSON::Field(key: "memoryUsageBytes")]
     property memory_usage_bytes : Int32 = 0
     @[JSON::Field(key: "memoryUsageHuman")]
@@ -15,7 +13,7 @@ module Routes::Admin
     property files : Array(String) = [] of String
 
     def initialize
-      Utils::Cache::FileCache.lru.each do |filename, v|
+      Utils::Cache::FileCache.as(Utils::Cache::LRU).lru.each do |filename, v|
         @files << filename
         @memory_usage_bytes = @memory_usage_bytes + v[:filesize]
         @memory_usage_human = @memory_usage_bytes.humanize_bytes
@@ -26,6 +24,10 @@ module Routes::Admin
   # /api/admin/cachedfiles
   # curl -X GET -H "X-Api-Key: asd" http://localhost:8080/api/admin/cachedfiles | jq
   def cached_files(env)
-    CachedFilesResponse.new.to_json
+    if CONFIG.cache.enable
+      CachedFilesResponse.new.to_json
+    else
+      msg EndpointDisabled.new.message
+    end
   end
 end

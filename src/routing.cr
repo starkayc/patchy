@@ -1,4 +1,5 @@
 require "./macros"
+require "./exceptions"
 require "./routes/**"
 require "./operations/*"
 
