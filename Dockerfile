@@ -1,7 +1,7 @@
 # Based on https://github.com/iv-org/invidious/blob/master/docker/Dockerfile
 FROM crystallang/crystal:1.16.3-alpine AS builder
 
-RUN apk add --no-cache sqlite-static yaml-static git
+RUN apk add --no-cache sqlite-static yaml-static
 
 WORKDIR /patchy
 
