@@ -38,7 +38,7 @@ module Routes::Retrieve
     end
 
     if cached_file = Utils::Cache.select(fileinfo)
-      send_file_raw env, cached_file[0], cached_file[1]
+      send_file_raw env, fileinfo, cached_file
     else
       file_path = "#{CONFIG.files}/#{fileinfo.filename}#{fileinfo.extension}"
       Utils::Cache.insert(fileinfo, file_path)

@@ -38,11 +38,11 @@ module Utils::Cache
       self.delete(fileinfo.filename)
     end
 
-    def get(fileinfo : UFile) : {UFile, Bytes}?
+    def get(fileinfo : UFile) : Bytes?
       data = self[fileinfo.filename]
       if data
         LOGGER.trace("File Cache: Retrieved file '#{fileinfo.filename}' from memory")
-        return {data[:fileinfo], data[:data]}
+        return data[:data]
       else
         return nil
       end
