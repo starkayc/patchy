@@ -4,18 +4,24 @@ module Routes::Admin
   struct FileinfoResponse
     include JSON::Serializable
 
-    property successfull : Int32
-    property failed : Int32
+    property successfull : Int32 = 0
+    property failed : Int32 = 0
     @[JSON::Field(key: "successfullFiles")]
-    property successfull_files : Hash(String, UFile)
+    property successfull_files : Hash(String, UFile) = {} of String => UFile
     @[JSON::Field(key: "failedFiles")]
-    property failed_files : Array(String)
+    property failed_files : Array(String) = [] of String
 
-    def initialize(sf : Hash(String, UFile), ff : Array(String))
-      @successfull = sf.size
-      @failed = ff.size
-      @successfull_files = sf
-      @failed_files = ff
+    def initialize
+    end
+
+    def add_successfull(filename : String, fileinfo : UFile)
+      @successfull = @successfull + 1
+      successfull_files[filename] = fileinfo
+    end
+
+    def add_failed(filename : String)
+      @failed = @failed + 1
+      failed_files << filename
     end
   end
 
@@ -35,17 +41,16 @@ module Routes::Admin
       ee 400, "Failed to parse JSON"
     end
 
-    successfull_files = {} of String => UFile
-    failed_files = [] of String
+    res = FileinfoResponse.new
 
     req.files.each do |filename|
       filename = filename.to_s
       begin
         fileinfo = Database::Files.select(filename)
         if fileinfo
-          successfull_files[filename] = fileinfo
+          res.add_successfull(filename, fileinfo)
         else
-          failed_files << filename
+          res.add_failed(filename)
         end
       rescue ex
         LOGGER.error "Unknown error: #{ex.message}"
@@ -53,7 +58,6 @@ module Routes::Admin
       end
     end
 
-    res = FileinfoResponse.new(successfull_files, failed_files)
     res.to_json
   end
 end

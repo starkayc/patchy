@@ -4,18 +4,24 @@ module Routes::Admin
   struct DeletionResponse
     include JSON::Serializable
 
-    property successfull : Int32
-    property failed : Int32
+    property successfull : Int32 = 0
+    property failed : Int32 = 0
     @[JSON::Field(key: "successfullFiles")]
-    property successfull_files : Array(String)
+    property successfull_files : Array(String) = [] of String
     @[JSON::Field(key: "failedFiles")]
-    property failed_files : Array(String)
+    property failed_files : Array(Hash(String, String)) = [] of Hash(String, String)
 
-    def initialize(sf : Array(String), ff : Array(String))
-      @successfull = sf.size
-      @failed = ff.size
-      @successfull_files = sf
-      @failed_files = ff
+    def initialize
+    end
+
+    def add_successfull(filename : String)
+      @successfull = @successfull + 1
+      successfull_files << filename
+    end
+
+    def add_failed(failed_file : Hash(String, String))
+      @failed = @failed + 1
+      failed_files << failed_file
     end
   end
 
@@ -35,25 +41,22 @@ module Routes::Admin
       ee 400, "Failed to parse JSON"
     end
 
-    successfull_files = [] of String
-    failed_files = [] of String
+    res = DeletionResponse.new
 
     req.files.each do |filename|
       filename = filename.to_s
       begin
         file_deleted = OP::Delete.delete_file(filename)
-        if file_deleted
-          successfull_files << filename
-        else
-          failed_files << filename
-        end
+        res.add_successfull(filename)
+      rescue ex : FileNotFound
+        failed_file = {filename => ex.message}
+        res.add_failed(failed_file)
       rescue ex
         LOGGER.error("Unknown error: #{ex.message}")
         ee 500, "Unknown error"
       end
     end
 
-    res = DeletionResponse.new(successfull_files, failed_files)
     res.to_json
   end
 end
