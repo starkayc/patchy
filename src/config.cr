@@ -112,12 +112,6 @@ class Config
   # Blocked extensions that are not allowed to be uploaded to the server
   property blocked_extensions : Array(String) = [] of String
 
-  # A list of OpenGraph user agents. If the request contains one of those User
-  # agents when trying to retrieve a file from the server; the server will
-  # reply with an HTML with OpenGraph tags, pointing to the media thumbnail
-  # (if it was generated successfully) and the name of the file as title
-  property opengraph_useragents : Array(String) = [] of String
-
   # Since this program detects the Host header of the client it can be used
   # with multiple domains. You can display the domains in the frontend
   # and in `/api/stats`

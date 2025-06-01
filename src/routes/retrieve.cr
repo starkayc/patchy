@@ -21,22 +21,6 @@ module Routes::Retrieve
     env.response.headers["Content-Disposition"] = "inline; filename*=UTF-8''#{fileinfo.original_filename}"
     env.response.headers["ETag"] = "#{fileinfo.checksum}"
 
-    CONFIG.opengraph_useragents.each do |useragent|
-      env.response.content_type = "text/html"
-
-      if env.request.headers["User-Agent"]?.try &.includes?(useragent)
-        return %(<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8">
-    <meta property="og:title" content="#{fileinfo.original_filename}">
-    <meta property="og:url" content="#{scheme}://#{host}/#{fileinfo.filename}">
-    #{%(<meta property="og:image" content="#{scheme}://#{host}/-/thumbnail/#{fileinfo.filename}.jpg">) if fileinfo.thumbnail}
-  </head>
-</html>)
-      end
-    end
-
     # TODO: send_file_raw and some functions
     if cached_file = Utils::Cache.select(fileinfo)
       send_file_raw env, fileinfo, cached_file

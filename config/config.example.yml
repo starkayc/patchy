@@ -49,12 +49,5 @@ cache:
 blocked_extensions:
   - "exe"
 
-opengraph_useragents:
-  - "chatterino-api-cache/"
-  - "FFZBot/"
-  - "Twitterbot/"
-  - "Synapse/"
-  - "Mastodon/"
-
 # alternative_domains:
 #   - "example.com"
