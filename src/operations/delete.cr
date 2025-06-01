@@ -1,15 +1,3 @@
-class DeletionKeyNotFound < Exception
-  def message
-    return "Deletion key not found."
-  end
-end
-
-class FileNotFound < Exception
-  def message
-    return "File not found in the database."
-  end
-end
-
 module OP::Delete
   extend self
 

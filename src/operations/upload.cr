@@ -1,28 +1,6 @@
 module OP
   extend self
 
-  class NoFileProvided < Exception
-    def message
-      return "No file provided"
-    end
-  end
-
-  class ExtensionNotAllowed < Exception
-    getter extension : String
-
-    def initialize(@extension)
-    end
-
-    def message
-      return "Extension '#{extension}' is not allowed"
-    end
-  end
-
-  class DBError < Exception
-    def message
-      return "An error ocurred when trying to insert the data into the DB"
-    end
-  end
 
   class Upload
     @uploaded_file : HTTP::FormData::Part
