@@ -22,6 +22,22 @@ class Config
   # Where the SQLITE3 database will be located
   property db : String = "./data/db/"
 
+  property s3 : S3Config = S3Config.from_yaml("")
+
+  struct S3Config
+    include YAML::Serializable
+
+    property enable : Bool = false
+
+    # Region can be anything if it's being used with Minio or Backblaze S3
+    property region : String = ""
+    property key : String = ""
+    property secret : String = ""
+    property endpoint : String = ""
+
+    property bucket_name : String = "patchy"
+  end
+
   # Enable or disable the admin API
   property admin_enabled : Bool = false
   # The API key for admin routes. It's passed as a "X-Api-Key" header to the
@@ -111,6 +127,24 @@ class Config
     if config.filename_length <= 0
       puts "Config: filename_length cannot be less or equal to 0"
       exit(1)
+    end
+
+    if config.s3.enable
+      # if CONFIG.generate_thumbnails
+      #   puts "Config [WARNING]: Thumbnail generation disabled when using S3! This is going to be fixed on a next release!"
+      #   CONFIG.generate_thumbnails = false
+      # end
+      {
+        "Config: s3.region cannot be empty!"   => config.s3.region,
+        "Config: s3.key cannot be empty!"      => config.s3.key,
+        "Config: s3.secret cannot be empty!"   => config.s3.secret,
+        "Config: s3.endpoint cannot be empty!" => config.s3.endpoint,
+      }.each do |message, value|
+        if value.empty?
+          puts message
+          exit(1)
+        end
+      end
     end
 
     if config.files.ends_with?('/')

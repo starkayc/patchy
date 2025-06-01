@@ -9,6 +9,8 @@ targets:
     main: src/patchy.cr
 
 dependencies:
+  awscr-s3:
+    github: taylorfinnell/awscr-s3
   kemal:
     github: kemalcr/kemal
   sqlite3:

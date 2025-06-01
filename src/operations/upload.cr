@@ -89,10 +89,21 @@ module OP
     end
 
     private def writefile(file_path : String) : Nil
-      File.open(file_path, "wb") do |output|
-        IO.copy(@uploaded_file.body, output)
+      if CONFIG.s3.enable
+        full_filename = @fileinfo.filename + @fileinfo.extension
+        body = IO::Memory.new
+        IO.copy(@uploaded_file.body, body)
+        # Rewind the IO first so the S3 library can calculate the correct
+        # sha256 sum
+        # https://github.com/taylorfinnell/awscr-s3/issues/149#issuecomment-2925707541
+        body.rewind
+        Utils::S3::Client.as(Utils::S3::S3).upload(full_filename, body)
+      else
+        File.open(file_path, "wb") do |output|
+          IO.copy(@uploaded_file.body, output)
+        end
+        generate_checksum(file_path)
       end
-      generate_checksum(file_path)
     end
 
     private def generate_thumbnail : Nil

@@ -23,7 +23,8 @@ about it, Patchy is a librarian, take the books as files, and Patchy as the
 software that manages them ;)
 
 ![](./screenshots/patchy.jpg)
-  > https://safebooru.org/index.php?page=post&s=view&id=905633
+
+> https://safebooru.org/index.php?page=post&s=view&id=905633
 
 ## Screenshots
 
@@ -53,12 +54,13 @@ software that manages them ;)
   information on [config.example.yml](./config/config.example.yml)
 - Low memory usage: Between 6MB at idle and 25MB if a file is being uploaded or
   retrieved. It will depend of your traffic and if Cache is enabled
+- **Experimental** S3 bucket support (OpenGraph thumbnails are not available,
+  tested using [Minio](https://min.io/))
 
 ## TODO
 
 - Admin panel for easy deletion of files and user management for authenticated
   uploads
-- S3 bucket support
 - Authenticated upload
 - Locale config to support different languages
 

@@ -37,12 +37,20 @@ module Routes::Retrieve
       end
     end
 
+    # TODO: send_file_raw and some functions
     if cached_file = Utils::Cache.select(fileinfo)
       send_file_raw env, fileinfo, cached_file
     else
-      file_path = "#{CONFIG.files}/#{fileinfo.filename}#{fileinfo.extension}"
-      Utils::Cache.insert(fileinfo, file_path)
-      send_file env, file_path
+      if CONFIG.s3.enable
+        full_filename = fileinfo.filename + fileinfo.extension
+        if file = Utils::S3::Client.as(Utils::S3::S3).retrieve(full_filename)
+          send_file_raw env, fileinfo, file
+        end
+      else
+        file_path = "#{CONFIG.files}/#{fileinfo.filename}#{fileinfo.extension}"
+        Utils::Cache.insert(fileinfo, file_path)
+        send_file env, file_path
+      end
     end
   end
 

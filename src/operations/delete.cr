@@ -17,12 +17,16 @@ module OP::Delete
     full_filename = fileinfo.filename + fileinfo.extension
     thumbnail = fileinfo.thumbnail
 
-    # Delete file
-    File.delete("#{CONFIG.files}/#{full_filename}")
+    if CONFIG.s3.enable
+      Utils::S3::Client.as(Utils::S3::S3).delete(full_filename)
+    else
+      # Delete file
+      File.delete("#{CONFIG.files}/#{full_filename}")
 
-    # Delete thumbnail if it was generated
-    if fileinfo.thumbnail
-      File.delete("#{CONFIG.thumbnails}/#{thumbnail}")
+      # Delete thumbnail if it was generated
+      if fileinfo.thumbnail
+        File.delete("#{CONFIG.thumbnails}/#{thumbnail}")
+      end
     end
   end
 
