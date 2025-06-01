@@ -63,6 +63,10 @@ module Database::Files
     SQL.exec(request, filename)
   end
 
+  def delete(fileinfo : UFile) : Nil
+    delete(fileinfo.filename)
+  end
+
   def delete_with_key(key : String) : Nil
     request = <<-SQL
       DELETE FROM files
@@ -84,6 +88,10 @@ module Database::Files
     SQL
 
     SQL.query_one?(request, filename, as: UFile)
+  end
+
+  def select(fileinfo : UFile) : Nil
+    self.select(fileinfo.filename)
   end
 
   def select_with_key(delete_key : String) : UFile?
