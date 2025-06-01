@@ -5,6 +5,12 @@
 
 <% content_for "head" do %>
 <title><%= original_filename_ %></title>
+<meta property="og:title" content="<%= original_filename_ %>">
+<meta property="og:url" content="<%= scheme %>://<%= host %>/<%= filename_ %>">
+<% if fileinfo.thumbnail %>
+  <meta property="og:image" content="<%= scheme %>://<%= host %>/-/thumbnail/<%= filename_ %>.jpg">
+<% end %>
+<meta property="og:video" content="<%= scheme %>://<%= host %>/-/file/<%= filename_ %>">
 <% end %>
 
 <div class="media-container">
