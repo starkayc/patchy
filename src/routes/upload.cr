@@ -5,6 +5,8 @@ module Routes::Upload
     include JSON::Serializable
 
     property link : String
+    @[JSON::Field(key: "directLink")]
+    property direct_link : String
     @[JSON::Field(key: "linkExt")]
     property link_ext : String
     property id : String
@@ -18,6 +20,7 @@ module Routes::Upload
 
     def initialize(fileinfo : UFile, scheme : String, host : String?)
       @link = "#{scheme}://#{host}/#{fileinfo.filename}"
+      @direct_link = "#{scheme}://#{host}/-/file/#{fileinfo.filename}"
       @link_ext = "#{scheme}://#{host}/#{fileinfo.filename}#{fileinfo.extension}"
       @id = fileinfo.filename
       @ext = fileinfo.extension

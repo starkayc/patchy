@@ -1,0 +1,29 @@
+<%
+  original_filename_ = HTML.escape(fileinfo.original_filename)
+  filename_ = HTML.escape(fileinfo.filename)
+%>
+
+<% content_for "head" do %>
+<title><%= original_filename_ %></title>
+<% end %>
+
+<div class="media-container">
+  <div class="media">
+    <% if [".png", ".jpg", ".gif", ".webp", ".jpeg", ".bmp", ".tiff"].any? { |ex| fileinfo.extension == ex } %>
+      <img src="/-/file/<%= filename_ %>" alt="<%= original_filename_ %>">
+    <% elsif [".mp4", ".webm", ".avi", ".mov", ".ogv"].any? { |ex| fileinfo.extension == ex } %>
+      <video controls>
+        <source src="/-/file/<%= filename_ %>" type="<%= mime_type %>">
+        Your browser does not support the video tag.
+      </video>
+    <% else %>
+      <p>This file cannot be displayed on the browser. Download it instead</p>
+    <% end %>
+  </div>
+  <hr>
+  <div class="navbar">
+    <a href='/-/file/<%= filename_ %>'>Download file (<%= original_filename_ %>)</a>
+    <span class="end-of-flex"></span>
+    <a href='/-/reportabuse?file=<%= filename_ %>'>Report abuse</a>
+  </div>
+</div>

@@ -78,16 +78,18 @@ module Routing
   def register_all
     # Views
     get "/", Routes::Views, :root
+    get "/:filename", Routes::Views, :show_file
     get "/-/info/configs", Routes::Views, :uploader_configs
     get "/-/admin", Routes::Views, :admin
     get "/-/login", Routes::Views, :login
+    get "/-/reportabuse", Routes::Views, :reportabuse
 
     # Upload
     post "/upload", Routes::Upload, :upload
     post "/-/upload", Routes::Upload, :upload
 
     # Retrieve
-    get "/:filename", Routes::Retrieve, :retrieve_file
+    get "/-/file/:filename", Routes::Retrieve, :retrieve_file
     get "/-/thumbnail/:thumbnail", Routes::Retrieve, :retrieve_thumbnail
 
     # Delete
