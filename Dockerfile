@@ -34,7 +34,7 @@ RUN apk add --no-cache tini ffmpeg mailcap
 WORKDIR /patchy
 
 # Default environment variables for the container
-ENV UPLOADER_THUMBNAILS=/data/files
+ENV UPLOADER_FILES=/data/files
 ENV UPLOADER_THUMBNAILS=/data/thumbnails
 ENV UPLOADER_DB=/data/db/db.sqlite3
 

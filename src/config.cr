@@ -16,11 +16,11 @@ class Config
   property files : String = "./data/files"
   # Where the thumbnails will be located when they are successfully generated
   property thumbnails : String = "./data/thumbnails"
+  # Where the SQLITE3 database will be located
+  property db : String = "./data/db"
   # Generate thumbnails for OpenGraph compatible platforms like Chatterino
   # Whatsapp, Facebook, Discord, etc.
   property generate_thumbnails : Bool = false
-  # Where the SQLITE3 database will be located
-  property db : String = "./data/db/"
 
   property s3 : S3Config = S3Config.from_yaml("")
 
