@@ -5,6 +5,14 @@ on:
   push:
     branches:
       - "main"
+    paths-ignore:
+      - "*.md"
+      - LICENCE
+      - .git*
+      - screenshots/*
+      - config/**
+      - .vscode/**
+
 
 jobs:
   build:
