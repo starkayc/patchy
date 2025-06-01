@@ -26,6 +26,8 @@ Kemal.config.shutdown_message = false
 Kemal.config.app_name = "Patchy"
 # https://github.com/iv-org/invidious/blob/90e94d4e6cc126a8b7a091d12d7a5556bfe369d5/src/invidious.cr#L136C1-L136C61
 LOGGER = LogHandler.new(STDOUT, CONFIG.log_level, CONFIG.colorize_logs)
+# Show current configuration
+LOGGER.debug("Current configuration: \n#{CONFIG.to_yaml}")
 
 Utils.create_db_dir
 SQL = DB.open("sqlite3://#{CONFIG.db}/db.sqlite3")
@@ -36,8 +38,6 @@ CURRENT_COMMIT  = {{ "#{`git rev-list HEAD --max-count=1 --abbrev-commit`.strip}
 CURRENT_VERSION = {{ "#{`git log -1 --format=%ci | awk '{print $1}' | sed s/-/./g`.strip}" }}
 CURRENT_TAG     = {{ "#{`git describe --long --abbrev=7 --tags | sed 's/([^-]*)-g.*/r\1/;s/-/./g'`.strip}" }}
 
-# Show current configuration
-LOGGER.debug("Current configuration: \n#{CONFIG.to_yaml}")
 
 Utils.check_dependencies
 Utils.create_tables
