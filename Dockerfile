@@ -19,7 +19,7 @@ COPY ./public/ ./public/
 
 RUN --mount=type=cache,target=/root/.cache/crystal \
 	crystal build ./src/patchy.cr \
-	-O3 -Drelease \
+	--release \
 	--static --warnings all -s -p -t
 
 # 2nd stage
