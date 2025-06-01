@@ -63,6 +63,11 @@ software that manages them ;)
   uploads
 - Authenticated upload
 - Locale config to support different languages
+- Abuse repots
+- VPN blocking (Not really necessary, but still, it's a good addition)
+- Admin API:
+  - IP blocks
+  - Delete all files from one IP address
 
 ## Hosting
 
