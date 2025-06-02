@@ -33,7 +33,6 @@ module OP
 
     private def set_extension : Nil
       @fileinfo.extension = File.extname("#{@uploaded_file.filename}")
-      @fileinfo.extension = Utils.detect_extension(@uploaded_file.filename.not_nil!) if @fileinfo.extension == ""
 
       validate_extension()
     end
