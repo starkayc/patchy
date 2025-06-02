@@ -164,7 +164,7 @@ module Utils
         "#{CONFIG.thumbnails}/#{filename}.jpg",
       ])
 
-    if process.exit_status == 0
+    if process.exit_reason == Process::ExitReason::Normal
       LOGGER.debug "Thumbnail for '#{filename + extension}' generated successfully"
       SQL.exec "UPDATE files SET thumbnail = ? WHERE filename = ?", filename + ".jpg", filename
     else
