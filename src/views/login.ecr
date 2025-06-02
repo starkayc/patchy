@@ -1,9 +1,9 @@
 <% content_for "head" do %>
-<title> <%= host %> - Login</title>
+<title> <%= host %> - <%= translate(locale, "Login") %></title>
 <% end %>
 
 <div class="container">
-  <a href='/'>Go back</a>
+  <a href='/'><%= translate(locale, "go_back") %></a>
   <hr>
   <h2>Login</h2>
     <p>

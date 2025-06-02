@@ -56,13 +56,14 @@ software that manages them ;)
   retrieved. It will depend of your traffic and if Cache is enabled
 - **Experimental** S3 bucket support (OpenGraph thumbnails are not available,
   tested using [Minio](https://min.io/))
+- Different language shown on the page depending of the language settings of the
+  client
 
 ## TODO
 
 - Admin panel for easy deletion of files and user management for authenticated
   uploads
 - Authenticated upload
-- Locale config to support different languages
 - Abuse repots
 - VPN blocking (Not really necessary, but still, it's a good addition)
 - Admin API:

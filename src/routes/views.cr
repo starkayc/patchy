@@ -2,6 +2,7 @@ module Routes::Views
   extend self
 
   def root(env)
+    locale = Headers.locale
     host = Headers.host
     scheme = Headers.scheme
     files_hosted = Database::Files.file_count
@@ -10,6 +11,7 @@ module Routes::Views
   end
 
   def show_file(env)
+    locale = Headers.locale
     host = Headers.host
     scheme = Headers.scheme
     filename = env.params.url["filename"].split(".").first
@@ -29,6 +31,7 @@ module Routes::Views
   end
 
   def uploader_configs(env)
+    locale = Headers.locale
     host = Headers.host
     scheme = Headers.scheme
 
@@ -36,6 +39,7 @@ module Routes::Views
   end
 
   def admin(env)
+    locale = Headers.locale
     host = Headers.host
     scheme = Headers.scheme
 
@@ -43,6 +47,7 @@ module Routes::Views
   end
 
   def reportabuse(env)
+    locale = Headers.locale
     host = Headers.host
     scheme = Headers.scheme
 
@@ -50,6 +55,7 @@ module Routes::Views
   end
 
   def login(env)
+    locale = Headers.locale
     host = Headers.host
     scheme = Headers.scheme
 

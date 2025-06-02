@@ -16,6 +16,7 @@ COPY ./.git/ ./.git/
 
 # Copy public folder to image
 COPY ./public/ ./public/
+COPY ./locales/ ./locales/
 
 RUN --mount=type=cache,target=/root/.cache/crystal \
 	crystal build ./src/patchy.cr \
@@ -45,6 +46,7 @@ RUN mkdir -p /data && chown -R 10000:10000 /data
 
 COPY --from=builder /patchy/patchy /patchy
 COPY --from=builder /patchy/public ./public
+COPY --from=builder /patchy/locales ./locales
 
 RUN chmod o+rX -R /patchy/patchy
 

@@ -33,6 +33,10 @@ macro templated(_filename, template = "template", navbar_search = true, buffer_f
 end
 
 module Headers
+  macro locale
+    env.request.headers["Accept-Language"]?.try &.split(",")[0].split(";")[0]
+  end
+
   macro host
     env.get("host").as(String)
   end

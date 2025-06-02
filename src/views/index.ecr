@@ -1,14 +1,14 @@
 <% content_for "head" do %>
-<title> <%= host %> - Temporary file uploader!</title>
+<title> <%= host %> - <%= translate(locale, "main_title") %></title>
 <script src="/-/assets/script.js"></script>
 <% end %>
 
 <div class="container">
   <div class="navbar">
-    <a href='/-/info/configs'>Configurations for uploaders</a>
+    <a href='/-/info/configs'><%= translate(locale, "uploader_configs") %></a>
     <span class="end-of-flex"></span>
-    <a href='/-/admin'>Admin Panel</a>
-    <a href='/-/login'>Login</a>
+    <a href='/-/admin'><%= translate(locale, "admin_panel") %></a>
+    <a href='/-/login'><%= translate(locale, "Login") %></a>
   </div>
   <hr>
   <h1><%= host %></h1>
@@ -21,9 +21,9 @@
   </div>
   <div id="upload-status"></div>
   <div class="footer">
-    <a>Files hosted: <%= files_hosted %></a>
+    <a><%= translate(locale, "files_hosted") %>: <%= files_hosted %></a>
     <div class="alternative-domains">
-      <a>Alternative domains: </a>
+      <a><%= translate(locale, "alternative_domains") %>: </a>
       <% if !CONFIG.alternative_domains.empty? %>
         <% CONFIG.alternative_domains.each do | domain | %>
           <a href="https://<%= domain %>"><%= domain %></a>
@@ -34,7 +34,7 @@
       patchy (<%= CURRENT_TAG %> - <%= CURRENT_VERSION %> @ <%= CURRENT_BRANCH %>)
     </a>
     <% if CONFIG.abuse_email && CONFIG.abuse_email != "" %>
-      <a href='mailto:<%= CONFIG.abuse_email %>'>Abuse email</a>
+      <a href='mailto:<%= CONFIG.abuse_email %>'><%= translate(locale, "abuse_email") %></a>
     <% end %>
   </div>
 </div>
