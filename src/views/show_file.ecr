@@ -1,6 +1,13 @@
 <%
   original_filename_ = HTML.escape(fileinfo.original_filename)
   filename_ = HTML.escape(fileinfo.filename)
+  extension_ = HTML.escape(fileinfo.extension)
+  filetype = 0
+  if [".png", ".jpg", ".gif", ".webp", ".jpeg", ".bmp", ".tiff"].any? { |ex| fileinfo.extension == ex }
+    filetype = 1
+  elsif [".mp4", ".webm", ".avi", ".mov", ".ogv"].any? { |ex| fileinfo.extension == ex }
+    filetype = 2
+  end
 %>
 
 <% content_for "head" do %>
@@ -8,16 +15,25 @@
 <meta property="og:title" content="<%= original_filename_ %>">
 <meta property="og:url" content="<%= scheme %>://<%= host %>/<%= filename_ %>">
 <% if fileinfo.thumbnail %>
-  <meta property="og:image" content="<%= scheme %>://<%= host %>/-/thumbnail/<%= filename_ %>.jpg">
+<meta property="og:image" content="<%= scheme %>://<%= host %>/-/thumbnail/<%= filename_ %>.jpg">
 <% end %>
-<meta property="og:video" content="<%= scheme %>://<%= host %>/-/file/<%= filename_ %>">
+<% if filetype == 1 %>
+<meta property="og:image:secure_url" content="<%= scheme %>://<%= host %>/-/file/<%= filename_ %><%= extension_ %>">
+<meta property="og:image:type" content="<%= mime_type %>">
+<% elsif filetype == 2 %>
+<meta property="og:video" content="<%= scheme %>://<%= host %>/-/file/<%= filename_ %><%= extension_ %>">
+<meta property="og:video:secure_url" content="<%= scheme %>://<%= host %>/-/file/<%= filename_ %><%= extension_ %>">
+<meta property="og:video:type" content="<%= mime_type %>">
+<meta property="og:type" content="video.other">
+<% end %>
+
 <% end %>
 
 <div class="media-container">
   <div class="media">
-    <% if [".png", ".jpg", ".gif", ".webp", ".jpeg", ".bmp", ".tiff"].any? { |ex| fileinfo.extension == ex } %>
+    <% if filetype == 1 %>
       <img src="/-/file/<%= filename_ %>" alt="<%= original_filename_ %>">
-    <% elsif [".mp4", ".webm", ".avi", ".mov", ".ogv"].any? { |ex| fileinfo.extension == ex } %>
+    <% elsif filetype == 2 %>
       <video controls>
         <source src="/-/file/<%= filename_ %>" type="<%= mime_type %>">
         Your browser does not support the video tag.
