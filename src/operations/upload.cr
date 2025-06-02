@@ -1,7 +1,6 @@
 module OP
   extend self
 
-
   class Upload
     @uploaded_file : HTTP::FormData::Part
     @ip_addr : String

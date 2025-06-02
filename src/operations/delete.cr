@@ -57,5 +57,4 @@ module OP::Delete
       return nil
     end
   end
-
 end
