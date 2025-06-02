@@ -23,8 +23,8 @@
   <div class="footer">
     <a><%= translate(locale, "files_hosted") %>: <%= files_hosted %></a>
     <div class="alternative-domains">
-      <a><%= translate(locale, "alternative_domains") %>: </a>
       <% if !CONFIG.alternative_domains.empty? %>
+        <a><%= translate(locale, "alternative_domains") %>: </a>
         <% CONFIG.alternative_domains.each do | domain | %>
           <a href="https://<%= domain %>"><%= domain %></a>
         <% end %>
