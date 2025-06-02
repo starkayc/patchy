@@ -31,7 +31,7 @@
       <% end %>
     </div>
     <a href='https://codeberg.org/Fijxu/patchy'>
-      patchy (<%= CURRENT_TAG %> - <%= CURRENT_VERSION %> @ <%= CURRENT_BRANCH %>)
+      patchy (<%= CURRENT_COMMIT %> - <%= CURRENT_VERSION %> @ <%= CURRENT_BRANCH %>)
     </a>
     <% if CONFIG.abuse_email && CONFIG.abuse_email != "" %>
       <a href='mailto:<%= CONFIG.abuse_email %>'><%= translate(locale, "abuse_email") %></a>
