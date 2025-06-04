@@ -46,9 +46,19 @@ module Jobs
     end
   end
 
+  def gc
+    spawn do
+      loop do
+        GC.collect
+        sleep 10.seconds
+      end
+    end
+  end
+
   def run
     check_old_files
     retrieve_tor_exit_nodes
     kemal
+    gc
   end
 end
