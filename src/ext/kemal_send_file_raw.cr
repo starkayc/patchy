@@ -1,6 +1,6 @@
 require "mime"
 
-def send_file_raw(env : HTTP::Server::Context, fileinfo : UFile, file : Bytes) : Nil
+def send_file_raw(env : HTTP::Server::Context, fileinfo : Fileinfo, file : Bytes) : Nil
   mime_type = MIME.from_extension(fileinfo.extension, "application/octet-stream")
   env.response.content_type = mime_type
   env.response.headers["Accept-Ranges"] = "bytes"

@@ -1,7 +1,7 @@
 module OP::Delete
   extend self
 
-  def delete_file(fileinfo : UFile) : Nil
+  def delete_file(fileinfo : Fileinfo) : Nil
     full_filename = fileinfo.filename + fileinfo.extension
     thumbnail = fileinfo.thumbnail
 

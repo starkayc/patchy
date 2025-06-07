@@ -4,7 +4,7 @@ module OP
   class Upload
     @uploaded_file : HTTP::FormData::Part
     @ip_addr : String
-    getter fileinfo : UFile = UFile.new
+    getter fileinfo : Fileinfo = Fileinfo.new
     @ip : UIP = UIP.new
 
     def initialize(@uploaded_file, @ip_addr)

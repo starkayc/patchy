@@ -7,14 +7,14 @@ module Routes::Admin
     property successfull : Int32 = 0
     property failed : Int32 = 0
     @[JSON::Field(key: "successfullFiles")]
-    property successfull_files : Hash(String, UFile) = {} of String => UFile
+    property successfull_files : Hash(String, Fileinfo) = {} of String => Fileinfo
     @[JSON::Field(key: "failedFiles")]
     property failed_files : Array(String) = [] of String
 
     def initialize
     end
 
-    def add_successfull(filename : String, fileinfo : UFile)
+    def add_successfull(filename : String, fileinfo : Fileinfo)
       @successfull = @successfull + 1
       successfull_files[filename] = fileinfo
     end

@@ -8,7 +8,7 @@ module Utils::Cache
   class LRU
     @max_size : Int32
     @max_allowed_filesize : Int32
-    getter lru = {} of String => {fileinfo: UFile, data: Bytes, filesize: Int64}
+    getter lru = {} of String => {fileinfo: Fileinfo, data: Bytes, filesize: Int64}
     @access = [] of String
 
     def initialize(@max_size = CONFIG.cache.max_size, @max_allowed_filesize = CONFIG.cache.max_allowed_filesize)
@@ -20,7 +20,7 @@ module Utils::Cache
     end
 
     # TODO: Handle expire_time with a Job
-    def set(fileinfo : UFile, file : File, expire_time) : Nil
+    def set(fileinfo : Fileinfo, file : File, expire_time) : Nil
       file_size = file.size
 
       if file_size > @max_allowed_filesize &* 1000
@@ -34,11 +34,11 @@ module Utils::Cache
       LOGGER.trace("File Cache: Inserted file '#{fileinfo.filename}' to memory")
     end
 
-    def del(fileinfo : UFile) : Nil
+    def del(fileinfo : Fileinfo) : Nil
       self.delete(fileinfo.filename)
     end
 
-    def get(fileinfo : UFile) : Bytes?
+    def get(fileinfo : Fileinfo) : Bytes?
       data = self[fileinfo.filename]
       if data
         LOGGER.trace("File Cache: Retrieved file '#{fileinfo.filename}' from memory")
@@ -75,19 +75,19 @@ module Utils::Cache
     end
   end
 
-  def insert(fileinfo : UFile, file_path : String)
+  def insert(fileinfo : Fileinfo, file_path : String)
     return if FileCache.nil?
     file = File.open(file_path)
     FileCache.as(LRU).set(fileinfo: fileinfo, file: file, expire_time: 14400)
     file.close
   end
 
-  def delete(fileinfo : UFile)
+  def delete(fileinfo : Fileinfo)
     return if FileCache.nil?
     FileCache.as(LRU).del(fileinfo)
   end
 
-  def select(fileinfo : UFile)
+  def select(fileinfo : Fileinfo)
     return if FileCache.nil?
     FileCache.as(LRU).get(fileinfo)
   end

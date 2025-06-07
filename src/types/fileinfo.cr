@@ -1,5 +1,5 @@
-struct UFile
-  # Without this, this class will not be able to be used as `as: UFile` on
+struct Fileinfo
+  # Without this, this class will not be able to be used as `as: Fileinfo` on
   # SQL queries
   include DB::Serializable
   include JSON::Serializable
