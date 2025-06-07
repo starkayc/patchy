@@ -3,7 +3,7 @@
   filename_ = HTML.escape(fileinfo.filename)
   extension_ = HTML.escape(fileinfo.extension)
   filetype = 0
-  if [".png", ".jpg", ".gif", ".webp", ".jpeg", ".bmp", ".tiff"].any? { |ex| fileinfo.extension == ex }
+  if [".png", ".jpg", ".gif", ".webp", ".jpeg", ".bmp", ".tiff", ".jfif"].any? { |ex| fileinfo.extension == ex }
     filetype = 1
   elsif [".mp4", ".webm", ".avi", ".mov", ".ogv"].any? { |ex| fileinfo.extension == ex }
     filetype = 2
