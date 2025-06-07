@@ -60,6 +60,18 @@ class Config
     property max_allowed_filesize : Int32 = 512
   end
 
+  property views : Views = Views.from_yaml("")
+
+  struct Views
+    include YAML::Serializable
+
+    property site_info : String = "Welcome to Patchy - A temporary file uploader"
+
+    property show_title : Bool = true
+    property show_file_count : Bool = true
+    property show_version : Bool = true
+  end
+
   # Enable or disable the admin API
   property admin_enabled : Bool = false
   # The API key for admin routes. It's passed as a "X-Api-Key" header to the
@@ -91,8 +103,6 @@ class Config
   property files_per_ip : Int32 = 32
   # How often is the file limit per IP reset? (in seconds)
   property rate_limit_period : Int32 = 600
-  # TODO: UNUSED CONSTANT
-  property rate_limit_message : String = ""
 
   # Delete the files after how many days?
   property delete_files_after : Int32 = 14
@@ -101,12 +111,8 @@ class Config
   # The lenght of the delete key
   property delete_key_length : Int32 = 6
 
-  property site_info : String = "Welcome to Patchy - A temporary file uploader"
-  # TODO: UNUSED CONSTANT
-  property site_warning : String? = ""
-
   # Abuse email that is going to be displayed on the website of the uploader
-  property abuse_email : String?
+  property abuse_email : String = ""
 
   # Blocked extensions that are not allowed to be uploaded to the server
   property blocked_extensions : Array(String) = [] of String

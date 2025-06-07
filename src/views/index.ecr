@@ -11,8 +11,12 @@
     <a href='/-/login'><%= translate(locale, "Login") %></a>
   </div>
   <hr>
-  <h1><%= host %></h1>
-  <p class="site-info"><%= CONFIG.site_info %></p>
+  <% if CONFIG.views.show_title %>
+    <h1><%= host %></h1>
+  <% end %>
+  <% if !CONFIG.views.site_info.empty? %>
+    <p class="site-info"><%= CONFIG.views.site_info %></p>
+  <% end %>
   <div class="drop-area" id="drop-area">
     <form action="/-/upload?nojs=1" method="post" enctype="multipart/form-data" id="form">
       <input name="file" type="file" id="file"/>
@@ -21,7 +25,9 @@
   </div>
   <div id="upload-status"></div>
   <div class="footer">
-    <a><%= translate(locale, "files_hosted") %>: <%= files_hosted %></a>
+    <% if CONFIG.views.show_file_count %>
+      <a><%= translate(locale, "files_hosted") %>: <%= files_hosted %></a>
+    <% end %>
     <div class="alternative-domains">
       <% if !CONFIG.alternative_domains.empty? %>
         <a><%= translate(locale, "alternative_domains") %>: </a>
@@ -30,10 +36,12 @@
         <% end %>
       <% end %>
     </div>
-    <a href='https://codeberg.org/Fijxu/patchy'>
-      patchy (<%= CURRENT_COMMIT %> - <%= CURRENT_VERSION %> @ <%= CURRENT_BRANCH %>)
-    </a>
-    <% if CONFIG.abuse_email && CONFIG.abuse_email != "" %>
+    <% if CONFIG.views.show_version %>
+      <a href='https://codeberg.org/Fijxu/patchy'>
+        patchy (<%= CURRENT_COMMIT %> - <%= CURRENT_VERSION %> @ <%= CURRENT_BRANCH %>)
+      </a>
+    <% end %>
+    <% if !CONFIG.abuse_email.empty? %>
       <a href='mailto:<%= CONFIG.abuse_email %>'><%= translate(locale, "abuse_email") %></a>
     <% end %>
   </div>
