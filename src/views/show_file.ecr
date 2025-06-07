@@ -2,11 +2,12 @@
   original_filename_ = HTML.escape(fileinfo.original_filename)
   filename_ = HTML.escape(fileinfo.filename)
   extension_ = HTML.escape(fileinfo.extension)
-  filetype = 0
+
+  filetype = Filetype::File
   if [".png", ".jpg", ".gif", ".webp", ".jpeg", ".bmp", ".tiff", ".jfif"].any? { |ex| fileinfo.extension == ex }
-    filetype = 1
+    filetype = Filetype::Image
   elsif [".mp4", ".webm", ".avi", ".mov", ".ogv"].any? { |ex| fileinfo.extension == ex }
-    filetype = 2
+    filetype = Filetype::Video
   end
 %>
 
@@ -31,9 +32,9 @@
 
 <div class="media-container">
   <div class="media">
-    <% if filetype == 1 %>
+    <% if filetype == Filetype::Image %>
       <img src="/-/file/<%= filename_ %>" alt="<%= original_filename_ %>">
-    <% elsif filetype == 2 %>
+    <% elsif filetype == Filetype::Video %>
       <video controls>
         <source src="/-/file/<%= filename_ %>" type="<%= mime_type %>">
         Your browser does not support the video tag.

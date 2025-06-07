@@ -1,6 +1,12 @@
 module Routes::Views
   extend self
 
+  enum Filetype
+    File = 0
+    Image = 1
+    Video = 2
+  end
+
   def root(env)
     locale = Headers.locale
     host = Headers.host
