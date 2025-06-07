@@ -69,6 +69,9 @@ software that manages them ;)
 - Admin API:
   - IP blocks
   - Delete all files from one IP address
+- Upload direcly from URL (Feature that used to exist, so I just need to strip it from older commits)
+- Upload files from Instragram, TikTok, Youtube and whatever using `yt-dlp` (It's going to make it harder to setup if the hoster wants support for it :/)
+- Limit request per second that an IP address can a access a file or how many times a file can be accessed on a range of seconds
 
 ## Hosting
 
