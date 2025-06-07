@@ -11,6 +11,9 @@ class Config
   property port : Int32 = 8080
   # IP address on which the uploader will bind
   property host : String = "0.0.0.0"
+  # A file path where do you want to place a unix socket (THIS WILL DISABLE ACCESS
+  # BY IP ADDRESS)
+  property unix_socket : String?
 
   # Where the uploaded files will be located
   property files : String = "./data/files"
@@ -38,20 +41,6 @@ class Config
     property bucket_name : String = "patchy"
   end
 
-  # Enable or disable the admin API
-  property admin_enabled : Bool = false
-  # The API key for admin routes. It's passed as a "X-Api-Key" header to the
-  # request
-  property admin_api_key : String? = nil
-
-  # Not implemented
-  property incrementalfilename_length : Bool = true
-  # Filename length
-  property filename_length : Int32 = 3
-  # In MiB
-  property size_limit : Int16 = 512
-  property enable_checksums : Bool = true
-
   # Uses more memory, but improves files retrieval and reduces stress
   # on the drive by caching the files into memory using LRU cache algorithm
   # If you are a techy person and you want to test if this works, then use
@@ -71,9 +60,19 @@ class Config
     property max_allowed_filesize : Int32 = 512
   end
 
-  # A file path where do you want to place a unix socket (THIS WILL DISABLE ACCESS
-  # BY IP ADDRESS)
-  property unix_socket : String?
+  # Enable or disable the admin API
+  property admin_enabled : Bool = false
+  # The API key for admin routes. It's passed as a "X-Api-Key" header to the
+  # request
+  property admin_api_key : String? = nil
+
+  # Not implemented
+  property incremental_filename_length : Bool = true
+  # Filename length
+  property filename_length : Int32 = 3
+  # In MiB
+  property size_limit : Int16 = 512
+  property enable_checksums : Bool = true
 
   # True if you want this program to block IP addresses coming from the Tor
   # network
