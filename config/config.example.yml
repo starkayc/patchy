@@ -26,14 +26,12 @@ enable_checksums: false
 
 files_per_ip: 2
 rate_limit_period: 20
-rate_limit_message: ""
 filename_length: 3
 
 # In hours (168 = 7 days)
 delete_files_after: 168
 # In seconds
 delete_files_check: 1800
-
 delete_key_length: 4
 
 site_info: "Whatever you want to put here"
@@ -56,6 +54,13 @@ cache:
   max_size: 256
   # In KiB, files bigger than this will not be cached
   max_allowed_filesize: 512
+
+# Modify what is show on the index index page
+views:
+  site_info: "Welcome to Patchy - A temporary file uploader"
+  show_title: true
+  show_file_count: true
+  show_version: true
 
 blocked_extensions:
   - "exe"
