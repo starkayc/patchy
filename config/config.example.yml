@@ -23,6 +23,7 @@ admin_enabled: true
 admin_api_key: "asd"
 size_limit: 512
 enable_checksums: false
+
 files_per_ip: 2
 rate_limit_period: 20
 rate_limit_message: ""
@@ -37,6 +38,16 @@ delete_key_length: 4
 
 site_info: "Whatever you want to put here"
 site_warning: "WARNING!"
+
+# S3 Support to upload the files to a S3 bucket.
+# Thumbnail generation will not run when using a S3 bucket
+s3:
+  enable: false
+  # Ignored if is not AWS
+  region: us-east-1
+  key: "key"
+  secret: "secret"
+  endpoint: "https://someendpoint.example"
 
 # Uses more memory, but improves files retrieval and reduces stress on the drive
 cache:
