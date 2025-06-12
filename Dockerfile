@@ -45,7 +45,6 @@ RUN addgroup -g 10000 -S patchy && \
 RUN mkdir -p /data && chown -R 10000:10000 /data
 
 COPY --from=builder /patchy/patchy /patchy
-COPY --from=builder /patchy/public ./public
 COPY --from=builder /patchy/locales ./locales
 
 RUN chmod o+rX -R /patchy/patchy

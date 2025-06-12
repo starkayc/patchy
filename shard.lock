@@ -16,6 +16,14 @@ shards:
     git: https://github.com/sija/backtracer.cr.git
     version: 1.2.4
 
+  baked_file_handler:
+    git: https://github.com/ralsina/baked_file_handler.git
+    version: 0.1.0+git.commit.0c6bbb6e7efaf9b8c78938d0e4daa7eed859fe1f
+
+  baked_file_system:
+    git: https://github.com/schovi/baked_file_system.git
+    version: 0.11.0
+
   db:
     git: https://github.com/crystal-lang/crystal-db.git
     version: 0.13.1
@@ -31,6 +39,10 @@ shards:
   radix:
     git: https://github.com/luislavena/radix.git
     version: 0.4.1
+
+  spectator:
+    git: https://gitlab.com/arctic-fox/spectator.git
+    version: 0.12.1
 
   sqlite3:
     git: https://github.com/crystal-lang/crystal-sqlite3.git

@@ -1,3 +1,5 @@
+require "./baked_fs"
+
 # Pretty cool way to write background jobs! :)
 module Jobs
   extend self
@@ -29,6 +31,7 @@ module Jobs
   end
 
   def kemal
+    add_handler BakedFileHandler::BakedFileHandler.new(PublicAssets)
     spawn do
       if !CONFIG.unix_socket.nil?
         Utils.delete_socket

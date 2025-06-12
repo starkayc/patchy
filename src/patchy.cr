@@ -4,6 +4,8 @@ require "yaml"
 require "db"
 require "sqlite3"
 require "digest"
+require "baked_file_handler"
+require "baked_file_system"
 
 # require "./ext/kemal_custom_exception_handler"
 
@@ -44,13 +46,10 @@ Utils.create_files_dir
 Utils.create_thumbnails_dir
 Routing.register_all
 
-Jobs.run
-
 {% if flag?(:release) || flag?(:production) %}
   Kemal.config.env = "production" if !ENV.has_key?("KEMAL_ENV")
 {% end %}
 
-if !CONFIG.unix_socket.nil?
-end
+Jobs.run
 
 sleep
