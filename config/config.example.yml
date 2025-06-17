@@ -16,10 +16,10 @@ port: 8080
 # content to the uploader. Sometimes they can be an annoyance, legally speaking.
 ip_block:
   tor:
-    enable: false
+    enabled: false
     update_interval: 3600
   vpn:
-    enable: false
+    enabled: false
     update_interval: 86400
     # Providers supported:
     # "Mullvad", "AirVPN"
@@ -47,7 +47,7 @@ site_warning: "WARNING!"
 # S3 Support to upload the files to a S3 bucket.
 # Thumbnail generation will not run when using a S3 bucket
 s3:
-  enable: false
+  enabled: false
   # Ignored if is not AWS
   region: us-east-1
   key: "key"
@@ -56,7 +56,7 @@ s3:
 
 # Uses more memory, but improves files retrieval and reduces stress on the drive
 cache:
-  enable: false
+  enabled: false
   # Number of files that can be cached
   max_size: 256
   # In KiB, files bigger than this will not be cached

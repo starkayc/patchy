@@ -65,7 +65,7 @@ module OP
     end
 
     private def writefile(file_path : String) : Nil
-      if CONFIG.s3.enable
+      if CONFIG.s3.enabled
         full_filename = @fileinfo.filename + @fileinfo.extension
         body = IO::Memory.new
         IO.copy(@uploaded_file.body, body)

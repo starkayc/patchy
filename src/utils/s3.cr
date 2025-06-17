@@ -3,7 +3,7 @@ require "awscr-s3"
 module Utils::S3
   extend self
 
-  Client = CONFIG.s3.enable ? S3.new : nil
+  Client = CONFIG.s3.enabled ? S3.new : nil
 
   class S3
     @client : Awscr::S3::Client

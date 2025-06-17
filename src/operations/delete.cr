@@ -5,7 +5,7 @@ module OP::Delete
     full_filename = fileinfo.filename + fileinfo.extension
     thumbnail = fileinfo.thumbnail
 
-    if CONFIG.s3.enable
+    if CONFIG.s3.enabled
       Utils::S3::Client.as(Utils::S3::S3).delete(full_filename)
     else
       # Delete file

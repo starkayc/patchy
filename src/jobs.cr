@@ -18,7 +18,7 @@ module Jobs
   end
 
   def retrieve_tor_exit_nodes
-    if !CONFIG.ip_block.tor.enable
+    if !CONFIG.ip_block.tor.enabled
       return
     end
     LOGGER.info "Blocking Tor exit nodes"
@@ -31,7 +31,7 @@ module Jobs
   end
 
   def retrieve_vpn_addresses
-    if !CONFIG.ip_block.vpn.enable
+    if !CONFIG.ip_block.vpn.enabled
       return
     end
     LOGGER.info "Blocking VPN addresses"

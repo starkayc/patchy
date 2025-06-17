@@ -1,7 +1,7 @@
 module Utils::Cache
   extend self
 
-  FileCache = CONFIG.cache.enable ? LRU.new : nil
+  FileCache = CONFIG.cache.enabled ? LRU.new : nil
 
   # Based on
   # https://git.nadeko.net/Fijxu/invidious/src/commit/0dd11b2e0fe00b0a9ccc68c38a69366e77c5e6d8/src/invidious/database/videos.cr#L37
@@ -12,7 +12,7 @@ module Utils::Cache
     @access = [] of String
 
     def initialize(@max_size = CONFIG.cache.max_size, @max_allowed_filesize = CONFIG.cache.max_allowed_filesize)
-      if CONFIG.cache.enable
+      if CONFIG.cache.enabled
         LOGGER.info "File Cache: Using in memory LRU to store files smaller than #{(@max_allowed_filesize * 1000).humanize_bytes}"
         LOGGER.info "File Cache: Maximum amount of files the cache can hold: #{@max_size}"
         LOGGER.info "File Cache: Max bytes that the cache can hold: #{(@max_size * @max_allowed_filesize * 1000).humanize_bytes}"

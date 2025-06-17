@@ -25,7 +25,7 @@ module Routes::Retrieve
     if cached_file = Utils::Cache.select(fileinfo)
       send_file_raw env, fileinfo, cached_file
     else
-      if CONFIG.s3.enable
+      if CONFIG.s3.enabled
         full_filename = fileinfo.filename + fileinfo.extension
         if file = Utils::S3::Client.as(Utils::S3::S3).retrieve(full_filename)
           send_file_raw env, fileinfo, file

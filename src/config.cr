@@ -30,7 +30,7 @@ class Config
   struct S3Config
     include YAML::Serializable
 
-    property enable : Bool = false
+    property enabled : Bool = false
 
     # Region can be anything if it's being used with Minio or Backblaze S3
     property region : String = ""
@@ -53,7 +53,7 @@ class Config
   struct Cache
     include YAML::Serializable
 
-    property enable : Bool = false
+    property enabled : Bool = false
     # Number of files that can be cached
     property max_size : Int32 = 256
     # In KiB, files bigger than this will not be cached
@@ -96,7 +96,7 @@ class Config
 
       # True if you want this program to block IP addresses coming from the Tor
       # network
-      property enable : Bool = false
+      property enabled : Bool = false
       # How often (in seconds) should this program update the exit nodes list
       property update_interval : Int32 = 3600
     end
@@ -104,7 +104,7 @@ class Config
     struct VPN
       include YAML::Serializable
 
-      property enable : Bool = false
+      property enabled : Bool = false
       # How often (in seconds) should this program update the VPN IP addresses list
       property update_interval : Int32 = 86400
       # List of VPN providers
@@ -145,7 +145,7 @@ class Config
       exit(1)
     end
 
-    if config.s3.enable
+    if config.s3.enabled
       # if CONFIG.generate_thumbnails
       #   puts "Config [WARNING]: Thumbnail generation disabled when using S3! This is going to be fixed on a next release!"
       #   CONFIG.generate_thumbnails = false
