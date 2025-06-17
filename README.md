@@ -8,7 +8,7 @@ software like Chatterino2 and ShareX and it has other features that are listed
 bellow
 
 There is an instance of this software running at
-[ayaya.beauty](https://ayaya.beauty)
+[patchy.moe](https://patchy.moe)
 
 ## Why is called Patchy?
 
