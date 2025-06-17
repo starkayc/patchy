@@ -8,6 +8,8 @@
     filetype = Filetype::Image
   elsif [".mp4", ".webm", ".avi", ".mov", ".ogv"].any? { |ex| fileinfo.extension == ex }
     filetype = Filetype::Video
+  elsif [".flac", ".wav", ".mp3", ".acc", ".ogg", ".opus"].any? { |ex| fileinfo.extension == ex }
+    filetype = Filetype::Audio
   end
 %>
 
@@ -18,14 +20,18 @@
 <% if fileinfo.thumbnail %>
 <meta property="og:image" content="<%= scheme %>://<%= host %>/-/thumbnail/<%= filename_ %>.jpg">
 <% end %>
-<% if filetype == 1 %>
+<% if filetype == Filetype::Image %>
 <meta property="og:image:secure_url" content="<%= scheme %>://<%= host %>/-/file/<%= filename_ %><%= extension_ %>">
 <meta property="og:image:type" content="<%= mime_type %>">
-<% elsif filetype == 2 %>
+<% elsif filetype == Filetype::Video %>
 <meta property="og:video" content="<%= scheme %>://<%= host %>/-/file/<%= filename_ %><%= extension_ %>">
 <meta property="og:video:secure_url" content="<%= scheme %>://<%= host %>/-/file/<%= filename_ %><%= extension_ %>">
 <meta property="og:video:type" content="<%= mime_type %>">
 <meta property="og:type" content="video.other">
+<% elsif filetype == Filetype::Audio %>
+<meta property="og:audio" content="<%= scheme %>://<%= host %>/-/file/<%= filename_ %><%= extension_ %>">
+<meta property="og:audio:secure_url" content="<%= scheme %>://<%= host %>/-/file/<%= filename_ %><%= extension_ %>">
+<meta property="og:audio:type" content="<%= mime_type %>">
 <% end %>
 
 <% end %>
@@ -39,6 +45,11 @@
         <source src="/-/file/<%= filename_ %>" type="<%= mime_type %>">
         Your browser does not support the video tag.
       </video>
+    <% elsif filetype == Filetype::Audio %>
+      <audio controls>
+        <source src="/-/file/<%= filename_ %>" type="<%= mime_type %>">
+        Your browser does not support the audio tag.
+      </audio>
     <% else %>
       <p>This file cannot be displayed on the browser. Download it instead</p>
     <% end %>
