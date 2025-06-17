@@ -86,17 +86,34 @@ class Config
   property size_limit : Int16 = 512
   property enable_checksums : Bool = true
 
-  # True if you want this program to block IP addresses coming from the Tor
-  # network
-  property block_tor_addresses : Bool = false
-  # How often (in seconds) should this program update the exit nodes list
-  property tor_exit_nodes_check : Int32 = 3600
-  # Only https://check.torproject.org/exit-addresses is supported
-  property tor_exit_nodes_url : String = "https://check.torproject.org/exit-addresses"
+  property ip_block : IPBlocks = IPBlocks.from_yaml("")
 
-  property block_vpn_addresses : Array(Utils::IpBlocks::VPN::Providers) = [] of Utils::IpBlocks::VPN::Providers
-  # How often (in seconds) should this program update the VPN IP addresses list
-  property block_vpn_addresses_check : Int32 = 86400
+  struct IPBlocks
+    include YAML::Serializable
+
+    struct Tor
+      include YAML::Serializable
+
+      # True if you want this program to block IP addresses coming from the Tor
+      # network
+      property enable : Bool = false
+      # How often (in seconds) should this program update the exit nodes list
+      property update_interval : Int32 = 3600
+    end
+
+    struct VPN
+      include YAML::Serializable
+
+      property enable : Bool = false
+      # How often (in seconds) should this program update the VPN IP addresses list
+      property update_interval : Int32 = 86400
+      # List of VPN providers
+      property providers : Array(Utils::IpBlocks::VPN::Providers) = [] of Utils::IpBlocks::VPN::Providers
+    end
+
+    property tor : Tor = Tor.from_yaml("")
+    property vpn : VPN = VPN.from_yaml("")
+  end
 
   # How many files an IP address can upload to the server. Setting this to 0
   # disables rate limits in the rate limit period

@@ -18,27 +18,27 @@ module Jobs
   end
 
   def retrieve_tor_exit_nodes
-    if !CONFIG.block_tor_addresses
+    if !CONFIG.ip_block.tor.enable
       return
     end
     LOGGER.info "Blocking Tor exit nodes"
     spawn do
       loop do
         Utils::IpBlocks::Tor.update_tor_exit_nodes
-        sleep CONFIG.tor_exit_nodes_check.seconds
+        sleep CONFIG.ip_block.tor.update_interval.seconds
       end
     end
   end
 
   def retrieve_vpn_addresses
-    if CONFIG.block_vpn_addresses.empty?
+    if !CONFIG.ip_block.vpn.enable
       return
     end
     LOGGER.info "Blocking VPN addresses"
     spawn do
       loop do
         Utils::IpBlocks::VPN.update_vpn_blocks
-        sleep CONFIG.block_vpn_addresses_check.seconds
+        sleep CONFIG.ip_block.vpn.update_interval.seconds
       end
     end
   end

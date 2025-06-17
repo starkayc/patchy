@@ -7,7 +7,8 @@ module Utils::IpBlocks
       LOGGER.debug "update_tor_exit_nodes: Updating Tor exit nodes list"
       ips = [] of String
 
-      uri = URI.parse(CONFIG.tor_exit_nodes_url)
+      url = "https://check.torproject.org/exit-addresses"
+      uri = URI.parse(url)
       client = HTTP::Client.new(uri)
       client.dns_timeout = 5.seconds
       client.connect_timeout = 5.seconds
@@ -16,7 +17,7 @@ module Utils::IpBlocks
       begin
         res = client.get(uri.request_target)
       rescue ex : Socket::ConnectError
-        LOGGER.error "update_tor_exit_nodes: Failed to connect to #{CONFIG.tor_exit_nodes_url}: #{ex.message}"
+        LOGGER.error "update_tor_exit_nodes: Failed to connect to #{url}: #{ex.message}"
         return
       rescue ex : IO::TimeoutError
         LOGGER.error "update_tor_exit_nodes: Timeout trying to pull nodes: #{ex.message}"
@@ -35,7 +36,7 @@ module Utils::IpBlocks
         @@exit_nodes = ips
         LOGGER.debug "update_tor_exit_nodes: Update done, IPs inside the Tor exit nodes list: #{@@exit_nodes.size}"
       else
-        LOGGER.error "update_tor_exit_nodes: Failed to retrieve exit nodes list. Status Code from '#{CONFIG.tor_exit_nodes_url}': #{res.status_code}"
+        LOGGER.error "update_tor_exit_nodes: Failed to retrieve exit nodes list. Status Code from '#{url}': #{res.status_code}"
         return
       end
     end
@@ -76,8 +77,8 @@ module Utils::IpBlocks
       getter servers : Array(ServerInfo) = [] of ServerInfo
     end
 
-    def request_vpn_api(uri : String)
-      uri = URI.parse(uri)
+    private def request_vpn_api(url : String)
+      uri = URI.parse(url)
       client = HTTP::Client.new(uri)
       client.dns_timeout = 5.seconds
       client.connect_timeout = 5.seconds
@@ -88,14 +89,14 @@ module Utils::IpBlocks
         if res.status_code == 200
           return res
         else
-          LOGGER.error "update_vpn_blocks: Request to '#{uri}' returned a non 200 status code, skipping"
+          LOGGER.error "update_vpn_blocks: Request to '#{url}' returned a non 200 status code, skipping"
           return
         end
       rescue ex : Socket::ConnectError
-        LOGGER.error "update_vpn_blocks: Failed to connect to '#{uri}': #{ex.message}"
+        LOGGER.error "update_vpn_blocks: Failed to connect to '#{url}': #{ex.message}"
         return
       rescue ex : IO::TimeoutError
-        LOGGER.error "update_vpn_blocks: Timeout trying to pull VPN data from '#{uri}': #{ex.message}"
+        LOGGER.error "update_vpn_blocks: Timeout trying to pull VPN data from '#{url}': #{ex.message}"
         return
       rescue ex
         LOGGER.error "update_vpn_blocks: Unknown error: #{ex.message}"
@@ -107,7 +108,7 @@ module Utils::IpBlocks
       LOGGER.debug "update_vpn_blocks: Updating VPN addresses"
       ips = [] of String
 
-      CONFIG.block_vpn_addresses.each do |provider|
+      CONFIG.ip_block.vpn.providers.each do |provider|
         case provider
         when Providers::Mullvad
           LOGGER.debug "update_vpn_blocks: Updating Mullvad addresses"

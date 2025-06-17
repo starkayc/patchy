@@ -12,16 +12,18 @@ port: 8080
 # Enabling the unix socket will disable port binding
 #unix_socket: "/tmp/patchy.sock"
 
-# Tor
-block_tor_addresses: true
-tor_exit_nodes_check: 1600
-tor_exit_nodes_url: "https://check.torproject.org/exit-addresses"
-
-block_vpn_addresses:
-  - Mullvad
-  - AirVPN
-
-block_vpn_addresses_check: 86400
+# To restrict Tor exit nodes and VPN providers IP addresses from uploading
+# content to the uploader. Sometimes they can be an annoyance, legally speaking.
+ip_block:
+  tor:
+    enable: false
+    update_interval: 3600
+  vpn:
+    enable: false
+    update_interval: 86400
+    # Providers supported:
+    # "Mullvad", "AirVPN"
+    providers: []
 
 generate_thumbnails: true
 admin_enabled: true
