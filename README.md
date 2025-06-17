@@ -22,7 +22,7 @@ So, why is called Patchy and how it's related to a file uploader service? Think
 about it, Patchy is a librarian, take the books as files, and Patchy as the
 software that manages them ;)
 
-![](./screenshots/patchy.jpg)
+<img src="./screenshots/patchy.jpg" height="500px"/>
 
 > https://safebooru.org/index.php?page=post&s=view&id=905633
 
