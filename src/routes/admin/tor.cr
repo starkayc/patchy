@@ -6,7 +6,7 @@ module Routes::Admin
   struct TorResponse
     include JSON::Serializable
 
-    property ips : Array(String) = Utils::Tor.exit_nodes
+    property ips : Array(String) = Utils::IpBlocks::Tor.exit_nodes
 
     def initialize
     end

@@ -16,7 +16,12 @@ port: 8080
 block_tor_addresses: true
 tor_exit_nodes_check: 1600
 tor_exit_nodes_url: "https://check.torproject.org/exit-addresses"
-tor_message: "TOR IS BLOCKED!"
+
+block_vpn_addresses:
+  - Mullvad
+  - AirVPN
+
+block_vpn_addresses_check: 86400
 
 generate_thumbnails: true
 admin_enabled: true

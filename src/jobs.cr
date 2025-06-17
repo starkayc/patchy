@@ -24,8 +24,21 @@ module Jobs
     LOGGER.info "Blocking Tor exit nodes"
     spawn do
       loop do
-        Utils::Tor.update_tor_exit_nodes
+        Utils::IpBlocks::Tor.update_tor_exit_nodes
         sleep CONFIG.tor_exit_nodes_check.seconds
+      end
+    end
+  end
+
+  def retrieve_vpn_addresses
+    if CONFIG.block_vpn_addresses.empty?
+      return
+    end
+    LOGGER.info "Blocking VPN addresses"
+    spawn do
+      loop do
+        Utils::IpBlocks::VPN.update_vpn_blocks
+        sleep CONFIG.block_vpn_addresses_check.seconds
       end
     end
   end
@@ -61,6 +74,7 @@ module Jobs
   def run
     check_old_files
     retrieve_tor_exit_nodes
+    retrieve_vpn_addresses
     kemal
     gc
   end

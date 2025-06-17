@@ -58,6 +58,7 @@ software that manages them ;)
   tested using [Minio](https://min.io/))
 - Different language shown on the page depending of the language settings of the
   client
+- VPN blocking (Not really necessary, but still, it's a good addition) (**In progress**)
 
 ## TODO
 
@@ -65,7 +66,6 @@ software that manages them ;)
   uploads
 - Authenticated upload
 - Abuse repots
-- VPN blocking (Not really necessary, but still, it's a good addition)
 - Admin API:
   - IP blocks
   - Delete all files from one IP address

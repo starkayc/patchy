@@ -40,7 +40,7 @@ module Routing
   end
 
   private def before_upload(env)
-    tor_exit_nodes = Utils::Tor.exit_nodes
+    tor_exit_nodes = Utils::IpBlocks::Tor.exit_nodes
     ip = Headers.ip_addr
     api_key = env.request.headers["X-Api-Key"]?
 
@@ -48,7 +48,7 @@ module Routing
     return if api_key == CONFIG.admin_api_key
 
     if CONFIG.block_tor_addresses && tor_exit_nodes.includes?(ip)
-      ee 401, CONFIG.tor_message
+      ee 401, "The administrator has blocked Tor exit nodes for uploading files"
     end
 
     if !ip

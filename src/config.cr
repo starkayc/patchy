@@ -89,14 +89,14 @@ class Config
   # True if you want this program to block IP addresses coming from the Tor
   # network
   property block_tor_addresses : Bool = false
-  # How often (in seconds) should this program download the exit nodes list
+  # How often (in seconds) should this program update the exit nodes list
   property tor_exit_nodes_check : Int32 = 3600
   # Only https://check.torproject.org/exit-addresses is supported
   property tor_exit_nodes_url : String = "https://check.torproject.org/exit-addresses"
-  # Message that will be displayed to the Tor user.
-  # It will be shown on the Frontend and shown in the error 401 when a user
-  # tries to upload a file using curl or any other tool
-  property tor_message : String? = "Tor is blocked!"
+
+  property block_vpn_addresses : Array(Utils::IpBlocks::VPN::Providers) = [] of Utils::IpBlocks::VPN::Providers
+  # How often (in seconds) should this program update the VPN IP addresses list
+  property block_vpn_addresses_check : Int32 = 86400
 
   # How many files an IP address can upload to the server. Setting this to 0
   # disables rate limits in the rate limit period
