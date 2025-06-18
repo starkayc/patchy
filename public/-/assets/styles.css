@@ -33,10 +33,23 @@
 	--orange-dim: #d65d0e;
 }
 
+@font-face {
+  font-family: InterVariable;
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url("/-/assets/fonts/InterVariable.woff2") format("woff2");
+}
+@font-face {
+  font-family: InterVariable;
+  font-style: italic;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url("/-/assets/fonts/InterVariable-Italic.woff2") format("woff2");
+}
+
 html {
-	font-family: "Monospace";
-	font-weight: 500;
-	letter-spacing: -1.5px;
+	font-family: 'InterVariable', 'Roboto', sans-serif;
 	background: var(--bg_h);
 	background-attachment: fixed;
 	background-repeat: no-repeat;
