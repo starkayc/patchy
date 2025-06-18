@@ -125,13 +125,6 @@ a[href]:hover {
 	border-radius: 0px;
 }
 
-.media-container {
-	/* width: 100%;
-	max-width: 100vh;
-	margin: 0 auto; */
-	/* max-width: 95vh; */
-}
-
 .media {
 	display: flex;
 	justify-content: center;
@@ -163,11 +156,8 @@ a[href]:hover {
 	background: var(--bg1);
 	border: 1px solid var(--bg2);
 	border-radius: 4px;
-	/* color: var; */
 	cursor: pointer;
 	padding: 28px 32px;
-	/* text-shadow: 0 1px hsla(0, 0%, 100%, .5); */
-	/* transition: background-color .25s, width .5s, height .5s; */
 }
 
 form {
