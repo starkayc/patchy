@@ -126,31 +126,32 @@ a[href]:hover {
 }
 
 .media-container {
-	width: 100%;
+	/* width: 100%;
 	max-width: 100vh;
-	margin: 0 auto;
+	margin: 0 auto; */
 	/* max-width: 95vh; */
 }
 
-.media-container>.media {
-	/* display: block;
-	max-width: 90vh;
-	max-height: 90vh;
-	object-fit: contain; */
-	/* display: flex;
+.media {
+	display: flex;
 	justify-content: center;
-	align-items: center; */
-	/* max-height: 90vh; */
+	align-items: center;
+	height: 100vh;
+	max-height: 85vh;
 }
 
-.media-container>.media>img {
-	width: 100%;
+.media>img {
+	max-height: 100%;
+	max-width: 100%;
 	height: auto;
+	width: auto;
 }
 
-.media-container>.media>video {
-	width: 100%;
+.media video {
+	max-height: 100%;
+	max-width: 100%;
 	height: auto;
+	width: auto;
 }
 
 .drop-area {
