@@ -10,5 +10,6 @@
 	"download_file": "Descargar archivo",
 	"view_file": "Ver archivo",
 	"report_abuse": "Reportar abuso",
-	"go_back": "Devolverse"
+	"go_back": "Devolverse",
+	"upload_text": "Clickea aquí para subir un archivo"
 }

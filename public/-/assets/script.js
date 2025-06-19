@@ -4,10 +4,14 @@ document.addEventListener("DOMContentLoaded", () => {
   const fileInput = document.getElementById("file");
   const form = document.getElementById("form");
   const uploadStatus = document.getElementById("upload-status");
+
+  // i18n
+  const uploadText = JSON.parse(document.getElementById('upload_text').textContent);
+
   form.style.display = "none";
 
   const dropAreaText = document.createElement("p");
-  dropAreaText.textContent = "Click here to upload a file"
+  dropAreaText.textContent = uploadText.msg
   dropArea.appendChild(dropAreaText)
 
   dropArea.addEventListener("drop", handleDrop, false);
