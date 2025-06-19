@@ -11,5 +11,7 @@
 	"view_file": "View file",
 	"report_abuse": "Report abuse",
 	"go_back": "Go back",
-	"upload_text": "Click here to upload a file"
+	"upload_text": "Click here to upload a file",
+	"uploader_configs_sharex_text": "Download the configuration here:",
+	"uploader_configs_chatterino_text": "You can use this uploader setting the following fields on Settings (cog in the top left corner) > External tools > Image uploader"
 }

@@ -11,5 +11,7 @@
 	"view_file": "Ver archivo",
 	"report_abuse": "Reportar abuso",
 	"go_back": "Devolverse",
-	"upload_text": "Clickea aquí para subir un archivo"
+	"upload_text": "Clickea aquí para subir un archivo",
+	"uploader_configs_sharex_text": "Descarga la configuración aquí:",
+	"uploader_configs_chatterino_text": "Puedes usar este subidor colocando los siguentes campos en Opciones (tuerca en el corner arriba a la izquierda) > External tools > Image uploader"
 }

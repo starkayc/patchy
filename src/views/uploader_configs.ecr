@@ -7,14 +7,14 @@
   <hr>
   <h2>Chatterino</h2>
     <p>
-      You can use this uploader setting the following fields on Settings > External tools > Image uploader
-      <p>Request URL: <a><%= scheme %>://<%= host %>/-/upload</a></p>
-      <p>Form field: <a>data</a></p>
-      <p>Image link: <a>{link}</a></p>
-      <p>Delete link: <a>{deleteLink}</a></p>
+      <%= translate(locale, "uploader_configs_chatterino_text") %>
+      <p>Request URL: <b><a><%= scheme %>://<%= host %>/-/upload</a></b></p>
+      <p>Form field: <b><a>data</a></b></p>
+      <p>Image link: <b><a>{link}</a></b></p>
+      <p>Delete link: <b><a>{deleteLink}</a></b></p>
     </p>
   <h2>ShareX</h2>
     <p>
-      Download the configuration here: <a href='./sharex.sxcu'>sharex.sxcu</a>
+      <%= translate(locale, "uploader_configs_sharex_text") %> <a href='./sharex.sxcu'>sharex.sxcu</a>
     </p>
 </div>
