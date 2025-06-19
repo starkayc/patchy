@@ -1,5 +1,8 @@
 # Patchy
 
+[![Translation status](https://translate.codeberg.org/widget/patchy/svg-badge.svg)](https://translate.codeberg.org/engage/patchy/)
+[![Translation status](https://translate.codeberg.org/widget/patchy/language-badge.svg)](https://translate.codeberg.org/engage/patchy/)
+
 A temporary file uploader easy to host that I did to replace
 [Uguu](https://github.com/nokonoko/uguu), which is not easy to host due to PHP.
 
@@ -139,3 +142,13 @@ server {
   http2 on;
 }
 ```
+
+---
+
+## Translations
+
+Feel free to translate Patchy to your own language if it's not supported here:
+https://translate.codeberg.org/projects/patchy/patchy/ (Requires a Codeberg
+account)
+
+[![Translation status](https://translate.codeberg.org/widget/patchy/multi-auto.svg)](https://translate.codeberg.org/engage/patchy/)
