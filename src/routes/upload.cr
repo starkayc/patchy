@@ -63,7 +63,7 @@ module Routes::Upload
 
     # Redirect to uploaded file if it's a browser
     if no_js
-      return env.redirect fileinfo.filename
+      return env.redirect "/#{fileinfo.filename}"
     end
 
     res = Response.new(fileinfo, scheme, host)
