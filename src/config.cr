@@ -2,18 +2,25 @@ require "yaml"
 
 class Config
   include YAML::Serializable
+
   # Colorize logs
   property colorize_logs : Bool = true
   # Log level
   property log_level : LogLevel = LogLevel::Info
 
-  # Port on which the uploader will bind
-  property port : Int32 = 8080
-  # IP address on which the uploader will bind
-  property host : String = "0.0.0.0"
-  # A file path where do you want to place a unix socket (THIS WILL DISABLE ACCESS
-  # BY IP ADDRESS)
-  property unix_socket : String?
+  property server : Server = Server.from_yaml("")
+
+  struct Server
+    include YAML::Serializable
+
+    # Port on which the uploader will bind
+    property port : Int32 = 8080
+    # IP address on which the uploader will bind
+    property host : String = "0.0.0.0"
+    # A file path where do you want to place a unix socket (THIS WILL DISABLE ACCESS
+    # BY IP ADDRESS)
+    property unix_socket : String?
+  end
 
   # Where the uploaded files will be located
   property files : String = "./data/files"
@@ -21,9 +28,16 @@ class Config
   property thumbnails : String = "./data/thumbnails"
   # Where the SQLITE3 database will be located
   property db : String = "./data/db"
+
   # Generate thumbnails for OpenGraph compatible platforms like Chatterino
   # Whatsapp, Facebook, Discord, etc.
-  property generate_thumbnails : Bool = false
+  property thumbnail_generation : ThumbnailGeneration = ThumbnailGeneration.from_yaml("")
+
+  struct ThumbnailGeneration
+    include YAML::Serializable
+
+    property enabled : Bool = false
+  end
 
   property s3 : S3Config = S3Config.from_yaml("")
 

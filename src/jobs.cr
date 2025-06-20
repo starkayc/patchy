@@ -46,12 +46,12 @@ module Jobs
   def kemal
     add_handler BakedFileHandler::BakedFileHandler.new(PublicAssets)
     spawn do
-      if !CONFIG.unix_socket.nil?
+      if !CONFIG.server.unix_socket.nil?
         Utils.delete_socket
-        Kemal.run &.server.not_nil!.bind_unix "#{CONFIG.unix_socket}"
+        Kemal.run &.server.not_nil!.bind_unix "#{CONFIG.server.unix_socket}"
         LOGGER.info "Changing socket permissions to 777"
         begin
-          File.chmod("#{CONFIG.unix_socket}", File::Permissions::All)
+          File.chmod("#{CONFIG.server.unix_socket}", File::Permissions::All)
         rescue ex
           LOGGER.fatal "Failed to set unix socket permissions to 777: #{ex.message}"
           exit(1)

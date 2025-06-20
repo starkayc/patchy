@@ -23,8 +23,8 @@ module Patchy
 end
 
 CONFIG = Config.load
-Kemal.config.port = CONFIG.port
-Kemal.config.host_binding = CONFIG.host
+Kemal.config.port = CONFIG.server.port
+Kemal.config.host_binding = CONFIG.server.host
 Kemal.config.shutdown_message = false
 Kemal.config.app_name = "Patchy"
 # https://github.com/iv-org/invidious/blob/90e94d4e6cc126a8b7a091d12d7a5556bfe369d5/src/invidious.cr#L136C1-L136C61

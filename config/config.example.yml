@@ -7,10 +7,14 @@ thumbnails: "./data/thumbnails/"
 db: "./data/db/"
 
 # http server
-host: 0.0.0.0
-port: 8080
-# Enabling the unix socket will disable port binding
-#unix_socket: "/tmp/patchy.sock"
+server:
+  port: 8080
+  host: 0.0.0.0
+  # Enabling the unix socket will disable port binding
+  #unix_socket: "/tmp/patchy.sock"
+
+thumbnail_generation:
+  enabled: false
 
 # To restrict Tor exit nodes and VPN providers IP addresses from uploading
 # content to the uploader. Sometimes they can be an annoyance, legally speaking.
@@ -25,7 +29,6 @@ ip_block:
     # "Mullvad", "AirVPN"
     providers: []
 
-generate_thumbnails: true
 admin_enabled: true
 admin_api_key: "asd"
 size_limit: 512

@@ -115,10 +115,10 @@ module Utils
   def check_dependencies
     dependencies = ["ffmpeg"]
     dependencies.each do |dep|
-      next if !CONFIG.generate_thumbnails
+      next if !CONFIG.thumbnail_generation.enabled
       if !Process.find_executable(dep)
         LOGGER.fatal("'#{dep}' was not found. Thumbnails for OpenGraph user agents will not be generated.")
-        CONFIG.generate_thumbnails = false
+        CONFIG.thumbnail_generation.enabled = false
       end
     end
   end
@@ -146,7 +146,7 @@ module Utils
     return if exts.none? { |ext| extension.downcase.includes?(ext) }
 
     # Disable generation if false
-    return if !CONFIG.generate_thumbnails || !CONFIG.thumbnails
+    return if !CONFIG.thumbnail_generation.enabled || !CONFIG.thumbnails
 
     LOGGER.debug "Generating thumbnail for #{filename + extension} in background"
 
@@ -175,10 +175,10 @@ module Utils
   # Delete socket if the server has not been previously cleaned by the server
   # (Due to unclean exits, crashes, etc.)
   def delete_socket
-    if File.exists?("#{CONFIG.unix_socket}")
+    if File.exists?("#{CONFIG.server.unix_socket}")
       LOGGER.info "Deleting old unix socket"
       begin
-        File.delete("#{CONFIG.unix_socket}")
+        File.delete("#{CONFIG.server.unix_socket}")
       rescue ex
         LOGGER.fatal "#{ex.message}"
         exit(1)
