@@ -1,18 +1,6 @@
 # Stripped down version of:
 # https://github.com/iv-org/invidious/blob/master/src/invidious/helpers/i18n.cr
 
-# Languages requiring a better level of translation (at least 20%)
-# to be added to the list below:
-#
-#  "af"      => "", # Afrikaans
-#  "az"      => "", # Azerbaijani
-#  "be"      => "", # Belarusian
-#  "bn_BD"   => "", # Bengali (Bangladesh)
-#  "ia"      => "", # Interlingua
-#  "or"      => "", # Odia
-#  "tk"      => "", # Turkmen
-#  "tok      => "", # Toki Pona
-#
 LOCALES_LIST = {
   "en-US" => "English", # English
   "es"    => "Español", # Spanish
