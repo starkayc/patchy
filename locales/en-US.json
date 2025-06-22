@@ -12,7 +12,7 @@
 	"view_file": "View file",
 	"report_abuse": "Report abuse",
 	"go_back": "Go back",
-	"upload_text": "Click here to upload a file",
+	"js_upload_text": "Click here to upload a file",
 	"js_upload_client_error": "Client error",
 	"js_upload_server_error": "Server error",
 	"js_upload_unknown_error": "Unknown error",
@@ -27,5 +27,7 @@
 	"js_history_delete_error_server_down": "Error deleting file, this patchy server seems to be down",
 	"js_history_delete_error": "Error deleting file",
 	"js_history_delete_error_status_code": "Error deleting file, status code",
-	"js_history_delete_error_unknown": "Error deleting file, unknown error"
+	"js_history_delete_error_unknown": "Error deleting file, unknown error",
+	"js_button_delete": "Delete",
+	"js_button_copy": "Copy"
 }

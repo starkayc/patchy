@@ -6,12 +6,17 @@ document.addEventListener("DOMContentLoaded", () => {
   const uploadStatus = document.getElementById("upload-status");
 
   // i18n
-  const uploadText = JSON.parse(document.getElementById('upload_text').textContent);
+  const translate_uploadText = translate("js_upload_text");
+  const translate_uploadClientError = translate("js_upload_client_error");
+  const translate_uploadServerError = translate("js_upload_server_error");
+  const translate_uploadUnknownError = translate("js_upload_unknown_error");
+  const translate_buttonDelete = translate("js_button_delete");
+  const translate_buttonCopy = translate("js_button_copy");
 
   form.style.display = "none";
 
   const dropAreaText = document.createElement("p");
-  dropAreaText.textContent = uploadText.msg
+  dropAreaText.textContent = translate_uploadText
   dropArea.appendChild(dropAreaText)
 
   dropArea.addEventListener("drop", handleDrop, false);
@@ -76,9 +81,9 @@ document.addEventListener("DOMContentLoaded", () => {
     uploadText.className = "percent";
     statusLink.className = "status";
     copyButton.className = "button copy-button";
-    copyButton.innerHTML = "Copy";
+    copyButton.innerHTML = translate_buttonCopy;
     deleteButton.className = "button delete-button";
-    deleteButton.innerHTML = "Delete";
+    deleteButton.innerHTML = translate_buttonDelete;
     copyButton.style.display = "none";
     deleteButton.style.display = "none";
 
@@ -91,7 +96,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     xhr.onerror = () => {
       console.error("Error:", xhr.status, xhr.statusText, xhr.responseText);
-      statusLink.textContent = "Error desconocido";
+      statusLink.textContent = translate_uploadUnknownError
     };
 
     xhr.onload = () => {
@@ -109,18 +114,12 @@ document.addEventListener("DOMContentLoaded", () => {
           };
           saveOnHistory(response)
         } catch (error) {
-          statusLink.textContent =
-            "Error desconocido, habla con el administrador";
+          statusLink.textContent = translate_uploadUnknownError;
         }
       } else if (xhr.status >= 400 && xhr.status < 500) {
-        try {
-          const errorResponse = JSON.parse(xhr.responseText);
-          statusLink.textContent = errorResponse.error || "Error del cliente.";
-        } catch (e) {
-          statusLink.textContent = "Error del cliente.";
-        }
+        statusLink.textContent = translate_uploadClientError;
       } else {
-        statusLink.textContent = "Error del servidor.";
+        statusLink.textContent = translate_uploadServerError;
       }
     };
 

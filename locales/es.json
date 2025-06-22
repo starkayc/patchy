@@ -12,7 +12,7 @@
 	"view_file": "Ver archivo",
 	"report_abuse": "Reportar abuso",
 	"go_back": "Devolverse",
-	"upload_text": "Clickea aquí para subir un archivo",
+	"js_upload_text": "Clickea aquí para subir un archivo",
 	"js_upload_client_error": "Error del cliente",
 	"js_upload_server_error": "Error del servidor",
 	"js_upload_unknown_error": "Error desconocido",
@@ -27,5 +27,7 @@
 	"js_history_delete_error_server_down": "Error al borrar archivo, tal vez este servidor de patchy esta caido",
 	"js_history_delete_error": "Error al borrar archivo",
 	"js_history_delete_error_status_code": "Error al borrar archivo, codigo de estado",
-	"js_history_delete_error_unknown": "Error al borrar archivo, error desconocido"
+	"js_history_delete_error_unknown": "Error al borrar archivo, error desconocido",
+	"js_button_delete": "Borrar",
+	"js_button_copy": "Copiar"
 }

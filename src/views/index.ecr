@@ -1,8 +1,14 @@
 <% content_for "head" do %>
 <title> <%= host %> - <%= translate(locale, "main_title") %></title>
+<script src="/-/assets/translations.js"></script>
 <script src="/-/assets/script.js"></script>
 <script src="/-/assets/history.js"></script>
-<script id="upload_text" type="application/json">{"msg":"<%= translate(locale, "upload_text") %>"}</script>
+<%= translate_js(locale, "js_upload_text") %>
+<%= translate_js(locale, "js_upload_client_error") %>
+<%= translate_js(locale, "js_upload_server_error") %>
+<%= translate_js(locale, "js_upload_unknown_error") %>
+<%= translate_js(locale, "js_button_delete") %>
+<%= translate_js(locale, "js_button_copy") %>
 <% end %>
 
 <div class="container">

@@ -11,6 +11,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const translate_DeleteDeleteError = translate("js_history_delete_error");
   const translate_DeleteDeleteErrorStatusCode = translate("js_history_delete_error_status_code");
   const translate_DeleteDeleteErrorUnknown = translate("js_history_delete_error_unknown");
+  const translate_buttonDelete = translate("js_button_delete");
+
   // To delete the message pointing that the history feature is not available
   // without JavaScript
   fileHistoryContainer.innerHTML = '';
@@ -75,7 +77,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const deleteButton = document.createElement("button");
     buttons.appendChild(deleteButton)
     deleteButton.className = "button delete-button";
-    deleteButton.innerHTML = "Delete";
+    deleteButton.innerHTML = translate_buttonDelete;
     deleteButton.style.display = "none";
     deleteButton.style.display = "inline";
     deleteButton.onclick = () => {
