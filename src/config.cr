@@ -84,6 +84,9 @@ class Config
     property show_title : Bool = true
     property show_file_count : Bool = true
     property show_version : Bool = true
+
+    property autoplay_video : Bool = false
+    property autoplay_audio : Bool = false
   end
 
   # Enable or disable the admin API

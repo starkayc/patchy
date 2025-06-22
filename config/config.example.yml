@@ -71,6 +71,8 @@ views:
   show_title: true
   show_file_count: true
   show_version: true
+  autoplay_video: false
+  autoplay_audio: false
 
 blocked_extensions:
   - "exe"

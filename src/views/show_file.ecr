@@ -41,12 +41,12 @@
     <% if filetype == Filetype::Image %>
       <img src="/-/file/<%= filename_ %>" alt="<%= original_filename_ %>">
     <% elsif filetype == Filetype::Video %>
-      <video controls>
+      <video controls <%= CONFIG.views.autoplay_video ? "autoplay" : "" %>>
         <source src="/-/file/<%= filename_ %>" type="<%= mime_type %>">
         Your browser does not support the video tag.
       </video>
     <% elsif filetype == Filetype::Audio %>
-      <audio controls>
+      <audio controls <%= CONFIG.views.autoplay_audio ? "autoplay" : "" %>>
         <source src="/-/file/<%= filename_ %>" type="<%= mime_type %>">
         Your browser does not support the audio tag.
       </audio>
