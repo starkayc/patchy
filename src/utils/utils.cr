@@ -76,7 +76,7 @@ module Utils
     # Delete entry from db
     Database::Files.delete_with_key(key)
 
-    LOGGER.debug "File '#{full_filename}' was deleted using key '#{key}'}"
+    LOGGER.debug "File '#{full_filename}' was deleted using key '#{key}'"
     msg("File '#{full_filename}' deleted successfully")
   end
 
