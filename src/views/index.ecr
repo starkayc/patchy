@@ -1,8 +1,8 @@
 <% content_for "head" do %>
 <title> <%= host %> - <%= translate(locale, "main_title") %></title>
-<script src="/-/assets/translations.js"></script>
-<script src="/-/assets/script.js"></script>
-<script src="/-/assets/history.js"></script>
+<script src="/-/assets/translations.js?v=<%= ASSET_COMMIT %>"></script>
+<script src="/-/assets/script.js?v=<%= ASSET_COMMIT %>"></script>
+<script src="/-/assets/history.js?v=<%= ASSET_COMMIT %>"></script>
 <%= translate_js(locale, "js_upload_text") %>
 <%= translate_js(locale, "js_upload_client_error") %>
 <%= translate_js(locale, "js_upload_server_error") %>
