@@ -2,7 +2,7 @@
 document.addEventListener("DOMContentLoaded", () => {
   const fileHistoryContainer = document.getElementById("file-history");
   const thumbnailsEnabled = JSON.parse(document.getElementById("thumbnails-enabled").textContent).msg;
-  const translate_Filename = translate("js_history_link");
+  const translate_Filename = translate("js_history_filename");
   const translate_Link = translate("js_history_link");
   const translate_DirectLink = translate("js_history_direct_link");
   const translate_DeleteDeletingFile = translate("js_history_delete_deleting_file");
