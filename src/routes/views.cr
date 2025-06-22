@@ -45,6 +45,14 @@ module Routes::Views
     templated "uploader_configs"
   end
 
+  def upload_history(env)
+    locale = Headers.locale
+    host = Headers.host
+    scheme = Headers.scheme
+
+    templated "upload_history"
+  end
+
   def admin(env)
     locale = Headers.locale
     host = Headers.host

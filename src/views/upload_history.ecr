@@ -1,0 +1,25 @@
+<% content_for "head" do %>
+<title> <%= host %> - <%= translate(locale, "upload_history") %></title>
+<script src="/-/assets/translations.js"></script>
+<script src="/-/assets/history.js"></script>
+<script src="/-/assets/uploadHistory.js"></script>
+<script id="thumbnails-enabled" type="application/json">{"msg":<%= CONFIG.thumbnail_generation.enabled ? "true" : "false" %>}</script>
+<%= translate_js(locale, "js_history_filename") %>
+<%= translate_js(locale, "js_history_link") %>
+<%= translate_js(locale, "js_history_direct_link") %>
+<%= translate_js(locale, "js_history_delete_deleting_file") %>
+<%= translate_js(locale, "js_history_delete_success") %>
+<%= translate_js(locale, "js_history_delete_error_server_down") %>
+<%= translate_js(locale, "js_history_delete_error") %>
+<%= translate_js(locale, "js_history_delete_error_status_code") %>
+<%= translate_js(locale, "js_history_delete_error_unknown") %>
+<% end %>
+
+<div class="container">
+  <a href='/'><%= translate(locale, "go_back") %></a>
+  <hr>
+  <h2><%= translate(locale, "upload_history") %></h2>
+  <div id="file-history" class="file-history">
+    <p><%= translate(locale, "file_history_unavailable") %></p>
+  </div>
+</div>

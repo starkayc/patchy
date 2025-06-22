@@ -1,6 +1,7 @@
 {
 	"main_title": "Subidor de archivos temporal",
 	"uploader_configs": "Configuraciones para subidores",
+	"upload_history": "Historial de subidas",
 	"admin_panel": "Panel de admin",
 	"Login": "Ingresar",
 	"login": "ingresar",
@@ -12,6 +13,19 @@
 	"report_abuse": "Reportar abuso",
 	"go_back": "Devolverse",
 	"upload_text": "Clickea aquí para subir un archivo",
+	"js_upload_client_error": "Error del cliente",
+	"js_upload_server_error": "Error del servidor",
+	"js_upload_unknown_error": "Error desconocido",
 	"uploader_configs_sharex_text": "Descarga la configuración aquí:",
-	"uploader_configs_chatterino_text": "Puedes usar este subidor colocando los siguentes campos en Opciones (tuerca en el corner arriba a la izquierda) > External tools > Image uploader"
+	"uploader_configs_chatterino_text": "Puedes usar este subidor colocando los siguentes campos en Opciones (tuerca en el corner arriba a la izquierda) > External tools > Image uploader",
+	"file_history_unavailable": "Historial de subidas no disponible, habilita JavaScript para llevar la cuenta de tus archivos subidos",
+	"js_history_filename": "Nombre del archivo",
+	"js_history_link": "Enlace",
+	"js_history_direct_link": "Enlace directo",
+	"js_history_delete_deleting_file": "Borrando archivo",
+	"js_history_delete_success": "Archivo borrado con exito",
+	"js_history_delete_error_server_down": "Error al borrar archivo, tal vez este servidor de patchy esta caido",
+	"js_history_delete_error": "Error al borrar archivo",
+	"js_history_delete_error_status_code": "Error al borrar archivo, codigo de estado",
+	"js_history_delete_error_unknown": "Error al borrar archivo, error desconocido"
 }

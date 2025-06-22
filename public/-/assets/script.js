@@ -97,8 +97,9 @@ document.addEventListener("DOMContentLoaded", () => {
     xhr.onload = () => {
       if (xhr.status === 200) {
         try {
-          const response = JSON.parse(xhr.responseText);
-          const fileLink = response.link;
+          const response = xhr.responseText;
+          const parsedResponse = JSON.parse(response)
+          const fileLink = parsedResponse.link;
           statusLink.innerHTML = `<a href="${fileLink}" target="_blank">${fileLink}</a>`;
           copyButton.style.display = "inline";
           copyButton.onclick = () => copyToClipboard(fileLink);
@@ -106,6 +107,7 @@ document.addEventListener("DOMContentLoaded", () => {
           deleteButton.onclick = () => {
             window.open(response.deleteLink, "_blank");
           };
+          saveOnHistory(response)
         } catch (error) {
           statusLink.textContent =
             "Error desconocido, habla con el administrador";

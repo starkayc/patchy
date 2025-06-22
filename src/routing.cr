@@ -85,6 +85,7 @@ module Routing
     get "/", Routes::Views, :root
     get "/:filename", Routes::Views, :show_file
     get "/-/info/configs", Routes::Views, :uploader_configs
+    get "/-/info/history", Routes::Views, :upload_history
     get "/-/admin", Routes::Views, :admin
     get "/-/login", Routes::Views, :login
     get "/-/reportabuse", Routes::Views, :reportabuse

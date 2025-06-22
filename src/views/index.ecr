@@ -1,12 +1,14 @@
 <% content_for "head" do %>
 <title> <%= host %> - <%= translate(locale, "main_title") %></title>
 <script src="/-/assets/script.js"></script>
+<script src="/-/assets/history.js"></script>
 <script id="upload_text" type="application/json">{"msg":"<%= translate(locale, "upload_text") %>"}</script>
 <% end %>
 
 <div class="container">
   <div class="navbar">
     <a href='/-/info/configs'><%= translate(locale, "uploader_configs") %></a>
+    <a href='/-/info/history'><%= translate(locale, "upload_history") %></a>
     <span class="end-of-flex"></span>
     <a href='/-/admin'><%= translate(locale, "admin_panel") %></a>
     <a href='/-/login'><%= translate(locale, "Login") %></a>

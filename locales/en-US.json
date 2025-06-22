@@ -1,6 +1,7 @@
 {
 	"main_title": "Temporary file uploader",
 	"uploader_configs": "Configurations for uploaders",
+	"upload_history": "Upload history",
 	"admin_panel": "Admin Panel",
 	"Login": "Login",
 	"login": "login",
@@ -12,6 +13,19 @@
 	"report_abuse": "Report abuse",
 	"go_back": "Go back",
 	"upload_text": "Click here to upload a file",
+	"js_upload_client_error": "Client error",
+	"js_upload_server_error": "Server error",
+	"js_upload_unknown_error": "Unknown error",
 	"uploader_configs_sharex_text": "Download the configuration here:",
-	"uploader_configs_chatterino_text": "You can use this uploader setting the following fields on Settings (cog in the top left corner) > External tools > Image uploader"
+	"uploader_configs_chatterino_text": "You can use this uploader setting the following fields on Settings (cog in the top left corner) > External tools > Image uploader",
+	"file_history_unavailable": "File history unavailable, enable JavaScript to keep track of your uploaded files",
+	"js_history_filename": "Filename",
+	"js_history_link": "Link",
+	"js_history_direct_link": "Direct Link",
+	"js_history_delete_deleting_file": "Deleting file",
+	"js_history_delete_success": "File deleted successfully",
+	"js_history_delete_error_server_down": "Error deleting file, this patchy server seems to be down",
+	"js_history_delete_error": "Error deleting file",
+	"js_history_delete_error_status_code": "Error deleting file, status code",
+	"js_history_delete_error_unknown": "Error deleting file, unknown error"
 }

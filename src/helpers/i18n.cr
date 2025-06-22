@@ -76,3 +76,8 @@ def translate_bool(locale : String?, translation : Bool)
     return translate(locale, "No")
   end
 end
+
+def translate_js(locale : String?, key : String)
+  translation = translate(locale, key)
+  "<script id=\"_translate-#{key}\" type=\"application/json\">{\"msg\":\"#{translation}\"}</script>"
+end
