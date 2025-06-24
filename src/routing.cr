@@ -27,6 +27,16 @@ module Routing
     env.set "scheme", env.request.headers["X-Forwarded-Proto"]? || "http"
     env.set "ip", env.request.headers["X-Real-IP"]? || env.request.remote_address.as?(Socket::IPAddress).try &.address || nil
 
+    env.response.headers["Content-Security-Policy"] = {
+      "sandbox allow-popups allow-popups-to-escape-sandbox allow-downloads allow-scripts allow-same-origin",
+      "default-src 'self'",
+      "script-src 'self' 'unsafe-inline'",
+      "img-src 'self' data:",
+      "style-src 'self' 'unsafe-inline'",
+      "font-src 'self' data:",
+      "connect-src 'self'",
+    }.join(";")
+
     if env.request.resource.starts_with?(ADMIN_API_ROUTE_PATH)
       env.response.content_type = "application/json"
 
