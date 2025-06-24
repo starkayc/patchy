@@ -29,5 +29,7 @@
 	"js_history_delete_error_status_code": "Error al borrar archivo, codigo de estado",
 	"js_history_delete_error_unknown": "Error al borrar archivo, error desconocido",
 	"js_button_delete": "Borrar",
-	"js_button_copy": "Copiar"
+	"js_button_copy": "Copiar",
+	"file_does_not_exist": "Este archivo no existe",
+	"error_at_file_retrieval": "Error when retrieving file"
 }

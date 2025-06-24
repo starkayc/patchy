@@ -1,0 +1,13 @@
+<% content_for "head" do %>
+<title> <%= host %> - <%= translate(locale, "file_does_not_exist") %></title>
+<% end %>
+
+<div class="media-container">
+  <div class="navbar">
+    <a href='/'><%= translate(locale, "go_back") %></a>
+  </div>
+  <hr>
+  <div class="media">
+    <p><%= translate(locale, "file_does_not_exist") %></p>
+  </div>
+</div>

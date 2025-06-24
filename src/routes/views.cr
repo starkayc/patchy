@@ -26,10 +26,10 @@ module Routes::Views
     begin
       fileinfo = Database::Files.select(filename)
       if fileinfo.nil?
-        ee 404, "File '#{filename}' does not exist"
+        return templated "show_file_not_exist"
       end
     rescue ex
-      ee 500, "Error when retrieving file '#{filename}'"
+      return templated "show_file_error"
     end
 
     mime_type = MIME.from_extension(fileinfo.extension, "application/octet-stream")

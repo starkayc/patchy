@@ -29,5 +29,7 @@
 	"js_history_delete_error_status_code": "Error deleting file, status code",
 	"js_history_delete_error_unknown": "Error deleting file, unknown error",
 	"js_button_delete": "Delete",
-	"js_button_copy": "Copy"
+	"js_button_copy": "Copy",
+	"file_does_not_exist": "This file does not exist",
+	"error_at_file_retrieval": "Error when retrieving file"
 }
