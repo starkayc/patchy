@@ -19,7 +19,7 @@ module Routes::Retrieve
     end
 
     env.response.headers["Content-Disposition"] = "inline; filename*=UTF-8''#{fileinfo.original_filename}"
-    env.response.headers["ETag"] = "#{fileinfo.checksum}"
+    env.response.headers["ETag"] = "#{fileinfo.checksum}" if fileinfo.checksum
 
     # TODO: send_file_raw and some functions
     if cached_file = Utils::Cache.select(fileinfo)
