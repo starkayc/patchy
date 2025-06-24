@@ -20,6 +20,7 @@ module Routes::Retrieve
 
     env.response.headers["Content-Disposition"] = "inline; filename*=UTF-8''#{fileinfo.original_filename}"
     env.response.headers["ETag"] = "#{fileinfo.checksum}" if fileinfo.checksum
+    env.response.headers["Expires"] = Time::Format::HTTP_DATE.format(Time.unix(fileinfo.uploaded_at + CONFIG.delete_files_after * 3600))
 
     # TODO: send_file_raw and some functions
     if cached_file = Utils::Cache.select(fileinfo)
