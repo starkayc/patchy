@@ -71,6 +71,12 @@ views:
   show_title: true
   show_file_count: true
   show_version: true
+  index_navbar:
+    enabled: true
+    show_uploader_configs: true
+    show_upload_history: true
+    show_admin: true
+    show_login: true
   autoplay_video: false
   autoplay_audio: false
 

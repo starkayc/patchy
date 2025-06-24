@@ -85,6 +85,18 @@ class Config
     property show_file_count : Bool = true
     property show_version : Bool = true
 
+    property index_navbar : IndexNavbar = IndexNavbar.from_yaml("")
+
+    struct IndexNavbar
+      include YAML::Serializable
+
+      property enabled : Bool = true
+      property show_uploader_configs : Bool = true
+      property show_upload_history : Bool = true
+      property show_admin : Bool = true
+      property show_login : Bool = true
+    end
+
     property autoplay_video : Bool = false
     property autoplay_audio : Bool = false
   end

@@ -12,14 +12,24 @@
 <% end %>
 
 <div class="container">
-  <div class="navbar">
-    <a href='/-/info/configs'><%= translate(locale, "uploader_configs") %></a>
-    <a href='/-/info/history'><%= translate(locale, "upload_history") %></a>
-    <span class="end-of-flex"></span>
-    <a href='/-/admin'><%= translate(locale, "admin_panel") %></a>
-    <a href='/-/login'><%= translate(locale, "Login") %></a>
-  </div>
-  <hr>
+  <% if CONFIG.views.index_navbar.enabled %>
+    <div class="navbar">
+      <% if CONFIG.views.index_navbar.show_uploader_configs %>
+      <a href='/-/info/configs'><%= translate(locale, "uploader_configs") %></a>
+      <% end %>
+      <% if CONFIG.views.index_navbar.show_upload_history %>
+      <a href='/-/info/history'><%= translate(locale, "upload_history") %></a>
+      <% end %>
+      <span class="end-of-flex"></span>
+      <% if CONFIG.views.index_navbar.show_admin %>
+      <a href='/-/admin'><%= translate(locale, "admin_panel") %></a>
+      <% end %>
+      <% if CONFIG.views.index_navbar.show_login %>
+      <a href='/-/login'><%= translate(locale, "Login") %></a>
+      <% end %>
+    </div>
+    <hr>
+  <% end %>
   <% if CONFIG.views.show_title %>
     <h1><%= host %></h1>
   <% end %>
