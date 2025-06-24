@@ -18,7 +18,12 @@ module Routes::Retrieve
       ee 500, "Error when retrieving file '#{filename}'"
     end
 
-    env.response.headers["Content-Disposition"] = "inline; filename*=UTF-8''#{fileinfo.original_filename}"
+    # Download the HTML file contents instead of rendering it on the browser
+    if !fileinfo.extension == ".html"
+      env.response.headers["Content-Disposition"] = "inline; filename*=UTF-8''#{fileinfo.original_filename}"
+    else
+      env.response.headers["Content-Disposition"] = "attachment; filename*=UTF-8''#{fileinfo.original_filename}"
+    end
     env.response.headers["ETag"] = "#{fileinfo.checksum}" if fileinfo.checksum
     env.response.headers["Expires"] = Time::Format::HTTP_DATE.format(Time.unix(fileinfo.uploaded_at + CONFIG.delete_files_after * 3600))
 

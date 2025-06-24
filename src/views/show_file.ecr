@@ -57,7 +57,12 @@
   <hr>
   <div class="navbar">
     <a href='/-/file/<%= filename_ %>' download=''><%= translate(locale, "download_file") %> (<%= original_filename_ %>)</a>
+    <% 
+      # Disable view button for .html files
+      if !fileinfo.extension == ".html" 
+    %>
     <a href='/-/file/<%= filename_ %>'><%= translate(locale, "view_file") %></a>
+    <% end %>
     <span class="end-of-flex"></span>
     <a href='/-/reportabuse?file=<%= filename_ %>'><%= translate(locale, "report_abuse") %></a>
   </div>
