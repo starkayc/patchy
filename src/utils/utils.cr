@@ -216,17 +216,13 @@ module Utils
     "html" => "<!DOCTYPE html>",
   }
 
-  def detect_extension(file) : String
-    file = File.open(file)
-    slice = Bytes.new(16)
-    hex = IO::Hexdump.new(file)
-    # Reads the first 16 bytes of the file in Heap
-    hex.read(slice)
+  def detect_extension(bytes : Bytes) : String?
     MAGIC_BYTES.each do |ext, mb|
-      if slice.hexstring.includes?(mb)
+      if bytes.hexstring.includes?(mb)
+        LOGGER.trace "detect_extension: Extension is '#{ext}'"
         return ext
       end
     end
-    ""
+    nil
   end
 end

@@ -17,9 +17,17 @@ module OP
       @ip.date = @fileinfo.uploaded_at
     end
 
-    private def writefile(file_path : String) : Nil
+    private def writefile : Nil
+      buffer = uninitialized UInt8[16]
+      slice = buffer.to_slice
+      @uploaded_file.body.read(slice)
+
+      detect_extension(slice)
+
+      full_filename = @fileinfo.filename + @fileinfo.extension
+      file_path = "#{CONFIG.files}/#{full_filename}"
+
       if CONFIG.s3.enabled
-        full_filename = @fileinfo.filename + @fileinfo.extension
         body = IO::Memory.new
         IO.copy(@uploaded_file.body, body)
         # Rewind the IO first so the S3 library can calculate the correct
@@ -29,9 +37,30 @@ module OP
         Utils::S3::Client.as(Utils::S3::S3).upload(full_filename, body)
       else
         File.open(file_path, "wb") do |output|
+          output.write(slice)
           IO.copy(@uploaded_file.body, output)
         end
         generate_checksum(file_path)
+      end
+    end
+
+    private def detect_extension(slice : Bytes) : Nil
+      extension = Utils.detect_extension(slice)
+
+      if extension
+        valid_extension?(extension)
+        @fileinfo.extension = extension
+      else
+        # Detect by filename if it wasn't detected by magic bytes
+        extension = File.extname("#{@uploaded_file.filename}")
+        valid_extension?(extension)
+        @fileinfo.extension = extension
+      end
+    end
+
+    private def valid_extension?(extension) : Nil
+      if CONFIG.blocked_extensions.includes?(extension.split(".")[1]?)
+        raise ExtensionNotAllowed.new(extension)
       end
     end
 
@@ -77,19 +106,7 @@ module OP
         @fileinfo.original_filename = @fileinfo.filename
       end
 
-      @fileinfo.extension = File.extname("#{@uploaded_file.filename}")
-
-      # Allow uploads without extension
-      if !@fileinfo.extension.empty?
-        if CONFIG.blocked_extensions.includes?(@fileinfo.extension.split(".")[1])
-          raise ExtensionNotAllowed.new(@fileinfo.extension)
-        end
-      end
-
-      full_filename = @fileinfo.filename + @fileinfo.extension
-      file_path = "#{CONFIG.files}/#{full_filename}"
-
-      writefile(file_path)
+      writefile()
       set_ip_information()
 
       if CONFIG.delete_key_length > 0
