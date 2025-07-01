@@ -53,6 +53,16 @@ module Database::Files
     SQL.exec(request, *fileinfo.to_tuple)
   end
 
+  def update_thumbnail(filename : String) : Nil
+    request = <<-SQL
+      UPDATE files
+      SET thumbnail = ?
+      WHERE filename = ?
+    SQL
+
+    SQL.exec(request, "#{filename}.jpg", filename)
+  end
+
   def delete(filename : String) : Nil
     request = <<-SQL
       DELETE

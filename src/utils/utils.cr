@@ -138,40 +138,6 @@ module Utils
     end
   end
 
-  def generate_thumbnail(filename, extension)
-    exts = [".jpg", ".jpeg", ".png", ".gif", ".bmp", ".tiff", ".webp", ".heic", ".jxl", ".avif", ".crw", ".dng",
-            ".mp4", ".mkv", ".webm", ".avi", ".wmv", ".flv", "m4v", ".mov", ".amv", ".3gp", ".mpg", ".mpeg", ".yuv"]
-
-    # To prevent thumbnail generation on non image extensions
-    return if exts.none? { |ext| extension.downcase.includes?(ext) }
-
-    # Disable generation if false
-    return if !CONFIG.thumbnail_generation.enabled || !CONFIG.thumbnails
-
-    LOGGER.debug "Generating thumbnail for #{filename + extension} in background"
-
-    process = Process.run("ffmpeg",
-      [
-        "-hide_banner",
-        "-i",
-        "#{CONFIG.files}/#{filename + extension}",
-        "-movflags", "faststart",
-        "-f", "mjpeg",
-        "-q:v", "2",
-        "-vf", "scale='min(350,iw)':'min(350,ih)':force_original_aspect_ratio=decrease, thumbnail=100",
-        "-frames:v", "1",
-        "-update", "1",
-        "#{CONFIG.thumbnails}/#{filename}.jpg",
-      ])
-
-    if process.exit_reason == Process::ExitReason::Normal
-      LOGGER.debug "Thumbnail for '#{filename + extension}' generated successfully"
-      SQL.exec "UPDATE files SET thumbnail = ? WHERE filename = ?", filename + ".jpg", filename
-    else
-      LOGGER.debug "Failed to generate thumbnail for '#{filename + extension}'. Exit code of ffmpeg: #{process.exit_code}"
-    end
-  end
-
   # Delete socket if the server has not been previously cleaned by the server
   # (Due to unclean exits, crashes, etc.)
   def delete_socket

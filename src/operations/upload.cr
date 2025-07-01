@@ -72,7 +72,7 @@ module OP
 
     private def generate_thumbnail : Nil
       begin
-        spawn { Utils.generate_thumbnail(@fileinfo.filename, @fileinfo.extension) }
+        spawn { Utils::Thumbnails.generate_thumbnail(@fileinfo.filename, @fileinfo.extension) }
       rescue ex
         LOGGER.error "An error ocurred when trying to generate a thumbnail: #{ex.message}"
       end
