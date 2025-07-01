@@ -23,6 +23,7 @@ jobs:
 
     - uses: https://code.forgejo.org/docker/setup-buildx-action@v3
       name: Setup Docker BuildX system
+      id: setup-buildx
 
     - name: Login to Docker Container Registry
       uses: https://code.forgejo.org/docker/login-action@v3.4.0
@@ -30,6 +31,23 @@ jobs:
         registry: git.nadeko.net
         username: ${{ secrets.USERNAME }}
         password: ${{ secrets.TOKEN }}
+
+    - name: ffmpeg ccache cache
+      uses: actions/cache@v4
+      id: cache
+      with:
+        path: ffmpeg-ccache
+        key: ffmpeg-ccache-${{ hashFiles('Dockerfile') }}
+
+    - name: Restore Docker cache mounts
+      uses: https://github.com/reproducible-containers/buildkit-cache-dance@v3
+      with:
+        builder: ${{ steps.setup-buildx.outputs.name }}
+        cache-map: |
+          {
+            "ffmpeg-ccache": "/root/.ccache"
+          }
+        skip-extraction: ${{ steps.cache.outputs.cache-hit }}
 
     - name: Docker meta
       id: meta
