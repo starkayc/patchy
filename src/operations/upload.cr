@@ -45,7 +45,7 @@ module OP
     end
 
     private def detect_extension(slice : Bytes) : Nil
-      extension = Utils.detect_extension(slice)
+      extension = Utils::MagicBytes.detect(slice)
 
       if extension
         valid_extension?(extension)
