@@ -45,7 +45,7 @@ CURRENT_VERSION = {{ "#{`git log -1 --format=%ci | awk '{print $1}' | sed s/-/./
 # This is used to determine the `?v=` on the end of file URLs (for cache busting). We
 # only need to expire modified assets, so we can use this to find the last commit that changes
 # any assets
-ASSET_COMMIT    = {{ "#{`git rev-list HEAD --max-count=1 --abbrev-commit -- public/-/assets/`.strip}" }}
+ASSET_COMMIT = {{ "#{`git rev-list HEAD --max-count=1 --abbrev-commit -- public/-/assets/`.strip}" }}
 
 Utils.check_dependencies
 Utils.create_tables
