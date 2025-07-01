@@ -18,6 +18,12 @@ module Routes::Views
   end
 
   def show_file(env)
+    user_agent = Headers.user_agent
+
+    if ["Discordbot/2.0"].any? { |ua| user_agent.includes?(ua) }
+      return Routes::Retrieve.retrieve_file(env)
+    end
+
     locale = Headers.locale
     host = Headers.host
     scheme = Headers.scheme

@@ -48,4 +48,8 @@ module Headers
   macro ip_addr
     env.get("ip").as(String)
   end
+
+  macro user_agent
+    env.get("user_agent").as(String)
+  end
 end

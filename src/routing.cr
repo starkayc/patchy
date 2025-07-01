@@ -26,6 +26,7 @@ module Routing
     env.set "host", env.request.headers["X-Forwarded-Host"]? || env.request.headers["Host"]? || nil
     env.set "scheme", env.request.headers["X-Forwarded-Proto"]? || "http"
     env.set "ip", env.request.headers["X-Real-IP"]? || env.request.remote_address.as?(Socket::IPAddress).try &.address || nil
+    env.set "user_agent", env.request.headers["User-Agent"]?
 
     env.response.headers["Content-Security-Policy"] = {
       "sandbox allow-popups allow-popups-to-escape-sandbox allow-downloads allow-scripts allow-same-origin",
