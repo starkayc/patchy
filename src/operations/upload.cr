@@ -20,7 +20,7 @@ module OP
     private def writefile : Nil
       buffer = uninitialized UInt8[16]
       slice = buffer.to_slice
-      @uploaded_file.body.read(slice)
+      @uploaded_file.body.read_fully(slice)
 
       detect_extension(slice)
 
