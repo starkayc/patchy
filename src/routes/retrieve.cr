@@ -19,7 +19,7 @@ module Routes::Retrieve
     end
 
     # Download the HTML file contents instead of rendering it on the browser
-    if !fileinfo.extension == ".html"
+    if fileinfo.extension != ".html"
       env.response.headers["Content-Disposition"] = "inline; filename*=UTF-8''#{fileinfo.original_filename}"
     else
       env.response.headers["Content-Disposition"] = "attachment; filename*=UTF-8''#{fileinfo.original_filename}"
