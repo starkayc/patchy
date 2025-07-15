@@ -11,7 +11,6 @@ module Utils::Thumbnails
     LOGGER.debug "Utils::Thumbnails.generate_thumbnail: Generating thumbnail for #{filename + extension} in background"
 
     process = generate_big_thumbnail(filename, extension)
-    pp process
 
     if process.exit_reason == Process::ExitReason::Normal
       LOGGER.debug "Utils::Thumbnails.generate_thumbnail: Thumbnail for '#{filename + extension}' generated successfully"
