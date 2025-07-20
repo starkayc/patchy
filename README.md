@@ -68,6 +68,10 @@ software that manages them ;)
 
 https://codeberg.org/Fijxu/patchy/issues/9
 
+## Docs
+
+[./docs](./docs/)
+
 ## How to host Patchy
 
 ### Containers
