@@ -23,7 +23,7 @@ RUN --mount=type=cache,target=/root/.cache/crystal \
 	--release \
 	--static --warnings all -s -p -t
 
-FROM alpine:3.21 AS builder-ffmpeg
+FROM alpine:3.22 AS builder-ffmpeg
 
 ARG FFMPEG_VERSION=6.1.2
 ARG PREFIX=/opt/ffmpeg
@@ -85,7 +85,7 @@ RUN --mount=type=cache,target=/root/.ccache \
 # Cleanup.
 RUN rm -rf /var/cache/apk/* /tmp/*
 
-FROM alpine:3.21
+FROM alpine:3.22
 # shared-mime-info is required so Crystal is able to guess the mime types
 # of uploaded/retrieved files using the file `/etc/mime.types` provided
 # by that package.
