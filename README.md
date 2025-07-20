@@ -1,7 +1,7 @@
 # Patchy
 
-[![Translation status](https://translate.codeberg.org/widget/patchy/svg-badge.svg)](https://translate.codeberg.org/engage/patchy/)
-[![Translation status](https://translate.codeberg.org/widget/patchy/language-badge.svg)](https://translate.codeberg.org/engage/patchy/)
+<!-- [![Translation status](https://translate.codeberg.org/widget/patchy/svg-badge.svg)](https://translate.codeberg.org/engage/patchy/)
+[![Translation status](https://translate.codeberg.org/widget/patchy/language-badge.svg)](https://translate.codeberg.org/engage/patchy/) -->
 
 A temporary file uploader easy to host that I did to replace
 [Uguu](https://github.com/nokonoko/uguu), which is not easy to host due to PHP.
@@ -55,28 +55,20 @@ software that manages them ;)
 - Cache files on memory to reduce stress on the drive using
   [LRU](https://en.wikipedia.org/wiki/Cache_replacement_policies#LRU), more
   information on [config.example.yml](./config/config.example.yml)
-- Low memory usage: Between 6MB at idle and 25MB if a file is being uploaded or
-  retrieved. It will depend of your traffic and if Cache is enabled
+- Low memory usage: Between 6MB at idle and 40MB if a file is being uploaded or
+  retrieved. It will depend of your traffic, if cache is enabled and if
+  checksumming is enabled.
 - **Experimental** S3 bucket support (OpenGraph thumbnails are not available,
   tested using [Minio](https://min.io/))
-- Different language shown on the page depending of the language settings of the
-  client
-- VPN blocking (Not really necessary, but still, it's a good addition) (**In progress**)
+- Localization support (Only English and Spanish supported for now)
+- VPN blocking (Not really necessary, but still, it's a good addition) (**In
+  progress**)
 
 ## TODO
 
-- Admin panel for easy deletion of files and user management for authenticated
-  uploads
-- Authenticated upload
-- Abuse repots
-- Admin API:
-  - IP blocks
-  - Delete all files from one IP address
-- Upload direcly from URL (Feature that used to exist, so I just need to strip it from older commits)
-- Upload files from Instragram, TikTok, Youtube and whatever using `yt-dlp` (It's going to make it harder to setup if the hoster wants support for it :/)
-- Limit request per second that an IP address can a access a file or how many times a file can be accessed on a range of seconds
+https://codeberg.org/Fijxu/patchy/issues/9
 
-## Hosting
+## How to host Patchy
 
 ### Containers
 
@@ -91,6 +83,10 @@ software that manages them ;)
 - Run it using `docker compose up` if using docker or `podman compose up` if
   using Podman. If it works fine, then you can append the `-d` argument next to
   leave the container running on the background
+
+#### Kubernetes
+
+**TODO**
 
 ### Native (Compiling it yourself)
 
@@ -108,10 +104,6 @@ software that manages them ;)
 > [!WARNING]
 > This was not tested, if you have any issues with it, please open an issue!
 
-#### Kubernetes
-
-**TODO**
-
 ## NGINX Server block
 
 Assuming you are already using NGINX and you know how to use it, you can use
@@ -128,7 +120,7 @@ server {
   location / {
     proxy_pass http://127.0.0.1:8080;
     # This if you want to use a UNIX socket instead
-    #proxy_pass http://unix:/tmp/patchy.sock;
+    # proxy_pass http://unix:/tmp/patchy.sock;
     proxy_set_header X-Real-IP   $proxy_add_x_forwarded_for;
     proxy_set_header X-Forwarded-Proto $scheme;
     proxy_set_header X-Forwarded-Host  $host;
@@ -143,7 +135,7 @@ server {
 }
 ```
 
----
+<!-- ---
 
 ## Translations
 
@@ -151,4 +143,4 @@ Feel free to translate Patchy to your own language if it's not supported here:
 https://translate.codeberg.org/projects/patchy/patchy/ (Requires a Codeberg
 account)
 
-[![Translation status](https://translate.codeberg.org/widget/patchy/multi-auto.svg)](https://translate.codeberg.org/engage/patchy/)
+[![Translation status](https://translate.codeberg.org/widget/patchy/multi-auto.svg)](https://translate.codeberg.org/engage/patchy/) -->
