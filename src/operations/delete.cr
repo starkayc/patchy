@@ -47,7 +47,7 @@ module OP::Delete
         delete_file(fileinfo)
         # Delete entry from db
         Database::Files.delete_with_key(deletion_key)
-        LOGGER.debug "delete_file (deletion_key): File '#{full_filename}' was deleted using key '#{deletion_key}'}"
+        LOGGER.debug "delete_file (deletion_key): File '#{full_filename}' was deleted using key '#{deletion_key}'"
         return full_filename
       rescue ex
         LOGGER.error("delete_file (deletion_key): Unknown error: #{ex.message}")
