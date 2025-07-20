@@ -105,12 +105,13 @@ document.addEventListener("DOMContentLoaded", () => {
           const response = xhr.responseText;
           const parsedResponse = JSON.parse(response)
           const fileLink = parsedResponse.link;
+          const deleteLink = parsedResponse.deleteLink
           statusLink.innerHTML = `<a href="${fileLink}" target="_blank">${fileLink}</a>`;
           copyButton.style.display = "inline";
           copyButton.onclick = () => copyToClipboard(fileLink);
           deleteButton.style.display = "inline";
           deleteButton.onclick = () => {
-            window.open(response.deleteLink, "_blank");
+            window.open(deleteLink, "_blank");
           };
           saveOnHistory(response)
         } catch (error) {
