@@ -13,9 +13,9 @@ module Utils::Cache
 
     def initialize(@max_size = CONFIG.cache.max_size, @max_allowed_filesize = CONFIG.cache.max_allowed_filesize)
       if CONFIG.cache.enabled
-        LOGGER.info "File Cache: Using in memory LRU to store files smaller than #{(@max_allowed_filesize * 1000).humanize_bytes}"
-        LOGGER.info "File Cache: Maximum amount of files the cache can hold: #{@max_size}"
-        LOGGER.info "File Cache: Max bytes that the cache can hold: #{(@max_size * @max_allowed_filesize * 1000).humanize_bytes}"
+        Log.info &.emit "File Cache: Using in memory LRU to store files smaller than #{(@max_allowed_filesize * 1000).humanize_bytes}"
+        Log.info &.emit "File Cache: Maximum amount of files the cache can hold: #{@max_size}"
+        Log.info &.emit "File Cache: Max bytes that the cache can hold: #{(@max_size * @max_allowed_filesize * 1000).humanize_bytes}"
       end
     end
 
@@ -24,14 +24,14 @@ module Utils::Cache
       file_size = file.size
 
       if file_size > @max_allowed_filesize &* 1000
-        LOGGER.trace("File Cache: Not caching '#{fileinfo.filename}', size too big to be cached, size: #{file_size.humanize_bytes}")
+        Log.trace &.emit("File Cache: Not caching '#{fileinfo.filename}', size too big to be cached, size: #{file_size.humanize_bytes}")
         return
       end
 
       slice = Bytes.new(file_size)
       file.read_fully(slice)
       self[fileinfo.filename] = {fileinfo: fileinfo, data: slice, filesize: file_size}
-      LOGGER.trace("File Cache: Inserted file '#{fileinfo.filename}' to memory")
+      Log.trace &.emit("File Cache: Inserted file '#{fileinfo.filename}' to memory")
     end
 
     def del(fileinfo : Fileinfo) : Nil
@@ -41,7 +41,7 @@ module Utils::Cache
     def get(fileinfo : Fileinfo) : Bytes?
       data = self[fileinfo.filename]
       if data
-        LOGGER.trace("File Cache: Retrieved file '#{fileinfo.filename}' from memory")
+        Log.trace &.emit("File Cache: Retrieved file '#{fileinfo.filename}' from memory")
         return data[:data]
       else
         return nil

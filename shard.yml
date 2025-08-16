@@ -19,6 +19,8 @@ dependencies:
     github: ralsina/baked_file_handler
   baked_file_system:
     github: schovi/baked_file_system
+  flib:
+    git: git://codeberg.org/Fijxu/flib.git
 
 development_dependencies:
   ameba:

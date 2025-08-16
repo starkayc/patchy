@@ -8,15 +8,15 @@ module Utils::Thumbnails
   def generate_thumbnail(filename : String, extension : String)
     return unless CONFIG.thumbnail_generation.enabled &&
                   !ALLOWED_EXTENSIONS.none? { |ext| extension.downcase.includes?(ext) }
-    LOGGER.debug "Utils::Thumbnails.generate_thumbnail: Generating thumbnail for #{filename + extension} in background"
+    Log.debug &.emit "Utils::Thumbnails.generate_thumbnail: Generating thumbnail for #{filename + extension} in background"
 
     process = generate_big_thumbnail(filename, extension)
 
     if process.exit_reason == Process::ExitReason::Normal
-      LOGGER.debug "Utils::Thumbnails.generate_thumbnail: Thumbnail for '#{filename + extension}' generated successfully"
+      Log.debug &.emit "Utils::Thumbnails.generate_thumbnail: Thumbnail for '#{filename + extension}' generated successfully"
       Database::Files.update_thumbnail(filename)
     else
-      LOGGER.debug "Utils::Thumbnails.generate_thumbnail: Failed to generate thumbnail for '#{filename + extension}'. Exit code of ffmpeg: #{process.exit_code}"
+      Log.debug &.emit "Utils::Thumbnails.generate_thumbnail: Failed to generate thumbnail for '#{filename + extension}'. Exit code of ffmpeg: #{process.exit_code}"
     end
   end
 

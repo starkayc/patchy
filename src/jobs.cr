@@ -6,7 +6,7 @@ module Jobs
 
   def check_old_files
     if CONFIG.delete_files_check <= 0
-      LOGGER.info "File deletion is disabled"
+      Log.info &.emit "File deletion is disabled"
       return
     end
     spawn do
@@ -21,7 +21,7 @@ module Jobs
     if !CONFIG.ip_block.tor.enabled
       return
     end
-    LOGGER.info "Blocking Tor exit nodes"
+    Log.info &.emit "Blocking Tor exit nodes"
     spawn do
       loop do
         Utils::IpBlocks::Tor.update_tor_exit_nodes
@@ -34,7 +34,7 @@ module Jobs
     if !CONFIG.ip_block.vpn.enabled
       return
     end
-    LOGGER.info "Blocking VPN addresses"
+    Log.info &.emit "Blocking VPN addresses"
     spawn do
       loop do
         Utils::IpBlocks::VPN.update_vpn_blocks
@@ -49,11 +49,11 @@ module Jobs
       if !CONFIG.server.unix_socket.nil?
         Utils.delete_socket
         Kemal.run &.server.not_nil!.bind_unix "#{CONFIG.server.unix_socket}"
-        LOGGER.info "Changing socket permissions to 777"
+        Log.info &.emit "Changing socket permissions to 777"
         begin
           File.chmod("#{CONFIG.server.unix_socket}", File::Permissions::All)
         rescue ex
-          LOGGER.fatal "Failed to set unix socket permissions to 777: #{ex.message}"
+          Log.fatal &.emit "Failed to set unix socket permissions to 777: #{ex.message}"
           exit(1)
         end
       else

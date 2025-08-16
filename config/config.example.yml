@@ -1,4 +1,5 @@
 colorize_logs: true
+# Levels are: none, fatal, error, warn, notice, info, debug and trace
 log_level: "debug"
 
 # File paths, you generally don't need to change this

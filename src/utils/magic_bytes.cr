@@ -51,7 +51,7 @@ module Utils::MagicBytes
   def detect(bytes : Bytes) : String?
     MAGIC_BYTES.each do |ext, mb|
       if bytes.hexstring.includes?(mb)
-        LOGGER.trace "Utils::MagicBytes.detect: Extension is '#{ext}'"
+        Log.trace &.emit "Utils::MagicBytes.detect: Extension is '#{ext}'"
         return ext
       end
     end

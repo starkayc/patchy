@@ -5,9 +5,9 @@ module Utils
     if !Database::Files.exists?
       begin
         Database::Files.create_table
-        LOGGER.info "create_tables: Created table 'files'"
+        Log.info &.emit "create_tables: Created table 'files'"
       rescue ex
-        LOGGER.fatal "create_tables: Failed to create 'files' table: #{ex.message}"
+        Log.fatal &.emit "create_tables: Failed to create 'files' table: #{ex.message}"
         exit(1)
       end
     end
@@ -15,9 +15,9 @@ module Utils
     if !Database::IP.exists?
       begin
         Database::IP.create_table
-        LOGGER.info "create_tables: Created table 'ips'"
+        Log.info &.emit "create_tables: Created table 'ips'"
       rescue ex
-        LOGGER.fatal "create_tables: Failed to create 'ips' table: #{ex.message}"
+        Log.fatal &.emit "create_tables: Failed to create 'ips' table: #{ex.message}"
         exit(1)
       end
     end
@@ -25,11 +25,11 @@ module Utils
 
   def create_files_dir
     if !Dir.exists?("#{CONFIG.files}")
-      LOGGER.info "Creating files folder under '#{CONFIG.files}'"
+      Log.info &.emit "Creating files folder under '#{CONFIG.files}'"
       begin
         Dir.mkdir_p("#{CONFIG.files}")
       rescue ex
-        LOGGER.fatal "#{ex.message}"
+        Log.fatal &.emit "#{ex.message}"
         exit(1)
       end
     end
@@ -38,11 +38,11 @@ module Utils
   def create_thumbnails_dir
     if CONFIG.thumbnails
       if !Dir.exists?("#{CONFIG.thumbnails}")
-        LOGGER.info "Creating thumbnails folder under '#{CONFIG.thumbnails}'"
+        Log.info &.emit "Creating thumbnails folder under '#{CONFIG.thumbnails}'"
         begin
           Dir.mkdir_p("#{CONFIG.thumbnails}")
         rescue ex
-          LOGGER.fatal "#{ex.message}"
+          Log.fatal &.emit "#{ex.message}"
           exit(1)
         end
       end
@@ -51,11 +51,11 @@ module Utils
 
   def create_db_dir
     if !Dir.exists?("#{CONFIG.db}")
-      LOGGER.info "Creating db folder under '#{CONFIG.db}'"
+      Log.info &.emit "Creating db folder under '#{CONFIG.db}'"
       begin
         Dir.mkdir_p("#{CONFIG.db}")
       rescue ex
-        LOGGER.fatal "#{ex.message}"
+        Log.fatal &.emit "#{ex.message}"
         exit(1)
       end
     end
@@ -76,7 +76,7 @@ module Utils
     # Delete entry from db
     Database::Files.delete_with_key(key)
 
-    LOGGER.debug "File '#{full_filename}' was deleted using key '#{key}'"
+    Log.debug &.emit "File '#{full_filename}' was deleted using key '#{key}'"
     msg("File '#{full_filename}' deleted successfully")
   end
 
@@ -85,7 +85,7 @@ module Utils
   # In the end, all old files should be not accessible, even if they are on the
   # drive.
   def check_old_files
-    LOGGER.info "check_old_files: Deleting old files"
+    Log.info &.emit "check_old_files: Deleting old files"
     files = Database::Files.old_files
 
     files.each do |f|
@@ -93,7 +93,7 @@ module Utils
       thumbnail = f.thumbnail
 
       # TODO: Check if it's able to bypass the path using a filename with a `/` in their name
-      LOGGER.debug "check_old_files: Deleting file '#{full_filename}'"
+      Log.debug &.emit "check_old_files: Deleting file '#{full_filename}'"
       begin
         File.delete("#{CONFIG.files}/#{full_filename}")
 
@@ -101,11 +101,11 @@ module Utils
           File.delete("#{CONFIG.thumbnails}/#{thumbnail}")
         end
       rescue File::NotFoundError
-        LOGGER.error "check_old_files: File '#{full_filename}' doesn't exist on the '#{CONFIG.files}', folder, deleting it from the database"
+        Log.error &.emit "check_old_files: File '#{full_filename}' doesn't exist on the '#{CONFIG.files}', folder, deleting it from the database"
       rescue ex : File::AccessDeniedError
-        LOGGER.error "check_old_files: File '#{full_filename}' failed to be deleted due to bad permissions, deleting it from the database, error: #{ex.message}"
+        Log.error &.emit "check_old_files: File '#{full_filename}' failed to be deleted due to bad permissions, deleting it from the database, error: #{ex.message}"
       rescue ex
-        LOGGER.error "check_old_files: File '#{full_filename}' failed to be deleted, deleting it from the database, error: #{ex.message}"
+        Log.error &.emit "check_old_files: File '#{full_filename}' failed to be deleted, deleting it from the database, error: #{ex.message}"
       ensure
         Database::Files.delete(f.filename)
       end
@@ -117,7 +117,7 @@ module Utils
     dependencies.each do |dep|
       next if !CONFIG.thumbnail_generation.enabled
       if !Process.find_executable(dep)
-        LOGGER.fatal("'#{dep}' was not found. Thumbnails for OpenGraph user agents will not be generated.")
+        Log.notice &.emit("'#{dep}' was not found. Thumbnails for OpenGraph user agents will not be generated.")
         CONFIG.thumbnail_generation.enabled = false
       end
     end
@@ -132,7 +132,7 @@ module Utils
       if !file
         return filename
       else
-        LOGGER.trace "Filename collision! Generating a new filename"
+        Log.trace &.emit "Filename collision! Generating a new filename"
         filename = Random.base58(CONFIG.filename_length)
       end
     end
@@ -142,11 +142,11 @@ module Utils
   # (Due to unclean exits, crashes, etc.)
   def delete_socket
     if File.exists?("#{CONFIG.server.unix_socket}")
-      LOGGER.info "Deleting old unix socket"
+      Log.info &.emit "Deleting old unix socket"
       begin
         File.delete("#{CONFIG.server.unix_socket}")
       rescue ex
-        LOGGER.fatal "#{ex.message}"
+        Log.fatal &.emit "#{ex.message}"
         exit(1)
       end
     end

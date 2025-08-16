@@ -27,10 +27,10 @@ module OP::Delete
 
         # Delete entry from db
         Database::Files.delete(fileinfo)
-        LOGGER.debug "delete_file (filename): File '#{full_filename}' was deleted"
+        Log.debug &.emit "delete_file (filename): File '#{full_filename}' was deleted"
         return full_filename
       rescue ex
-        LOGGER.error "delete_file (filename): Unknown error: #{ex.message}"
+        Log.error &.emit "delete_file (filename): Unknown error: #{ex.message}"
         raise ex
       end
     else
@@ -47,10 +47,10 @@ module OP::Delete
         delete_file(fileinfo)
         # Delete entry from db
         Database::Files.delete_with_key(deletion_key)
-        LOGGER.debug "delete_file (deletion_key): File '#{full_filename}' was deleted using key '#{deletion_key}'"
+        Log.debug &.emit "delete_file (deletion_key): File '#{full_filename}' was deleted using key '#{deletion_key}'"
         return full_filename
       rescue ex
-        LOGGER.error("delete_file (deletion_key): Unknown error: #{ex.message}")
+        Log.error &.emit("delete_file (deletion_key): Unknown error: #{ex.message}")
         raise ex
       end
     else

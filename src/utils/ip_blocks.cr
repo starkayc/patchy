@@ -4,7 +4,7 @@ module Utils::IpBlocks
     @@exit_nodes : Array(String) = [] of String
 
     def update_tor_exit_nodes
-      LOGGER.debug "update_tor_exit_nodes: Updating Tor exit nodes list"
+      Log.debug &.emit "update_tor_exit_nodes: Updating Tor exit nodes list"
       ips = [] of String
 
       url = "https://check.torproject.org/exit-addresses"
@@ -17,13 +17,13 @@ module Utils::IpBlocks
       begin
         res = client.get(uri.request_target)
       rescue ex : Socket::ConnectError
-        LOGGER.error "update_tor_exit_nodes: Failed to connect to #{url}: #{ex.message}"
+        Log.error &.emit "update_tor_exit_nodes: Failed to connect to #{url}: #{ex.message}"
         return
       rescue ex : IO::TimeoutError
-        LOGGER.error "update_tor_exit_nodes: Timeout trying to pull nodes: #{ex.message}"
+        Log.error &.emit "update_tor_exit_nodes: Timeout trying to pull nodes: #{ex.message}"
         return
       rescue ex
-        LOGGER.error "update_tor_exit_nodes: Unknown error: #{ex.message}"
+        Log.error &.emit "update_tor_exit_nodes: Unknown error: #{ex.message}"
         return
       end
 
@@ -34,9 +34,9 @@ module Utils::IpBlocks
           end
         end
         @@exit_nodes = ips
-        LOGGER.debug "update_tor_exit_nodes: Update done, IPs inside the Tor exit nodes list: #{@@exit_nodes.size}"
+        Log.debug &.emit "update_tor_exit_nodes: Update done, IPs inside the Tor exit nodes list: #{@@exit_nodes.size}"
       else
-        LOGGER.error "update_tor_exit_nodes: Failed to retrieve exit nodes list. Status Code from '#{url}': #{res.status_code}"
+        Log.error &.emit "update_tor_exit_nodes: Failed to retrieve exit nodes list. Status Code from '#{url}': #{res.status_code}"
         return
       end
     end
@@ -89,29 +89,29 @@ module Utils::IpBlocks
         if res.status_code == 200
           return res
         else
-          LOGGER.error "update_vpn_blocks: Request to '#{url}' returned a non 200 status code, skipping"
+          Log.error &.emit "update_vpn_blocks: Request to '#{url}' returned a non 200 status code, skipping"
           return
         end
       rescue ex : Socket::ConnectError
-        LOGGER.error "update_vpn_blocks: Failed to connect to '#{url}': #{ex.message}"
+        Log.error &.emit "update_vpn_blocks: Failed to connect to '#{url}': #{ex.message}"
         return
       rescue ex : IO::TimeoutError
-        LOGGER.error "update_vpn_blocks: Timeout trying to pull VPN data from '#{url}': #{ex.message}"
+        Log.error &.emit "update_vpn_blocks: Timeout trying to pull VPN data from '#{url}': #{ex.message}"
         return
       rescue ex
-        LOGGER.error "update_vpn_blocks: Unknown error: #{ex.message}"
+        Log.error &.emit "update_vpn_blocks: Unknown error: #{ex.message}"
         return
       end
     end
 
     def update_vpn_blocks
-      LOGGER.debug "update_vpn_blocks: Updating VPN addresses"
+      Log.debug &.emit "update_vpn_blocks: Updating VPN addresses"
       ips = [] of String
 
       CONFIG.ip_block.vpn.providers.each do |provider|
         case provider
         when Providers::Mullvad
-          LOGGER.debug "update_vpn_blocks: Updating Mullvad addresses"
+          Log.debug &.emit "update_vpn_blocks: Updating Mullvad addresses"
           data = request_vpn_api("https://api.mullvad.net/www/relays/all")
           if data
             data = Array(MullvadResponse).from_json(data.body)
@@ -120,7 +120,7 @@ module Utils::IpBlocks
             end
           end
         when Providers::AirVPN
-          LOGGER.debug "update_vpn_blocks: Updating AirVPN addresses"
+          Log.debug &.emit "update_vpn_blocks: Updating AirVPN addresses"
           data = request_vpn_api("https://airvpn.org/api/status/")
           if data
             data = AirVPNResponse.from_json(data.body)
@@ -135,7 +135,7 @@ module Utils::IpBlocks
       end
 
       @@ips = ips
-      LOGGER.debug "update_vpn_blocks: Update done, IPs inside the VPN addresses list: #{@@ips.size}"
+      Log.debug &.emit "update_vpn_blocks: Update done, IPs inside the VPN addresses list: #{@@ips.size}"
     end
 
     def ips : Array(String)

@@ -32,6 +32,10 @@ shards:
     git: https://github.com/crystal-loot/exception_page.git
     version: 0.5.0
 
+  flib:
+    git: https://codeberg.org/fijxu/flib.git
+    version: 0.1.0+git.commit.484238f717687a86aee2030b04bc80d03de4da00
+
   kemal:
     git: https://github.com/kemalcr/kemal.git
     version: 1.7.1

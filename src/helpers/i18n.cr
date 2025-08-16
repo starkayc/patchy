@@ -22,7 +22,7 @@ def translate(locale : String?, key : String, text : String | Hash(String, Strin
   # Log a warning if "key" doesn't exist in en-US locale and return
   # that key as the text, so this is more or less transparent to the user.
   if !LOCALES["en-US"].has_key?(key)
-    LOGGER.warn("i18n: Missing translation key \"#{key}\"")
+    Log.warn &.emit("i18n: Missing translation key \"#{key}\"")
     return key
   end
 

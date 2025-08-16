@@ -12,13 +12,13 @@ module Utils::S3
       @client = begin
         Awscr::S3::Client.new(CONFIG.s3.region, CONFIG.s3.key, CONFIG.s3.secret, endpoint: CONFIG.s3.endpoint, signer: :v4)
       rescue ex : Awscr::S3::InvalidAccessKeyId
-        LOGGER.fatal "S3: Invalid access key id, please check your configuration"
+        Log.fatal &.emit "S3: Invalid access key id, please check your configuration"
         exit(1)
       rescue ex
-        LOGGER.fatal "S3: Unknown error: #{ex.message}"
+        Log.fatal &.emit "S3: Unknown error: #{ex.message}"
         exit(1)
       end
-      LOGGER.info "S3: Connected to object storage at #{CONFIG.s3.endpoint}"
+      Log.info &.emit "S3: Connected to object storage at #{CONFIG.s3.endpoint}"
 
       check_bucket()
     end
@@ -27,9 +27,9 @@ module Utils::S3
       if !@client.list_buckets.any? { |bucket| bucket == CONFIG.s3.bucket_name }
         begin
           @client.put_bucket(CONFIG.s3.bucket_name)
-          LOGGER.info "S3: Created bucket '#{CONFIG.s3.bucket_name}'"
+          Log.info &.emit "S3: Created bucket '#{CONFIG.s3.bucket_name}'"
         rescue ex
-          LOGGER.error "S3: Failed to create bucket: #{ex.message}"
+          Log.error &.emit "S3: Failed to create bucket: #{ex.message}"
         end
       end
     end
@@ -38,9 +38,9 @@ module Utils::S3
       uploader = Awscr::S3::FileUploader.new(@client)
       begin
         uploader.upload(CONFIG.s3.bucket_name, full_filename, body)
-        LOGGER.debug "S3: File '#{full_filename}' uploaded"
+        Log.debug &.emit "S3: File '#{full_filename}' uploaded"
       rescue ex
-        LOGGER.error "S3: Failed to upload file to bucket: #{ex.message}"
+        Log.error &.emit "S3: Failed to upload file to bucket: #{ex.message}"
       end
     end
 
@@ -48,7 +48,7 @@ module Utils::S3
       begin
         @client.delete_object(CONFIG.s3.bucket_name, full_filename)
       rescue ex
-        LOGGER.error "S3: Failed to delete file from bucket: #{ex.message}"
+        Log.error &.emit "S3: Failed to delete file from bucket: #{ex.message}"
       end
     end
 
@@ -61,10 +61,10 @@ module Utils::S3
         io.rewind
         slice = Bytes.new(io.size)
         io.read_fully(slice)
-        LOGGER.debug "S3: File '#{full_filename}' retrieved"
+        Log.debug &.emit "S3: File '#{full_filename}' retrieved"
         return slice
       rescue ex
-        LOGGER.error "S3: Failed to retrieve file from bucket: #{ex.message}"
+        Log.error &.emit "S3: Failed to retrieve file from bucket: #{ex.message}"
       end
     end
   end

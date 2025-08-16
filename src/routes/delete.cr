@@ -18,7 +18,7 @@ module Routes::Delete
         ee 418, "No files matches the deletion key '#{deletion_key}'"
       end
     rescue ex
-      LOGGER.error("Unknown error: #{ex.message}")
+      Log.error &.emit("Unknown error: #{ex.message}")
       ee 500, "Unknown error"
     end
   end

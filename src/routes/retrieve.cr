@@ -14,7 +14,7 @@ module Routes::Retrieve
         ee 404, "File '#{filename}' does not exist"
       end
     rescue ex
-      LOGGER.debug "Error when retrieving file '#{filename}': #{ex.message}"
+      Log.debug &.emit "Error when retrieving file '#{filename}': #{ex.message}"
       ee 500, "Error when retrieving file '#{filename}'"
     end
 
@@ -50,7 +50,7 @@ module Routes::Retrieve
     begin
       send_file env, "#{CONFIG.thumbnails}/#{thumbnail}"
     rescue ex
-      LOGGER.debug "Thumbnail '#{thumbnail}' does not exist: #{ex.message}"
+      Log.debug &.emit "Thumbnail '#{thumbnail}' does not exist: #{ex.message}"
       ee 403, "Thumbnail '#{thumbnail}' does not exist"
     end
   end

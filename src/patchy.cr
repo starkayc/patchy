@@ -6,10 +6,11 @@ require "sqlite3"
 require "digest"
 require "baked_file_handler"
 require "baked_file_system"
+require "log"
+require "flib"
 
 # require "./ext/kemal_custom_exception_handler"
 
-require "./logger"
 require "./routing"
 require "./config"
 require "./jobs"
@@ -23,15 +24,23 @@ module Patchy
 end
 
 CONFIG = Config.load
+
+Log.setup do |c|
+  backend = Log::IOBackend.new(formatter: Flib::Logger::FORMATTER)
+
+  c.bind "*", CONFIG.log_level, backend
+  c.bind "db.*", :none, backend
+  c.bind "http.*", :none, backend
+end
+
 Kemal.config.port = CONFIG.server.port
 Kemal.config.host_binding = CONFIG.server.host
 Kemal.config.shutdown_message = false
 Kemal.config.app_name = "Patchy"
 Kemal.config.powered_by_header = false
-# https://github.com/iv-org/invidious/blob/90e94d4e6cc126a8b7a091d12d7a5556bfe369d5/src/invidious.cr#L136C1-L136C61
-LOGGER = LogHandler.new(STDOUT, CONFIG.log_level, CONFIG.colorize_logs)
+
 # Show current configuration
-LOGGER.debug("Current configuration: \n#{CONFIG.to_yaml}")
+Log.debug &.emit("Current configuration: \n#{CONFIG.to_yaml}")
 
 Utils.create_db_dir
 SQL = DB.open("sqlite3://#{CONFIG.db}/db.sqlite3")

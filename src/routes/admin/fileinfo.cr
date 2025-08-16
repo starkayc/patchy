@@ -37,7 +37,7 @@ module Routes::Admin
     begin
       req = FileinfoRequest.from_json(env.params.json.to_json)
     rescue ex : JSON::SerializableError
-      LOGGER.error("Failed to parse JSON: #{ex.message}")
+      Log.error &.emit("Failed to parse JSON: #{ex.message}")
       ee 400, "Failed to parse JSON"
     end
 
@@ -53,7 +53,7 @@ module Routes::Admin
           res.add_failed(filename)
         end
       rescue ex
-        LOGGER.error "Unknown error: #{ex.message}"
+        Log.error &.emit "Unknown error: #{ex.message}"
         ee 500, "Unknown error: #{ex.message}"
       end
     end

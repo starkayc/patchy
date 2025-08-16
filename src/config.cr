@@ -6,7 +6,7 @@ class Config
   # Colorize logs
   property colorize_logs : Bool = true
   # Log level
-  property log_level : LogLevel = LogLevel::Info
+  property log_level : Log::Severity = Log::Severity::Info
 
   property server : Server = Server.from_yaml("")
 

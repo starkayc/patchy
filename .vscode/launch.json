@@ -9,7 +9,7 @@
       "args": [],
       "cwd": "${workspaceFolder}",
       "initCommands": [
-        "command script import ${workspaceFolder}/crystal_formatters.py"
+        "command script import ${workspaceFolder}/.vscode/crystal_formatters.py"
       ]
     },
   ]

@@ -37,7 +37,7 @@ module Routes::Admin
     begin
       req = DeletionRequest.from_json(env.params.json.to_json)
     rescue ex : JSON::SerializableError
-      LOGGER.error("Failed to parse JSON: #{ex.message}")
+      Log.error &.emit("Failed to parse JSON: #{ex.message}")
       ee 400, "Failed to parse JSON"
     end
 
@@ -52,7 +52,7 @@ module Routes::Admin
         failed_file = {filename => ex.message}
         res.add_failed(failed_file)
       rescue ex
-        LOGGER.error("Unknown error: #{ex.message}")
+        Log.error &.emit("Unknown error: #{ex.message}")
         ee 500, "Unknown error"
       end
     end
