@@ -40,9 +40,21 @@ shards:
     git: https://github.com/kemalcr/kemal.git
     version: 1.7.2
 
+  markd:
+    git: https://github.com/icyleaf/markd.git
+    version: 0.5.0
+
   radix:
     git: https://github.com/luislavena/radix.git
     version: 0.4.1
+
+  reply:
+    git: https://github.com/i3oris/reply.git
+    version: 0.4.0
+
+  source-typer:
+    git: https://github.com/vici37/cr-source-typer.git
+    version: 0.3.5+git.commit.022b9d33e424826c5b20ab20b6cb4dd2f3b96db3
 
   spectator:
     git: https://gitlab.com/arctic-fox/spectator.git
