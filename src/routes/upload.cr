@@ -31,7 +31,7 @@ module Routes::Upload
     end
   end
 
-  def upload(env)
+  def upload(env : HTTP::Server::Context) : String?
     host = Headers.host
     scheme = Headers.scheme
     ip_addr = Headers.ip_addr

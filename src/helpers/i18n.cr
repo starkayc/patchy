@@ -8,7 +8,7 @@ LOCALES_LIST = {
 
 LOCALES = load_all_locales()
 
-def load_all_locales
+def load_all_locales : Hash(String, Hash(String, JSON::Any))
   locales = {} of String => Hash(String, JSON::Any)
 
   LOCALES_LIST.each_key do |name|
@@ -77,7 +77,7 @@ def translate_bool(locale : String?, translation : Bool)
   end
 end
 
-def translate_js(locale : String?, key : String)
+def translate_js(locale : String?, key : String) : String
   translation = translate(locale, key)
   "<script id=\"_translate-#{key}\" type=\"application/json\">{\"msg\":\"#{translation}\"}</script>"
 end

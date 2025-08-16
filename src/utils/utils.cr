@@ -1,7 +1,7 @@
 module Utils
   extend self
 
-  def create_tables
+  def create_tables : Nil
     if !Database::Files.exists?
       begin
         Database::Files.create_table
@@ -23,7 +23,7 @@ module Utils
     end
   end
 
-  def create_files_dir
+  def create_files_dir : Nil
     if !Dir.exists?("#{CONFIG.files}")
       Log.info &.emit "Creating files folder under '#{CONFIG.files}'"
       begin
@@ -35,7 +35,7 @@ module Utils
     end
   end
 
-  def create_thumbnails_dir
+  def create_thumbnails_dir : Nil
     if CONFIG.thumbnails
       if !Dir.exists?("#{CONFIG.thumbnails}")
         Log.info &.emit "Creating thumbnails folder under '#{CONFIG.thumbnails}'"
@@ -49,7 +49,7 @@ module Utils
     end
   end
 
-  def create_db_dir
+  def create_db_dir : Nil
     if !Dir.exists?("#{CONFIG.db}")
       Log.info &.emit "Creating db folder under '#{CONFIG.db}'"
       begin
@@ -84,7 +84,7 @@ module Utils
   # the database using a single SQL query.
   # In the end, all old files should be not accessible, even if they are on the
   # drive.
-  def check_old_files
+  def check_old_files : Nil
     Log.info &.emit "check_old_files: Deleting old files"
     files = Database::Files.old_files
 
@@ -112,7 +112,7 @@ module Utils
     end
   end
 
-  def check_dependencies
+  def check_dependencies : Nil
     dependencies = ["ffmpeg"]
     dependencies.each do |dep|
       next if !CONFIG.thumbnail_generation.enabled
@@ -124,7 +124,7 @@ module Utils
   end
 
   # TODO: Check if there are no other possibilities to get a random filename and exit
-  def generate_filename
+  def generate_filename : String
     filename = Random.base58(CONFIG.filename_length)
 
     loop do
@@ -140,7 +140,7 @@ module Utils
 
   # Delete socket if the server has not been previously cleaned by the server
   # (Due to unclean exits, crashes, etc.)
-  def delete_socket
+  def delete_socket : Nil
     if File.exists?("#{CONFIG.server.unix_socket}")
       Log.info &.emit "Deleting old unix socket"
       begin

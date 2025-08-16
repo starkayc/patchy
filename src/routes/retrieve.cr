@@ -3,7 +3,7 @@ require "../ext/kemal_send_file_raw"
 module Routes::Retrieve
   extend self
 
-  def retrieve_file(env)
+  def retrieve_file(env : HTTP::Server::Context) : Nil
     host = Headers.host
     scheme = Headers.scheme
     filename = env.params.url["filename"].split(".").first
@@ -44,7 +44,7 @@ module Routes::Retrieve
     end
   end
 
-  def retrieve_thumbnail(env)
+  def retrieve_thumbnail(env : HTTP::Server::Context) : Nil
     thumbnail = env.params.url["thumbnail"]?
 
     begin

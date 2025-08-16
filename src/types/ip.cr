@@ -14,7 +14,7 @@ struct UIP
   )
   end
 
-  def to_tuple
+  def to_tuple : Tuple(String, Int32, Int64)
     {% begin %}
       {
         {{@type.instance_vars.map(&.name).splat}}

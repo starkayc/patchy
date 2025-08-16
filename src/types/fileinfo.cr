@@ -25,7 +25,7 @@ struct Fileinfo
   )
   end
 
-  def to_tuple
+  def to_tuple : Tuple(String, String, String, Int64, String | Nil, String, String, String | Nil)
     {% begin %}
       {
         {{@type.instance_vars.map(&.name).splat}}

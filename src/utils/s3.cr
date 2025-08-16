@@ -23,7 +23,7 @@ module Utils::S3
       check_bucket()
     end
 
-    private def check_bucket
+    private def check_bucket : Nil
       if !@client.list_buckets.any? { |bucket| bucket == CONFIG.s3.bucket_name }
         begin
           @client.put_bucket(CONFIG.s3.bucket_name)
@@ -34,7 +34,7 @@ module Utils::S3
       end
     end
 
-    def upload(full_filename : String, body : IO)
+    def upload(full_filename : String, body : IO) : Nil
       uploader = Awscr::S3::FileUploader.new(@client)
       begin
         uploader.upload(CONFIG.s3.bucket_name, full_filename, body)
@@ -44,7 +44,7 @@ module Utils::S3
       end
     end
 
-    def delete(full_filename : String)
+    def delete(full_filename : String) : Bool?
       begin
         @client.delete_object(CONFIG.s3.bucket_name, full_filename)
       rescue ex
@@ -52,7 +52,7 @@ module Utils::S3
       end
     end
 
-    def retrieve(full_filename : String)
+    def retrieve(full_filename : String) : Slice(UInt8)?
       begin
         io = IO::Memory.new
         @client.get_object(CONFIG.s3.bucket_name, full_filename) do |file|

@@ -5,7 +5,7 @@ module Utils::Thumbnails
     {".jpg", ".jpeg", ".png", ".gif", ".bmp", ".tiff", ".webp", ".heic", ".jxl", ".avif", ".crw", ".dng",
      ".mp4", ".mkv", ".webm", ".avi", ".wmv", ".flv", "m4v", ".mov", ".amv", ".3gp", ".mpg", ".mpeg", ".yuv"}
 
-  def generate_thumbnail(filename : String, extension : String)
+  def generate_thumbnail(filename : String, extension : String) : Nil
     return unless CONFIG.thumbnail_generation.enabled &&
                   !ALLOWED_EXTENSIONS.none? { |ext| extension.downcase.includes?(ext) }
     Log.debug &.emit "Utils::Thumbnails.generate_thumbnail: Generating thumbnail for #{filename + extension} in background"

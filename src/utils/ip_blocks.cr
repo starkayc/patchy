@@ -3,7 +3,7 @@ module Utils::IpBlocks
     extend self
     @@exit_nodes : Array(String) = [] of String
 
-    def update_tor_exit_nodes
+    def update_tor_exit_nodes : Nil
       Log.debug &.emit "update_tor_exit_nodes: Updating Tor exit nodes list"
       ips = [] of String
 
@@ -77,7 +77,7 @@ module Utils::IpBlocks
       getter servers : Array(ServerInfo) = [] of ServerInfo
     end
 
-    private def request_vpn_api(url : String)
+    private def request_vpn_api(url : String) : HTTP::Client::Response?
       uri = URI.parse(url)
       client = HTTP::Client.new(uri)
       client.dns_timeout = 5.seconds
@@ -104,7 +104,7 @@ module Utils::IpBlocks
       end
     end
 
-    def update_vpn_blocks
+    def update_vpn_blocks : Nil
       Log.debug &.emit "update_vpn_blocks: Updating VPN addresses"
       ips = [] of String
 

@@ -51,7 +51,7 @@ module Routing
     end
   end
 
-  private def before_upload(env)
+  private def before_upload(env : HTTP::Server::Context) : Nil
     tor_exit_nodes = Utils::IpBlocks::Tor.exit_nodes
     vpn_ip_addresses = Utils::IpBlocks::VPN.ips
     ip = Headers.ip_addr
@@ -92,7 +92,7 @@ module Routing
   before_post "/upload" { |env| before_upload(env) }
   before_post "/-/upload" { |env| before_upload(env) }
 
-  def register_all
+  def register_all : Array(Radix::Node(Kemal::Route)) | Kemal::Route | Radix::Node(Kemal::Route) | Nil
     # Views
     get "/", Routes::Views, :root
     get "/:filename", Routes::Views, :show_file
@@ -120,7 +120,7 @@ module Routing
     self.register_admin if CONFIG.admin_enabled
   end
 
-  def register_admin
+  def register_admin : Array(Radix::Node(Kemal::Route)) | Kemal::Route | Radix::Node(Kemal::Route) | Nil
     post "#{ADMIN_API_ROUTE_PATH}/delete", Routes::Admin, :delete_file
     post "#{ADMIN_API_ROUTE_PATH}/fileinfo", Routes::Admin, :retrieve_file_info
     get "#{ADMIN_API_ROUTE_PATH}/torexitnodes", Routes::Admin, :tor_exit_nodes

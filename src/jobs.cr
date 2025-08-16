@@ -4,7 +4,7 @@ require "./baked_fs"
 module Jobs
   extend self
 
-  def check_old_files
+  def check_old_files : Fiber?
     if CONFIG.delete_files_check <= 0
       Log.info &.emit "File deletion is disabled"
       return
@@ -17,7 +17,7 @@ module Jobs
     end
   end
 
-  def retrieve_tor_exit_nodes
+  def retrieve_tor_exit_nodes : Fiber?
     if !CONFIG.ip_block.tor.enabled
       return
     end
@@ -30,7 +30,7 @@ module Jobs
     end
   end
 
-  def retrieve_vpn_addresses
+  def retrieve_vpn_addresses : Fiber?
     if !CONFIG.ip_block.vpn.enabled
       return
     end
@@ -43,7 +43,7 @@ module Jobs
     end
   end
 
-  def kemal
+  def kemal : Fiber
     add_handler BakedFileHandler::BakedFileHandler.new(PublicAssets)
     spawn do
       if !CONFIG.server.unix_socket.nil?
@@ -62,7 +62,7 @@ module Jobs
     end
   end
 
-  def gc
+  def gc : Fiber
     spawn do
       loop do
         GC.collect
@@ -71,7 +71,7 @@ module Jobs
     end
   end
 
-  def run
+  def run : Fiber
     check_old_files
     retrieve_tor_exit_nodes
     retrieve_vpn_addresses

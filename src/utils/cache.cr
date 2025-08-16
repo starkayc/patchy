@@ -20,7 +20,7 @@ module Utils::Cache
     end
 
     # TODO: Handle expire_time with a Job
-    def set(fileinfo : Fileinfo, file : File, expire_time) : Nil
+    def set(fileinfo : Fileinfo, file : File, expire_time : Int32) : Nil
       file_size = file.size
 
       if file_size > @max_allowed_filesize &* 1000
@@ -48,7 +48,7 @@ module Utils::Cache
       end
     end
 
-    private def [](key)
+    private def [](key : String) : NamedTuple(fileinfo: Fileinfo, data: Slice(UInt8), filesize: Int64)?
       if @lru[key]?
         @access.delete(key)
         @access.push(key)
@@ -58,7 +58,7 @@ module Utils::Cache
       end
     end
 
-    private def []=(key, value)
+    private def []=(key : String, value : NamedTuple(fileinfo: Fileinfo, data: Slice(UInt8), filesize: Int64)) : Array(String)
       if @lru.size >= @max_size
         lru_key = @access.shift
         @lru.delete(lru_key)
@@ -75,7 +75,7 @@ module Utils::Cache
     end
   end
 
-  def insert(fileinfo : Fileinfo, file_path : String)
+  def insert(fileinfo : Fileinfo, file_path : String) : Nil
     return if FileCache.nil?
     file = File.open(file_path)
     FileCache.as(LRU).set(fileinfo: fileinfo, file: file, expire_time: 14400)
@@ -87,7 +87,7 @@ module Utils::Cache
     FileCache.as(LRU).del(fileinfo)
   end
 
-  def select(fileinfo : Fileinfo)
+  def select(fileinfo : Fileinfo) : Slice(UInt8)?
     return if FileCache.nil?
     FileCache.as(LRU).get(fileinfo)
   end

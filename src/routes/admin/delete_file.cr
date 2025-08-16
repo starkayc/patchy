@@ -14,12 +14,12 @@ module Routes::Admin
     def initialize
     end
 
-    def add_successfull(filename : String)
+    def add_successfull(filename : String) : Array(String)
       @successfull = @successfull + 1
       successfull_files << filename
     end
 
-    def add_failed(failed_file : Hash(String, String))
+    def add_failed(failed_file : Hash(String, String)) : Array(Hash(String, String))
       @failed = @failed + 1
       failed_files << failed_file
     end
@@ -33,7 +33,7 @@ module Routes::Admin
 
   # /api/admin/delete
   # curl -X POST -H "Content-Type: application/json" -H "X-Api-Key: asd" http://localhost:8080/api/admin/delete -d '{"files": ["j63"]}' | jq
-  def delete_file(env)
+  def delete_file(env : HTTP::Server::Context) : String?
     begin
       req = DeletionRequest.from_json(env.params.json.to_json)
     rescue ex : JSON::SerializableError

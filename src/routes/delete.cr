@@ -1,7 +1,7 @@
 module Routes::Delete
   extend self
 
-  def delete_file(env)
+  def delete_file(env : HTTP::Server::Context) : Nil
     deletion_key = env.params.query["key"]?
 
     if !deletion_key || deletion_key.empty?

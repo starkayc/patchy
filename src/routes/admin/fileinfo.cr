@@ -14,12 +14,12 @@ module Routes::Admin
     def initialize
     end
 
-    def add_successfull(filename : String, fileinfo : Fileinfo)
+    def add_successfull(filename : String, fileinfo : Fileinfo) : Fileinfo
       @successfull = @successfull + 1
       successfull_files[filename] = fileinfo
     end
 
-    def add_failed(filename : String)
+    def add_failed(filename : String) : Array(String)
       @failed = @failed + 1
       failed_files << filename
     end
@@ -33,7 +33,7 @@ module Routes::Admin
 
   # /api/admin/fileinfo
   # curl -X POST -H "Content-Type: application/json" -H "X-Api-Key: asd" http://localhost:8080/api/admin/fileinfo -d '{"files": ["j63"]}' | jq
-  def retrieve_file_info(env)
+  def retrieve_file_info(env : HTTP::Server::Context) : String?
     begin
       req = FileinfoRequest.from_json(env.params.json.to_json)
     rescue ex : JSON::SerializableError

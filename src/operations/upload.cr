@@ -58,7 +58,7 @@ module OP
       end
     end
 
-    private def valid_extension?(extension) : Nil
+    private def valid_extension?(extension : String) : Nil
       if CONFIG.blocked_extensions.includes?(extension.split(".")[1]?)
         raise ExtensionNotAllowed.new(extension)
       end

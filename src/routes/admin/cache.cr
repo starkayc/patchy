@@ -23,7 +23,7 @@ module Routes::Admin
 
   # /api/admin/cachedfiles
   # curl -X GET -H "X-Api-Key: asd" http://localhost:8080/api/admin/cachedfiles | jq
-  def cached_files(env)
+  def cached_files(env : HTTP::Server::Context) : String?
     if CONFIG.cache.enabled
       CachedFilesResponse.new.to_json
     else

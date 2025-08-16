@@ -8,7 +8,7 @@ module Routes::Views
     Audio = 3
   end
 
-  def root(env)
+  def root(env : HTTP::Server::Context) : String
     locale = Headers.locale
     host = Headers.host
     scheme = Headers.scheme
@@ -17,7 +17,7 @@ module Routes::Views
     templated "index"
   end
 
-  def show_file(env)
+  def show_file(env : HTTP::Server::Context) : String?
     user_agent = Headers.user_agent
 
     if ["Discordbot/2.0"].any? { |ua| user_agent.includes?(ua) }
@@ -43,7 +43,7 @@ module Routes::Views
     templated "show_file"
   end
 
-  def uploader_configs(env)
+  def uploader_configs(env : HTTP::Server::Context) : String
     locale = Headers.locale
     host = Headers.host
     scheme = Headers.scheme
@@ -51,7 +51,7 @@ module Routes::Views
     templated "uploader_configs"
   end
 
-  def upload_history(env)
+  def upload_history(env : HTTP::Server::Context) : String
     locale = Headers.locale
     host = Headers.host
     scheme = Headers.scheme
@@ -59,7 +59,7 @@ module Routes::Views
     templated "upload_history"
   end
 
-  def admin(env)
+  def admin(env : HTTP::Server::Context) : String
     locale = Headers.locale
     host = Headers.host
     scheme = Headers.scheme
@@ -67,7 +67,7 @@ module Routes::Views
     templated "admin"
   end
 
-  def reportabuse(env)
+  def reportabuse(env : HTTP::Server::Context) : String
     locale = Headers.locale
     host = Headers.host
     scheme = Headers.scheme
@@ -75,7 +75,7 @@ module Routes::Views
     templated "reportabuse"
   end
 
-  def login(env)
+  def login(env : HTTP::Server::Context) : String
     locale = Headers.locale
     host = Headers.host
     scheme = Headers.scheme

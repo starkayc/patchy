@@ -168,7 +168,7 @@ class Config
   # and in `/api/stats`
   property alternative_domains : Array(String) = [] of String
 
-  def self.check_config(config : Config)
+  def self.check_config(config : Config) : String?
     if config.filename_length <= 0
       puts "Config: filename_length cannot be less or equal to 0"
       exit(1)
@@ -200,7 +200,7 @@ class Config
     end
   end
 
-  def self.load(config_file : String = "config/config.yml")
+  def self.load(config_file : String = "config/config.yml") : Config
     begin
       config_yaml = File.read(config_file)
       config = Config.from_yaml(config_yaml)

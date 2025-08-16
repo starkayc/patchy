@@ -26,12 +26,12 @@ module Routes::Misc
     end
   end
 
-  def stats(env)
+  def stats(env : HTTP::Server::Context) : String
     env.response.content_type = "application/json"
     Stats.new.to_json
   end
 
-  def sharex_config(env)
+  def sharex_config(env : HTTP::Server::Context) : String
     host = Headers.host
     scheme = Headers.scheme
 
