@@ -11,3 +11,5 @@ run:
 	./$(PROGRAM_NAME)
 fmt:
 	crystal tool format ./src
+typer:
+	./bin/typer --progress --stats ./src/$(PROGRAM_NAME).cr src
