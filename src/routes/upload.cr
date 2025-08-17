@@ -57,7 +57,7 @@ module Routes::Upload
         up.process
         fileinfo = up.fileinfo
       rescue ex
-        ee 403, "Failed to process upload: #{ex.message}"
+        ee 403, "Failed to process upload"
       end
     end
 

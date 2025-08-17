@@ -40,7 +40,7 @@ Kemal.config.app_name = "Patchy"
 Kemal.config.powered_by_header = false
 
 # Show current configuration
-Log.debug &.emit("Current configuration: \n#{CONFIG.to_yaml}")
+Log.debug &.emit("current configuration: \n#{CONFIG.to_yaml}")
 
 Utils.create_db_dir
 SQL = DB.open("sqlite3://#{CONFIG.db}/db.sqlite3")

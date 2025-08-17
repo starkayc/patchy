@@ -74,7 +74,7 @@ module OP
       begin
         spawn { Utils::Thumbnails.generate_thumbnail(@fileinfo.filename, @fileinfo.extension) }
       rescue ex
-        Log.error &.emit "An error ocurred when trying to generate a thumbnail: #{ex.message}"
+        Log.error &.emit("an error ocurred when trying to generate a thumbnail", error: ex.message)
       end
     end
 
@@ -84,7 +84,7 @@ module OP
         exists = Database::IP.insert(@ip).rows_affected == 0
         Database::IP.increase_count(@ip) if exists
       rescue ex
-        Log.error &.emit "An error ocurred when trying to insert the data into the DB: #{ex.message}"
+        Log.error &.emit("an error ocurred when trying to insert the data into the DB", error: ex.message)
         raise DBError.new
       end
     end
@@ -93,7 +93,7 @@ module OP
       if filename = @uploaded_file.filename
         @fileinfo.original_filename = filename
       else
-        Log.debug &.emit "No file provided by the user"
+        Log.debug &.emit("No file provided by the user")
         raise NoFileProvided.new
       end
 

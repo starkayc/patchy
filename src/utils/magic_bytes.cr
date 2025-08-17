@@ -1,5 +1,6 @@
 module Utils::MagicBytes
   extend self
+  Log = ::Log.for(self)
 
   # https://www.garykessler.net/library/file_sigs_GCK_latest.html
   private MAGIC_BYTES = {
@@ -51,7 +52,7 @@ module Utils::MagicBytes
   def detect(bytes : Bytes) : String?
     MAGIC_BYTES.each do |ext, mb|
       if bytes.hexstring.includes?(mb)
-        Log.trace &.emit "Utils::MagicBytes.detect: Extension is '#{ext}'"
+        Log.trace &.emit("extension is '#{ext}'")
         return ext
       end
     end
