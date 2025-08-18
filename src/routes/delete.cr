@@ -9,13 +9,11 @@ module Routes::Delete
     end
 
     begin
-      file_deleted = OP::Delete.delete_file_by_key(deletion_key)
+      file_deleted = Operations::Deletion.delete_file(deletion_key, true)
       if file_deleted
         msg("File '#{file_deleted}' deleted successfully using deletion key '#{deletion_key}'")
       else
-        # Temporal 418 as replacement of 404, since Kemal overrides the 404
-        # error code with it's own exception handler
-        ee 418, "No files matches the deletion key '#{deletion_key}'"
+        ee 404, "No files matches the deletion key '#{deletion_key}'"
       end
     rescue ex
       Log.error &.emit("unknown error", error: ex.message)

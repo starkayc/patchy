@@ -2,61 +2,17 @@ module Utils
   extend self
   Log = ::Log.for(self)
 
-  def create_tables : Nil
-    if !Database::Files.exists?
-      begin
-        Database::Files.create_table
-        Log.info &.emit("created table 'files'")
-      rescue ex
-        Log.fatal &.emit("failed to create 'files' table", error: ex.message)
-        exit(1)
+  def create_dir(path : String, reason : String? = nil) : Nil
+    if !Dir.exists?(path)
+      message = "creating directory '#{path}'"
+      if reason
+        message += " " + reason
       end
-    end
-
-    if !Database::IP.exists?
+      Log.info &.emit(message)
       begin
-        Database::IP.create_table
-        Log.info &.emit("created table 'ips'")
+        Dir.mkdir_p(path)
       rescue ex
-        Log.fatal &.emit("failed to create 'ips' table", error: ex.message)
-        exit(1)
-      end
-    end
-  end
-
-  def create_files_dir : Nil
-    if !Dir.exists?("#{CONFIG.files}")
-      Log.info &.emit("creating files folder under '#{CONFIG.files}'")
-      begin
-        Dir.mkdir_p("#{CONFIG.files}")
-      rescue ex
-        Log.fatal &.emit("#{ex.message}")
-        exit(1)
-      end
-    end
-  end
-
-  def create_thumbnails_dir : Nil
-    if CONFIG.thumbnails
-      if !Dir.exists?("#{CONFIG.thumbnails}")
-        Log.info &.emit("creating thumbnails folder under '#{CONFIG.thumbnails}'")
-        begin
-          Dir.mkdir_p("#{CONFIG.thumbnails}")
-        rescue ex
-          Log.fatal &.emit("#{ex.message}")
-          exit(1)
-        end
-      end
-    end
-  end
-
-  def create_db_dir : Nil
-    if !Dir.exists?("#{CONFIG.db}")
-      Log.info &.emit("creating db folder under '#{CONFIG.db}'")
-      begin
-        Dir.mkdir_p("#{CONFIG.db}")
-      rescue ex
-        Log.fatal &.emit("#{ex.message}")
+        Log.fatal &.emit("failed to create directory '#{path}'", error: ex.message)
         exit(1)
       end
     end

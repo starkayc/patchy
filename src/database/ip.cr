@@ -1,28 +1,13 @@
-module Database::IP
+module Database::IPS
   extend self
-
-  # -------------------
-  #  Database checking
-  # -------------------
-
-  def exists? : Bool?
-    request = <<-SQL
-      SELECT EXISTS
-      (
-      SELECT 1 FROM
-      sqlite_schema
-      WHERE type='table'
-      AND name='ips'
-      )
-    SQL
-
-    SQL.query_one(request, as: Bool?)
-  end
+  Log = ::Log.for(self)
+  nodeProperties
+  Utils::DB.database_create
 
   def create_table : Nil
     request = <<-SQL
       CREATE TABLE
-      IF NOT EXISTS ips
+      IF NOT EXISTS #{TABLE_NAME}
       (
       ip text,
       count integer DEFAULT 0,
@@ -41,7 +26,7 @@ module Database::IP
   def insert(ip : UIP) : DB::ExecResult
     request = <<-SQL
       INSERT OR IGNORE
-      INTO ips
+      INTO #{TABLE_NAME}
       VALUES ($1, $2, $3)
     SQL
 
@@ -51,7 +36,7 @@ module Database::IP
   def delete(ip : String) : Nil
     request = <<-SQL
       DELETE
-      FROM ips
+      FROM #{TABLE_NAME}
       WHERE ip = ?
     SQL
 
@@ -65,7 +50,7 @@ module Database::IP
   def select(ip : String) : UIP?
     request = <<-SQL
       SELECT *
-      FROM ips
+      FROM #{TABLE_NAME}
       WHERE ip = ?
     SQL
 
@@ -78,7 +63,7 @@ module Database::IP
 
   def increase_count(ip : UIP) : Nil
     request = <<-SQL
-      UPDATE ips
+      UPDATE #{TABLE_NAME}
       SET count = count + 1
       WHERE ip = $1
     SQL

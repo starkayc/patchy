@@ -32,6 +32,11 @@ macro templated(_filename, template = "template", navbar_search = true, buffer_f
   render {{filename}}, {{layout}}
 end
 
+macro nodeProperties
+  private MODULE_NAME = {{ @type.name.stringify }}
+  private TABLE_NAME = {{ @type.name.stringify.split("::").last.downcase }}
+end
+
 module Headers
   macro locale
     env.request.headers["Accept-Language"]?.try &.split(",")[0].split(";")[0]

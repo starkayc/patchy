@@ -1,28 +1,13 @@
 module Database::Files
   extend self
-
-  # -------------------
-  #  Database checking
-  # -------------------
-
-  def exists? : Bool?
-    request = <<-SQL
-      SELECT EXISTS
-      (
-      SELECT 1 FROM
-      sqlite_schema
-      WHERE type='table'
-      AND name='files'
-      )
-    SQL
-
-    SQL.query_one(request, as: Bool?)
-  end
+  Log = ::Log.for(self)
+  nodeProperties
+  Utils::DB.database_create
 
   def create_table : Nil
     request = <<-SQL
       CREATE TABLE
-      IF NOT EXISTS files
+      IF NOT EXISTS #{TABLE_NAME}
       (
       original_filename text not null,
       filename text not null,
@@ -45,7 +30,7 @@ module Database::Files
 
   def insert(fileinfo : Fileinfo) : Nil
     request = <<-SQL
-      INSERT INTO files
+      INSERT INTO #{TABLE_NAME}
       VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
       ON CONFLICT DO NOTHING
     SQL
@@ -55,7 +40,7 @@ module Database::Files
 
   def update_thumbnail(filename : String) : Nil
     request = <<-SQL
-      UPDATE files
+      UPDATE #{TABLE_NAME}
       SET thumbnail = ?
       WHERE filename = ?
     SQL
@@ -66,7 +51,7 @@ module Database::Files
   def delete(filename : String) : Nil
     request = <<-SQL
       DELETE
-      FROM files
+      FROM #{TABLE_NAME}
       WHERE filename = ?
     SQL
 
@@ -79,7 +64,7 @@ module Database::Files
 
   def delete_with_key(key : String) : Nil
     request = <<-SQL
-      DELETE FROM files
+      DELETE FROM #{TABLE_NAME}
       WHERE delete_key = ?
     SQL
 
@@ -93,7 +78,7 @@ module Database::Files
   def select(filename : String) : Fileinfo?
     request = <<-SQL
       SELECT *
-      FROM files
+      FROM #{TABLE_NAME}
       WHERE filename = ?
     SQL
 
@@ -107,7 +92,7 @@ module Database::Files
   def select_with_key(delete_key : String) : Fileinfo?
     request = <<-SQL
       SELECT *
-      FROM files
+      FROM #{TABLE_NAME}
       WHERE delete_key = ?
     SQL
 
@@ -121,7 +106,7 @@ module Database::Files
   def old_files : Array(Fileinfo)
     request = <<-SQL
       SELECT *
-      FROM files
+      FROM #{TABLE_NAME}
       WHERE uploaded_at < strftime('%s', 'now') - #{CONFIG.delete_files_after * 3600}
     SQL
 
@@ -131,7 +116,7 @@ module Database::Files
   def file_count : Int32
     request = <<-SQL
       SELECT COUNT (filename)
-      FROM files
+      FROM #{TABLE_NAME}
     SQL
 
     SQL.query_one(request, as: Int32)

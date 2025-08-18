@@ -72,7 +72,7 @@ module Routing
       ee 401, "X-Real-IP header not present. Contact the admin to fix this!"
     end
 
-    ip_info = Database::IP.select(ip)
+    ip_info = Database::IPS.select(ip)
     return if ip_info.nil?
 
     if CONFIG.files_per_ip > 0
@@ -80,7 +80,7 @@ module Routing
       time_until_unban = ip_info.date - Time.utc.to_unix + CONFIG.rate_limit_period
 
       if time_since_first_upload > CONFIG.rate_limit_period
-        Database::IP.delete(ip_info.ip)
+        Database::IPS.delete(ip_info.ip)
       end
 
       if ip_info.count >= CONFIG.files_per_ip && time_since_first_upload < CONFIG.rate_limit_period

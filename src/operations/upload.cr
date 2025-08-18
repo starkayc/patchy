@@ -1,4 +1,4 @@
-module OP
+module Operations
   extend self
 
   class Upload
@@ -81,8 +81,8 @@ module OP
     private def insert_into_db : Nil
       begin
         Database::Files.insert(@fileinfo)
-        exists = Database::IP.insert(@ip).rows_affected == 0
-        Database::IP.increase_count(@ip) if exists
+        exists = Database::IPS.insert(@ip).rows_affected == 0
+        Database::IPS.increase_count(@ip) if exists
       rescue ex
         Log.error &.emit("an error ocurred when trying to insert the data into the DB", error: ex.message)
         raise DBError.new

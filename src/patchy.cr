@@ -42,7 +42,7 @@ Kemal.config.powered_by_header = false
 # Show current configuration
 Log.debug &.emit("current configuration: \n#{CONFIG.to_yaml}")
 
-Utils.create_db_dir
+Utils.create_dir(CONFIG.db, "for database")
 SQL = DB.open("sqlite3://#{CONFIG.db}/db.sqlite3")
 
 # https://github.com/iv-org/invidious/blob/90e94d4e6cc126a8b7a091d12d7a5556bfe369d5/src/invidious.cr#L78
@@ -57,9 +57,9 @@ CURRENT_VERSION = {{ "#{`git log -1 --format=%ci | awk '{print $1}' | sed s/-/./
 ASSET_COMMIT = {{ "#{`git rev-list HEAD --max-count=1 --abbrev-commit -- public/-/assets/`.strip}" }}
 
 Utils.check_dependencies
-Utils.create_tables
-Utils.create_files_dir
-Utils.create_thumbnails_dir
+Utils::DB.create_tables
+Utils.create_dir(CONFIG.files, "for files")
+Utils.create_dir(CONFIG.thumbnails, "for thumbnails")
 Routing.register_all
 
 {% if flag?(:release) || flag?(:production) %}

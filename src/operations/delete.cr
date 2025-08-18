@@ -1,60 +1,40 @@
-module OP::Delete
-  extend self
+module Operations
+  module Deletion
+    extend self
+    Log = ::Log.for(self)
 
-  def delete_file(fileinfo : Fileinfo) : Nil
-    full_filename = fileinfo.filename + fileinfo.extension
-    thumbnail = fileinfo.thumbnail
+    private def delete(full_filename : String, thumbnail : String?) : Nil
+      if CONFIG.s3.enabled
+        Utils::S3::Client.as(Utils::S3::S3).delete(full_filename)
+      else
+        # Delete file
+        File.delete("#{CONFIG.files}/#{full_filename}")
 
-    if CONFIG.s3.enabled
-      Utils::S3::Client.as(Utils::S3::S3).delete(full_filename)
-    else
-      # Delete file
-      File.delete("#{CONFIG.files}/#{full_filename}")
-
-      # Delete thumbnail if it was generated
-      if fileinfo.thumbnail
-        File.delete("#{CONFIG.thumbnails}/#{thumbnail}")
+        # Delete thumbnail if it was generated
+        if thumbnail
+          File.delete("#{CONFIG.thumbnails}/#{thumbnail}")
+        end
       end
     end
-  end
 
-  def delete_file(filename : String) : String?
-    fileinfo = Database::Files.select(filename)
-    if fileinfo
-      full_filename = fileinfo.filename + fileinfo.extension
-      begin
-        delete_file(fileinfo)
-
-        # Delete entry from db
-        Database::Files.delete(fileinfo)
-        Log.debug &.emit("file '#{full_filename}' was deleted")
-        return full_filename
-      rescue ex
-        Log.error &.emit("unknown error", error: ex.message)
-        raise ex
+    def delete_file(filename_or_key : String, is_key : Bool) : String?
+      fileinfo = is_key ? Database::Files.select_with_key(filename_or_key) : Database::Files.select(filename_or_key)
+      if fileinfo
+        full_filename = fileinfo.filename + fileinfo.extension
+        thumbnail = fileinfo.thumbnail
+        begin
+          delete(full_filename, thumbnail)
+          # Delete entry from db
+          Database::Files.delete(fileinfo)
+          Log.debug &.emit "file '#{full_filename}' was deleted"
+          return full_filename
+        rescue ex
+          Log.error &.emit("unknown error: #{ex.message}")
+          raise ex
+        end
+      else
+        nil
       end
-    else
-      raise FileNotFound.new
-      return nil
-    end
-  end
-
-  def delete_file_by_key(deletion_key : String) : String?
-    fileinfo = Database::Files.select_with_key(deletion_key)
-    if fileinfo
-      full_filename = fileinfo.filename + fileinfo.extension
-      begin
-        delete_file(fileinfo)
-        # Delete entry from db
-        Database::Files.delete_with_key(deletion_key)
-        Log.debug &.emit("file '#{full_filename}' was deleted using key '#{deletion_key}'")
-        return full_filename
-      rescue ex
-        Log.error &.emit("unknown error", error: ex.message)
-        raise ex
-      end
-    else
-      return nil
     end
   end
 end

@@ -53,7 +53,7 @@ module Routes::Upload
 
     HTTP::FormData.parse(env.request) do |upload|
       begin
-        up = OP::Upload.new(upload, ip_addr)
+        up = Operations::Upload.new(upload, ip_addr)
         up.process
         fileinfo = up.fileinfo
       rescue ex

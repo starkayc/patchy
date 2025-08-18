@@ -46,7 +46,7 @@ module Routes::Admin
     req.files.each do |filename|
       filename = filename.to_s
       begin
-        file_deleted = OP::Delete.delete_file(filename)
+        file_deleted = Operations::Deletion.delete_file(filename, false)
         res.add_successfull(filename)
       rescue ex : FileNotFound
         failed_file = {filename => ex.message}
