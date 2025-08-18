@@ -51,18 +51,4 @@ module Routes::Misc
 "ErrorMessage": "{json:error}"
 })
   end
-
-  def chatterino_config(env)
-    host = Headers.host
-    scheme = Headers.scheme
-
-    env.response.content_type = "application/json"
-
-    return %({
-"requestUrl": "#{scheme}://#{host}/upload",
-formField": "data",
-imageLink": "{link}",
-deleteLink": "{deleteLink}"
-})
-  end
 end

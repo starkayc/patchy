@@ -18,25 +18,6 @@ module Utils
     end
   end
 
-  def delete_file(env)
-    key = env.params.query["key"]
-    full_filename = fileinfo.filename + fileinfo.extension
-    thumbnail = fileinfo.thumbnail
-
-    # Delete file
-    File.delete("#{CONFIG.files}/#{full_filename}")
-
-    if fileinfo.thumbnail
-      File.delete("#{CONFIG.thumbnails}/#{thumbnail}")
-    end
-
-    # Delete entry from db
-    Database::Files.delete_with_key(key)
-
-    Log.debug &.emit("file '#{full_filename}' was deleted using key '#{key}'")
-    msg("file '#{full_filename}' deleted successfully")
-  end
-
   # TODO: Spawn a fiber and add each file to an array to bulk delete files from
   # the database using a single SQL query.
   # In the end, all old files should be not accessible, even if they are on the
