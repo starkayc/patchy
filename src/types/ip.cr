@@ -1,4 +1,4 @@
-struct UIP
+struct IPInfo
   # Without this, this class will not be able to be used as `as: IP` on
   # SQL queries
   include DB::Serializable

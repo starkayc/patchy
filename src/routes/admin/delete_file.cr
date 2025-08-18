@@ -9,17 +9,17 @@ module Routes::Admin
     @[JSON::Field(key: "successfullFiles")]
     property successfull_files : Array(String) = [] of String
     @[JSON::Field(key: "failedFiles")]
-    property failed_files : Array(Hash(String, String)) = [] of Hash(String, String)
+    property failed_files : Array(Hash(String, String?)) = [] of Hash(String, String?)
 
     def initialize
     end
 
-    def add_successfull(filename : String) : Array(String)
+    def add_successful(filename : String) : Array(String)
       @successfull = @successfull + 1
       successfull_files << filename
     end
 
-    def add_failed(failed_file : Hash(String, String)) : Array(Hash(String, String))
+    def add_failed(failed_file : Hash(String, String | Nil)) : Array(Hash(String, String | Nil))
       @failed = @failed + 1
       failed_files << failed_file
     end
@@ -47,13 +47,11 @@ module Routes::Admin
       filename = filename.to_s
       begin
         file_deleted = Operations::Deletion.delete_file(filename, false)
-        res.add_successfull(filename)
-      rescue ex : FileNotFound
-        failed_file = {filename => ex.message}
-        res.add_failed(failed_file)
+        if file_deleted
+          res.add_successful(filename)
+        end
       rescue ex
-        Log.error &.emit("unknown error", error: ex.message)
-        ee 500, "Unknown error"
+        res.add_failed({filename => ex.message})
       end
     end
 

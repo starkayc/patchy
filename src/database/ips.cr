@@ -23,7 +23,7 @@ module Database::IPS
   #  Insert / Delete
   # -------------------
 
-  def insert(ip : UIP) : DB::ExecResult
+  def insert(ip : IPInfo) : DB::ExecResult
     request = <<-SQL
       INSERT OR IGNORE
       INTO #{TABLE_NAME}
@@ -47,21 +47,21 @@ module Database::IPS
   #  Select
   # -------------------
 
-  def select(ip : String) : UIP?
+  def select(ip : String) : IPInfo?
     request = <<-SQL
       SELECT *
       FROM #{TABLE_NAME}
       WHERE ip = ?
     SQL
 
-    SQL.query_one?(request, ip, as: UIP)
+    SQL.query_one?(request, ip, as: IPInfo)
   end
 
   # -------------------
   #  Update
   # -------------------
 
-  def increase_count(ip : UIP) : Nil
+  def increase_count(ip : IPInfo) : Nil
     request = <<-SQL
       UPDATE #{TABLE_NAME}
       SET count = count + 1

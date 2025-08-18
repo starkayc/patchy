@@ -23,7 +23,7 @@ module Operations
         full_filename = fileinfo.filename + fileinfo.extension
         thumbnail = fileinfo.thumbnail
         begin
-          delete(full_filename, thumbnail)
+          self.delete(full_filename, thumbnail)
           # Delete entry from db
           Database::Files.delete(fileinfo)
           Log.debug &.emit "file '#{full_filename}' was deleted"
@@ -33,7 +33,7 @@ module Operations
           raise ex
         end
       else
-        nil
+        raise FileNotFound.new
       end
     end
   end

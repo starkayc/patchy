@@ -5,7 +5,7 @@ module Operations
     @uploaded_file : HTTP::FormData::Part
     @ip_addr : String
     getter fileinfo : Fileinfo = Fileinfo.new
-    @ip : UIP = UIP.new
+    @ip : IPInfo = IPInfo.new
 
     def initialize(@uploaded_file, @ip_addr)
       @fileinfo.uploaded_at = Time.utc.to_unix
@@ -22,7 +22,7 @@ module Operations
       slice = buffer.to_slice
       @uploaded_file.body.read_fully(slice)
 
-      detect_extension(slice)
+      self.detect_extension(slice)
 
       full_filename = @fileinfo.filename + @fileinfo.extension
       file_path = "#{CONFIG.files}/#{full_filename}"
@@ -40,7 +40,7 @@ module Operations
           output.write(slice)
           IO.copy(@uploaded_file.body, output)
         end
-        generate_checksum(file_path)
+        self.generate_checksum(file_path)
       end
     end
 
@@ -48,12 +48,12 @@ module Operations
       extension = Utils::MagicBytes.detect(slice)
 
       if extension
-        valid_extension?(extension)
+        self.valid_extension?(extension)
         @fileinfo.extension = extension
       else
         # Detect by filename if it wasn't detected by magic bytes
         extension = File.extname("#{@uploaded_file.filename}")
-        valid_extension?(extension)
+        self.valid_extension?(extension)
         @fileinfo.extension = extension
       end
     end
@@ -106,15 +106,15 @@ module Operations
         @fileinfo.original_filename = @fileinfo.filename
       end
 
-      writefile()
-      set_ip_information()
+      self.writefile()
+      self.set_ip_information()
 
       if CONFIG.delete_key_length > 0
         @fileinfo.delete_key = Random.base58(CONFIG.delete_key_length)
       end
 
-      generate_thumbnail()
-      insert_into_db()
+      self.generate_thumbnail()
+      self.insert_into_db()
 
       return @fileinfo
     end
