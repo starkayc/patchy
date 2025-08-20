@@ -1,23 +1,31 @@
-// By chatgpt becuase I hate frontend and javascript kill me
+import UploadHistory from "./history.js";
+import { translate } from "./translations.js";
+
 document.addEventListener("DOMContentLoaded", () => {
   const dropArea = document.getElementById("drop-area");
   const fileInput = document.getElementById("file");
   const form = document.getElementById("form");
-  const uploadStatus = document.getElementById("upload-status");
+  const uploadStatus = document.getElementById("upload-status-container");
+  const history = new UploadHistory();
 
   // i18n
   const translate_uploadText = translate("js_upload_text");
   const translate_uploadClientError = translate("js_upload_client_error");
   const translate_uploadServerError = translate("js_upload_server_error");
-  const translate_uploadUnknownError = translate("js_upload_unknown_error");
-  const translate_buttonDelete = translate("js_button_delete");
-  const translate_buttonCopy = translate("js_button_copy");
+  const translate_DeleteError = translate("js_history_delete_error");
+  const translate_DeleteSuccess = translate("js_history_delete_success");
+  const translate_LinkCopied = translate("js_generic_link_copied_to_clipboard");
+  const translate_buttonDelete = translate("js_btn_delete");
+  const translate_buttonCopy = translate("js_btn_copy");
+  const translate_deleteKeyDoesNotExist = translate(
+    "js_generic_delete_key_does_not_exist"
+  );
 
   form.style.display = "none";
 
   const dropAreaText = document.createElement("p");
-  dropAreaText.textContent = translate_uploadText
-  dropArea.appendChild(dropAreaText)
+  dropAreaText.textContent = translate_uploadText;
+  dropArea.appendChild(dropAreaText);
 
   dropArea.addEventListener("drop", handleDrop, false);
   dropArea.addEventListener("click", () => fileInput.click());
@@ -70,11 +78,12 @@ document.addEventListener("DOMContentLoaded", () => {
     const deleteButton = document.createElement("button");
 
     uploadContainer.className = "upload-status";
+    uploadContainer.id = "upload-status";
     uploadContainer.appendChild(uploadText);
     uploadContainer.appendChild(statusLink);
-    buttons.appendChild(copyButton)
-    buttons.appendChild(deleteButton)
-    uploadContainer.appendChild(buttons)
+    buttons.appendChild(copyButton);
+    buttons.appendChild(deleteButton);
+    uploadContainer.appendChild(buttons);
     uploadStatus.appendChild(uploadContainer);
 
     uploadText.innerHTML = "0%";
@@ -96,24 +105,25 @@ document.addEventListener("DOMContentLoaded", () => {
 
     xhr.onerror = () => {
       console.error("Error:", xhr.status, xhr.statusText, xhr.responseText);
-      statusLink.textContent = translate_uploadUnknownError
+      statusLink.textContent = translate_uploadUnknownError;
     };
 
     xhr.onload = () => {
+      let deleteKey;
       if (xhr.status === 200) {
         try {
           const response = xhr.responseText;
-          const parsedResponse = JSON.parse(response)
+          const parsedResponse = JSON.parse(response);
           const fileLink = parsedResponse.link;
-          const deleteLink = parsedResponse.deleteLink
+          const deleteLink = parsedResponse.deleteLink;
+          deleteKey = parsedResponse.deleteKey;
           statusLink.innerHTML = `<a href="${fileLink}" target="_blank">${fileLink}</a>`;
           copyButton.style.display = "inline";
-          copyButton.onclick = () => copyToClipboard(fileLink);
           deleteButton.style.display = "inline";
-          deleteButton.onclick = () => {
-            window.open(deleteLink, "_blank");
-          };
-          saveOnHistory(response)
+          copyButton.onclick = () => copyToClipboard(fileLink, copyButton);
+          deleteButton.onclick = () =>
+            deleteFile(deleteLink, deleteKey, uploadContainer);
+          history.add(response);
         } catch (error) {
           statusLink.textContent = translate_uploadUnknownError;
         }
@@ -131,7 +141,42 @@ document.addEventListener("DOMContentLoaded", () => {
     xhr.send(formData);
   }
 
-  function copyToClipboard(text) {
-    navigator.clipboard.writeText(text)
+  function deleteFile(deleteLink, deleteKey, uploadContainer) {
+    const url = deleteLink;
+    const xhr = new XMLHttpRequest();
+    const deleteText = document.createElement("a");
+    uploadContainer.innerHTML = "";
+    uploadContainer.appendChild(deleteText);
+    deleteText.className = "delete-text";
+
+    xhr.onerror = () => {
+      console.error(
+        "Error deleting file:",
+        xhr.status,
+        xhr.statusText,
+        xhr.responseText
+      );
+      deleteText.textContent = translate_DeleteError;
+    };
+
+    xhr.onload = () => {
+      if (xhr.status === 200) {
+        deleteText.textContent = translate_DeleteSuccess;
+        history.delete(deleteKey);
+      }
+    };
+
+    xhr.open("GET", url, true);
+    xhr.send();
+  }
+
+  function copyToClipboard(text, copyButton) {
+    navigator.clipboard.writeText(text);
+    const prevState = copyButton.innerHTML;
+    copyButton.innerHTML = translate_LinkCopied;
+    copyButton.innerHTML = translate_LinkCopied;
+    setTimeout(() => {
+      copyButton.innerHTML = prevState;
+    }, 2000);
   }
 });

@@ -31,8 +31,8 @@ module Routes::Admin
     property files : Array(String)
   end
 
-  # /api/admin/fileinfo
-  # curl -X POST -H "Content-Type: application/json" -H "X-Api-Key: asd" http://localhost:8080/api/admin/fileinfo -d '{"files": ["j63"]}' | jq
+  # /-/api/admin/fileinfo
+  # curl -X POST -H "Content-Type: application/json" -H "X-Api-Key: asd" http://localhost:8080/-/api/admin/fileinfo -d '{"files": ["j63"]}' | jq
   def retrieve_file_info(env : HTTP::Server::Context) : String?
     begin
       req = FileinfoRequest.from_json(env.params.json.to_json)

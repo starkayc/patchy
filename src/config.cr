@@ -72,6 +72,8 @@ class Config
     property max_size : Int32 = 256
     # In KiB, files bigger than this will not be cached
     property max_allowed_filesize : Int32 = 512
+    property expire_time : Int64? = nil
+    property clean_interval : Int32? = nil
   end
 
   property views : Views = Views.from_yaml("")
@@ -79,38 +81,52 @@ class Config
   struct Views
     include YAML::Serializable
 
-    property site_info : String = "Welcome to Patchy - A temporary file uploader"
+    property index : Index = Index.from_yaml("")
+    property show_file : ShowFile = ShowFile.from_yaml("")
 
-    property show_title : Bool = true
-    property show_file_count : Bool = true
-    property show_version : Bool = true
-
-    property index_navbar : IndexNavbar = IndexNavbar.from_yaml("")
-
-    struct IndexNavbar
+    struct Index
       include YAML::Serializable
 
-      property enabled : Bool = true
-      property show_uploader_configs : Bool = true
-      property show_upload_history : Bool = true
-      property show_admin : Bool = true
-      property show_login : Bool = true
+      property site_info : String = "Welcome to Patchy - A temporary file uploader"
+      property show_title : Bool = true
+      property show_file_count : Bool = true
+      property show_version : Bool = true
+      property navbar : Navbar = Navbar.from_yaml("")
+
+      struct Navbar
+        include YAML::Serializable
+
+        property enabled : Bool = true
+        property show_uploader_configs : Bool = true
+        property show_upload_history : Bool = true
+        property show_settings : Bool = true
+        property show_admin : Bool = true
+        property show_login : Bool = true
+      end
     end
 
-    property autoplay_video : Bool = false
-    property autoplay_audio : Bool = false
+    struct ShowFile
+      include YAML::Serializable
+
+      property autoplay_video : Bool = false
+      property autoplay_audio : Bool = false
+    end
   end
 
-  # Enable or disable the admin API
-  property admin_enabled : Bool = false
-  # The API key for admin routes. It's passed as a "X-Api-Key" header to the
-  # request
-  property admin_api_key : String? = nil
+  property admin : Admin = Admin.from_yaml("")
 
-  # Not implemented
-  property incremental_filename_length : Bool = true
+  struct Admin
+    include YAML::Serializable
+
+    # Enable or disable the admin API
+    property enabled : Bool = false
+    # The API key for admin routes. It's passed as a "X-Api-Key" header to the
+    # request
+    property api_key : String? = nil
+  end
+
   # Filename length
-  property filename_length : Int32 = 3
+  property filename_length : Int32 = 5
   # In MiB
   property size_limit : Int16 = 512
   property enable_checksums : Bool = true
@@ -170,7 +186,7 @@ class Config
 
   def self.check_config(config : Config) : String?
     if config.filename_length <= 0
-      puts "Config: filename_length cannot be less or equal to 0"
+      Log.fatal &.emit("Config: filename_length cannot be less or equal to 0")
       exit(1)
     end
 
@@ -204,9 +220,10 @@ class Config
     begin
       config_yaml = File.read(config_file)
       config = Config.from_yaml(config_yaml)
+      pp config
     rescue File::NotFoundError
-      puts "Config: Config file '#{config_file}' was not found, using the default uploader configuration"
-      puts "Config, Note: You can ignore this error safely if you use environment variables to configure the uploader!"
+      Log.notice &.emit("Config: Config file '#{config_file}' was not found, using the default uploader configuration")
+      Log.notice &.emit("Config, Note: You can ignore this error safely if you use environment variables to configure the uploader!")
       config = Config.from_yaml("")
     end
 
@@ -244,14 +261,14 @@ class Config
 
             # Exit on fail
             if !success
-                puts %(Config: Config.{{ivar.id}} failed to parse #{env_value} as {{ivar.type}})
+                Log.fatal &.emit(%(Config: Config.{{ivar.id}} failed to parse #{env_value} as {{ivar.type}}))
                 exit(1)
             end
         end
 
         # Warn when any config attribute is set to "CHANGE_ME!!"
         if config.{{ivar.id}} == "CHANGE_ME!!"
-          puts "Config: The value of '#{ {{ivar.stringify}} }' needs to be changed!!"
+          Log.fatal &.emit("Config: The value of '#{ {{ivar.stringify}} }' needs to be changed!!")
           exit(1)
         end
     {% end %}

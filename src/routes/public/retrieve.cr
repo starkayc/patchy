@@ -1,4 +1,4 @@
-require "../ext/kemal_send_file_raw"
+require "../../ext/kemal_send_file_raw"
 
 module Routes::Retrieve
   extend self
@@ -38,7 +38,7 @@ module Routes::Retrieve
         end
       else
         file_path = "#{CONFIG.files}/#{fileinfo.filename}#{fileinfo.extension}"
-        Utils::Cache.insert(fileinfo, file_path)
+        Utils::Cache.insert(fileinfo, file_path, CONFIG.cache.expire_time)
         send_file env, file_path
       end
     end
@@ -51,7 +51,7 @@ module Routes::Retrieve
       send_file env, "#{CONFIG.thumbnails}/#{thumbnail}"
     rescue ex
       Log.debug &.emit("thumbnail '#{thumbnail}' does not exist", error: ex.message)
-      ee 403, "Thumbnail '#{thumbnail}' does not exist"
+      ee 404, "Thumbnail '#{thumbnail}' does not exist"
     end
   end
 end

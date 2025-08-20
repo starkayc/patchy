@@ -1,0 +1,16 @@
+<%
+title = translate(locale, "index_settings")
+%>
+
+<% content_for "head" do %>
+<title> <%= host %> - <%= title %></title>
+<% end %>
+
+<div class="container">
+  <a href='/'><%= translate(locale, "go_back") %></a>
+  <hr>
+  <h2><%= title %></h2>
+    <p>
+      Work in progress user settings
+    </p>
+</div>

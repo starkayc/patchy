@@ -30,8 +30,10 @@ ip_block:
     # "Mullvad", "AirVPN"
     providers: []
 
-admin_enabled: true
-admin_api_key: "asd"
+admin:
+  enabled: true
+  api_key: "asd"
+
 size_limit: 512
 enable_checksums: false
 
@@ -44,9 +46,6 @@ delete_files_after: 168
 # In seconds
 delete_files_check: 1800
 delete_key_length: 4
-
-site_info: "Whatever you want to put here"
-site_warning: "WARNING!"
 
 # S3 Support to upload the files to a S3 bucket.
 # Thumbnail generation will not run when using a S3 bucket
@@ -65,24 +64,27 @@ cache:
   max_size: 256
   # In KiB, files bigger than this will not be cached
   max_allowed_filesize: 512
+  expire_time: 1
+  clean_interval: 1
 
-# Modify what is show on the index index page
+# Modify what is shown on the different pages
 views:
-  site_info: "Welcome to Patchy - A temporary file uploader"
-  show_title: true
-  show_file_count: true
-  show_version: true
-  index_navbar:
-    enabled: true
-    show_uploader_configs: true
-    show_upload_history: true
-    show_admin: true
-    show_login: true
-  autoplay_video: false
-  autoplay_audio: false
+  index:
+    site_info: "Welcome to Patchy - A temporary file uploader"
+    show_title: true
+    show_file_count: true
+    show_version: true
+    navbar:
+      enabled: true
+      show_uploader_configs: true
+      show_upload_history: true
+      show_admin: true
+      show_login: true
+  show_file:
+    autoplay_video: false
+    autoplay_audio: false
 
 blocked_extensions:
   - "exe"
-
 # alternative_domains:
 #   - "example.com"

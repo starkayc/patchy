@@ -12,8 +12,8 @@ module Routes::Admin
     end
   end
 
-  # /api/admin/torexitnodes
-  # curl -X GET -H "X-Api-Key: asd" http://localhost:8080/api/admin/torexitnodes | jq
+  # /-/api/admin/torexitnodes
+  # curl -X GET -H "X-Api-Key: asd" http://localhost:8080/-/api/admin/torexitnodes | jq
   def tor_exit_nodes(env : HTTP::Server::Context) : String
     TorResponse.new.to_json
   end

@@ -17,6 +17,8 @@ module Routes::Upload
     property delete_key : String
     @[JSON::Field(key: "deleteLink")]
     property delete_link : String
+    @[JSON::Field(key: "uploadedAt")]
+    property uploaded_at : String
 
     def initialize(fileinfo : Fileinfo, scheme : String, host : String?)
       @link = "#{scheme}://#{host}/#{fileinfo.filename}"
@@ -28,6 +30,7 @@ module Routes::Upload
       @checksum = fileinfo.checksum
       @delete_key = fileinfo.delete_key
       @delete_link = "#{scheme}://#{host}/-/delete?key=#{fileinfo.delete_key}"
+      @uploaded_at = fileinfo.uploaded_at.to_s
     end
   end
 

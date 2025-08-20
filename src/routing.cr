@@ -41,11 +41,10 @@ module Routing
 
     if env.request.resource.starts_with?(ADMIN_API_ROUTE_PATH)
       env.response.content_type = "application/json"
-
       api_key = env.request.headers["X-Api-Key"]?
 
-      res = {"error" => "Wrong API Key"}.to_json
-      if api_key != CONFIG.admin_api_key
+      if api_key != CONFIG.admin.api_key
+        res = {"error" => "Wrong API Key"}.to_json
         halt env, status_code: 401, response: res
       end
     end
@@ -58,7 +57,7 @@ module Routing
     api_key = env.request.headers["X-Api-Key"]?
 
     # Skips Tor blocking and Rate limits if the API key matches
-    return if api_key == CONFIG.admin_api_key
+    return if api_key == CONFIG.admin.api_key
 
     if tor_exit_nodes.includes?(ip)
       ee 401, "The administrator has blocked Tor exit nodes for uploading files"
@@ -98,6 +97,7 @@ module Routing
     get "/:filename", Routes::Views, :show_file
     get "/-/info/configs", Routes::Views, :uploader_configs
     get "/-/info/history", Routes::Views, :upload_history
+    get "/-/settings", Routes::Views, :settings
     get "/-/admin", Routes::Views, :admin
     get "/-/login", Routes::Views, :login
     get "/-/reportabuse", Routes::Views, :reportabuse
@@ -117,13 +117,14 @@ module Routing
     get "/-/api/stats", Routes::Misc, :stats
     get "/-/info/sharex.sxcu", Routes::Misc, :sharex_config
 
-    self.register_admin if CONFIG.admin_enabled
+    self.register_admin if CONFIG.admin.enabled
   end
 
   def register_admin : Array(Radix::Node(Kemal::Route)) | Kemal::Route | Radix::Node(Kemal::Route) | Nil
     post "#{ADMIN_API_ROUTE_PATH}/delete", Routes::Admin, :delete_file
     post "#{ADMIN_API_ROUTE_PATH}/fileinfo", Routes::Admin, :retrieve_file_info
     get "#{ADMIN_API_ROUTE_PATH}/torexitnodes", Routes::Admin, :tor_exit_nodes
+    get "#{ADMIN_API_ROUTE_PATH}/vpnips", Routes::Admin, :vpn_ips
     get "#{ADMIN_API_ROUTE_PATH}/cachedfiles", Routes::Admin, :cached_files
   end
 end

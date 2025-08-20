@@ -1,11 +1,16 @@
+<%
+  title = translate(locale, "upload_history")
+%>
+
 <% content_for "head" do %>
-<title> <%= host %> - <%= translate(locale, "upload_history") %></title>
-<script src="/-/assets/translations.js?v=<%= ASSET_COMMIT %>"></script>
-<script src="/-/assets/history.js?v=<%= ASSET_COMMIT %>"></script>
-<script src="/-/assets/uploadHistory.js?v=<%= ASSET_COMMIT %>"></script>
+<title> <%= host %> - <%= title %></title>
+<script type="module" src="/-/assets/js/uploadHistory.js?v=<%= ASSET_COMMIT %>"></script>
 <script id="thumbnails-enabled" type="application/json">{"msg":<%= CONFIG.thumbnail_generation.enabled ? "true" : "false" %>}</script>
+<script id="delete-files" type="application/json">{"msg":<%= CONFIG.thumbnail_generation.enabled ? "true" : "false" %>}</script>
 <%= translate_js(locale, "js_history_filename") %>
 <%= translate_js(locale, "js_history_link") %>
+<%= translate_js(locale, "js_history_empty") %>
+<%= translate_js(locale, "js_history_uploaded_at") %>
 <%= translate_js(locale, "js_history_direct_link") %>
 <%= translate_js(locale, "js_history_delete_deleting_file") %>
 <%= translate_js(locale, "js_history_delete_success") %>
@@ -13,13 +18,15 @@
 <%= translate_js(locale, "js_history_delete_error") %>
 <%= translate_js(locale, "js_history_delete_error_status_code") %>
 <%= translate_js(locale, "js_history_delete_error_unknown") %>
-<%= translate_js(locale, "js_button_delete") %>
+<%= translate_js(locale, "js_history_delete_error_404") %>
+<%= translate_js(locale, "js_history_delete_from_history") %>
+<%= translate_js(locale, "js_btn_delete") %>
 <% end %>
 
 <div class="container">
   <a href='/'><%= translate(locale, "go_back") %></a>
   <hr>
-  <h2><%= translate(locale, "upload_history") %></h2>
+  <h2><%= title %></h2>
   <div id="file-history" class="file-history">
     <p><%= translate(locale, "file_history_unavailable") %></p>
   </div>

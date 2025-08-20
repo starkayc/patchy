@@ -106,15 +106,15 @@ module Operations
         @fileinfo.original_filename = @fileinfo.filename
       end
 
-      self.writefile()
-      self.set_ip_information()
+      self.writefile
+      self.set_ip_information
 
       if CONFIG.delete_key_length > 0
         @fileinfo.delete_key = Random.base58(CONFIG.delete_key_length)
       end
 
-      self.generate_thumbnail()
-      self.insert_into_db()
+      self.generate_thumbnail
+      self.insert_into_db
 
       return @fileinfo
     end

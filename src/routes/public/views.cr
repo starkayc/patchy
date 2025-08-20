@@ -82,4 +82,12 @@ module Routes::Views
 
     templated "login"
   end
+
+  def settings(env : HTTP::Server::Context) : String
+    locale = Headers.locale
+    host = Headers.host
+    scheme = Headers.scheme
+
+    templated "settings"
+  end
 end

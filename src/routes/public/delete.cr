@@ -12,9 +12,9 @@ module Routes::Delete
       file_deleted = Operations::Deletion.delete_file(deletion_key, true)
       if file_deleted
         msg("File '#{file_deleted}' deleted successfully using deletion key '#{deletion_key}'")
-      else
-        ee 404, "No files matches the deletion key '#{deletion_key}'"
       end
+    rescue ex : FileNotFound
+      ee 404, ex.message
     rescue ex
       Log.error &.emit("unknown error", error: ex.message)
       ee 500, "Unknown error"
