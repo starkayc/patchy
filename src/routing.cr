@@ -29,7 +29,7 @@ module Routing
     env.set "user_agent", env.request.headers["User-Agent"]?
 
     env.response.headers["Content-Security-Policy"] = {
-      "sandbox allow-popups allow-popups-to-escape-sandbox allow-downloads allow-scripts allow-same-origin",
+      "sandbox allow-popups allow-popups-to-escape-sandbox allow-downloads allow-scripts allow-same-origin allow-forms",
       "default-src 'self'",
       "script-src 'self' 'unsafe-inline'",
       "img-src 'self' data:",
