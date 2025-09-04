@@ -19,9 +19,8 @@ module Jobs
   end
 
   def retrieve_tor_exit_nodes : Fiber?
-    if !CONFIG.ip_block.tor.enabled
-      return
-    end
+    return if !CONFIG.ip_block.tor.enabled
+
     Log.info &.emit("blocking Tor exit nodes")
     spawn do
       loop do
@@ -32,9 +31,8 @@ module Jobs
   end
 
   def retrieve_vpn_addresses : Fiber?
-    if !CONFIG.ip_block.vpn.enabled
-      return
-    end
+    return if !CONFIG.ip_block.vpn.enabled
+
     Log.info &.emit("blocking VPN addresses")
     spawn do
       loop do
