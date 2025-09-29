@@ -1,7 +1,7 @@
 import UploadHistory from "./history.js";
 import { translate } from "./translations.js";
 
-document.addEventListener("DOMContentLoaded", () => {
+window.addEventListener("DOMContentLoaded", () => {
   const dropArea = document.getElementById("drop-area");
   const fileInput = document.getElementById("file");
   const form = document.getElementById("form");

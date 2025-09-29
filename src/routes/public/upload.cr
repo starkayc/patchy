@@ -5,10 +5,11 @@ module Routes::Upload
     include JSON::Serializable
 
     property link : String
-    @[JSON::Field(key: "directLink")]
-    property direct_link : String
     @[JSON::Field(key: "linkExt")]
     property link_ext : String
+    @[JSON::Field(key: "directLink")]
+    property direct_link : String
+    property thumbnail_link : String?
     property id : String
     property ext : String
     property name : String
@@ -18,19 +19,23 @@ module Routes::Upload
     @[JSON::Field(key: "deleteLink")]
     property delete_link : String
     @[JSON::Field(key: "uploadedAt")]
-    property uploaded_at : String
+    property uploaded_at : Int64
+    @[JSON::Field(key: "expiresAt")]
+    property expires_at : Int64
 
     def initialize(fileinfo : Fileinfo, scheme : String, host : String?)
       @link = "#{scheme}://#{host}/#{fileinfo.filename}"
-      @direct_link = "#{scheme}://#{host}/-/file/#{fileinfo.filename}"
       @link_ext = "#{scheme}://#{host}/#{fileinfo.filename}#{fileinfo.extension}"
+      @direct_link = "#{scheme}://#{host}/-/file/#{fileinfo.filename}"
+      @thumbnail_link = "#{scheme}://#{host}/-/thumbnail/#{fileinfo.thumbnail}"
       @id = fileinfo.filename
       @ext = fileinfo.extension
       @name = fileinfo.original_filename
       @checksum = fileinfo.checksum
       @delete_key = fileinfo.delete_key
       @delete_link = "#{scheme}://#{host}/-/delete?key=#{fileinfo.delete_key}"
-      @uploaded_at = fileinfo.uploaded_at.to_s
+      @uploaded_at = fileinfo.uploaded_at
+      @expires_at = fileinfo.uploaded_at + (CONFIG.delete_files_after * 60 * 60)
     end
   end
 

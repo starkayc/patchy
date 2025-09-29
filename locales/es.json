@@ -26,6 +26,7 @@
 	"js_history_link": "Enlace",
 	"js_history_empty": "Tu historial esta vacio. Tal vez sube algunos archivos?",
 	"js_history_uploaded_at": "Subido el",
+	"js_history_expires_at": "Expira el",
 	"js_history_direct_link": "Enlace directo",
 	"js_history_delete_deleting_file": "Borrando archivo...",
 	"js_history_delete_success": "Archivo borrado con exito",

@@ -1,18 +1,20 @@
 import UploadHistory from "./history.js";
 import { translate } from "./translations.js";
 
-document.addEventListener("DOMContentLoaded", () => {
+window.addEventListener("DOMContentLoaded", () => {
   const fileHistoryContainer = document.getElementById("file-history");
   const thumbnailsEnabled = JSON.parse(
     document.getElementById("thumbnails-enabled").textContent
   ).msg;
   const history = new UploadHistory();
+  const currentTime = Math.ceil(new Date().getTime() / 1000);
 
   // i18n
   const translate_Filename = translate("js_history_filename");
   const translate_Link = translate("js_history_link");
   const translate_Empty = translate("js_history_empty");
   const translate_uploadedAt = translate("js_history_uploaded_at");
+  const translate_expiresAt = translate("js_history_expires_at");
   const translate_DirectLink = translate("js_history_direct_link");
   const translate_DeletingFile = translate("js_history_delete_deleting_file");
   const translate_DeleteSuccess = translate("js_history_delete_success");
@@ -44,6 +46,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
   historyList.forEach((v) => {
     const fileinfo = JSON.parse(v);
+    const expiresAt = fileinfo.expiresAt;
+    const uploadedAt = fileinfo.uploadedAt;
+
+    if (expiresAt) {
+      if (expiresAt < currentTime) {
+        history.delete(fileinfo.deleteKey);
+        return;
+      }
+    }
+
     const fileinfoContainer = document.createElement("div");
     fileinfoContainer.className = "file-info";
     fileinfoContainer.id = fileinfo.id;
@@ -77,9 +89,25 @@ document.addEventListener("DOMContentLoaded", () => {
     const filename = document.createElement("a");
     filename.textContent = `${translate_Filename}: ${fileinfo.name}`;
 
-    const uploadedAt = document.createElement("a");
-    const uploadedAtDate = new Date(fileinfo.uploadedAt * 1000);
-    uploadedAt.textContent = `${translate_uploadedAt}: ${uploadedAtDate.getFullYear()}-${uploadedAtDate.getMonth()}-${uploadedAtDate.getDay()} ${uploadedAtDate.getHours()}:${uploadedAtDate.getMinutes()}`;
+    fileinfobox.appendChild(linkContainer);
+    fileinfobox.appendChild(directLinkContainer);
+    // fileinfobox.appendChild(deleteLinkContainer);
+    fileinfobox.appendChild(id);
+    fileinfobox.appendChild(filename);
+
+    if (uploadedAt) {
+      const uploadedAtElement = document.createElement("a");
+      const uploadedAtDate = new Date(fileinfo.uploadedAt * 1000);
+      uploadedAtElement.textContent = `${translate_uploadedAt}: ${uploadedAtDate.toLocaleString()}`;
+      fileinfobox.appendChild(uploadedAtElement);
+    }
+
+    if (expiresAt) {
+      const expiresAtElement = document.createElement("a");
+      const expiresAtDate = new Date(expiresAt * 1000);
+      expiresAtElement.textContent = `${translate_expiresAt}: ${expiresAtDate.toLocaleString()}`;
+      fileinfobox.appendChild(expiresAtElement);
+    }
 
     let img = undefined;
 
@@ -129,13 +157,6 @@ document.addEventListener("DOMContentLoaded", () => {
       xhr.open("GET", fileinfo.deleteLink, false);
       xhr.send();
     };
-
-    fileinfobox.appendChild(linkContainer);
-    fileinfobox.appendChild(directLinkContainer);
-    // fileinfobox.appendChild(deleteLinkContainer);
-    fileinfobox.appendChild(id);
-    fileinfobox.appendChild(filename);
-    fileinfobox.appendChild(uploadedAt);
 
     fileinfoContainer.appendChild(fileinfobox);
     if (img !== undefined) {

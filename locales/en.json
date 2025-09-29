@@ -26,6 +26,7 @@
 	"js_history_link": "Link",
 	"js_history_empty": "You history is empty. Maybe upload some files?",
 	"js_history_uploaded_at": "Uploaded at",
+	"js_history_expires_at": "Expires at",
 	"js_history_direct_link": "Direct Link",
 	"js_history_delete_deleting_file": "Deleting file...",
 	"js_history_delete_success": "File deleted successfully",

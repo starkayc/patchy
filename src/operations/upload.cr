@@ -11,10 +11,10 @@ module Operations
       @fileinfo.uploaded_at = Time.utc.to_unix
     end
 
-    private def set_ip_information : Nil
-      @fileinfo.ip = @ip_addr.to_s
-      @ip.ip = @ip_addr.to_s
-      @ip.date = @fileinfo.uploaded_at
+    private def generate_checksum(file_path : String) : Nil
+      if CONFIG.enable_checksums
+        @fileinfo.checksum = Utils::Hashing.hash_file(file_path)
+      end
     end
 
     private def writefile : Nil
@@ -44,6 +44,12 @@ module Operations
       end
     end
 
+    private def valid_extension?(extension : String) : Nil
+      if CONFIG.blocked_extensions.includes?(extension.split(".")[1]?)
+        raise ExtensionNotAllowed.new(extension)
+      end
+    end
+
     private def detect_extension(slice : Bytes) : Nil
       extension = Utils::MagicBytes.detect(slice)
 
@@ -55,37 +61,6 @@ module Operations
         extension = File.extname("#{@uploaded_file.filename}")
         self.valid_extension?(extension)
         @fileinfo.extension = extension
-      end
-    end
-
-    private def valid_extension?(extension : String) : Nil
-      if CONFIG.blocked_extensions.includes?(extension.split(".")[1]?)
-        raise ExtensionNotAllowed.new(extension)
-      end
-    end
-
-    private def generate_checksum(file_path : String) : Nil
-      if CONFIG.enable_checksums
-        @fileinfo.checksum = Utils::Hashing.hash_file(file_path)
-      end
-    end
-
-    private def generate_thumbnail : Nil
-      begin
-        spawn { Utils::Thumbnails.generate_thumbnail(@fileinfo.filename, @fileinfo.extension) }
-      rescue ex
-        Log.error &.emit("an error ocurred when trying to generate a thumbnail", error: ex.message)
-      end
-    end
-
-    private def insert_into_db : Nil
-      begin
-        Database::Files.insert(@fileinfo)
-        exists = Database::IPS.insert(@ip).rows_affected == 0
-        Database::IPS.increase_count(@ip) if exists
-      rescue ex
-        Log.error &.emit("an error ocurred when trying to insert the data into the DB", error: ex.message)
-        raise DBError.new
       end
     end
 
@@ -107,14 +82,29 @@ module Operations
       end
 
       self.writefile
-      self.set_ip_information
+
+      @fileinfo.ip = @ip_addr.to_s
+      @ip.ip = @ip_addr.to_s
+      @ip.date = @fileinfo.uploaded_at
 
       if CONFIG.delete_key_length > 0
         @fileinfo.delete_key = Random.base58(CONFIG.delete_key_length)
       end
 
-      self.generate_thumbnail
-      self.insert_into_db
+      begin
+        Utils::Thumbnails.generate_thumbnail(@fileinfo.filename, @fileinfo.extension)
+      rescue ex
+        Log.error &.emit("an error ocurred when trying to generate a thumbnail", error: ex.message)
+      end
+
+      begin
+        Database::Files.insert(@fileinfo)
+        exists = Database::IPS.insert(@ip).rows_affected == 0
+        Database::IPS.increase_count(@ip) if exists
+      rescue ex
+        Log.error &.emit("an error ocurred when trying to insert the data into the DB", error: ex.message)
+        raise DBError.new
+      end
 
       return @fileinfo
     end
