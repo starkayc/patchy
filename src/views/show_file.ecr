@@ -4,7 +4,7 @@
   extension_ = HTML.escape(fileinfo.extension)
 
   filetype = Filetype::File
-  if [".png", ".jpg", ".gif", ".webp", ".jpeg", ".bmp", ".tiff", ".jfif"].any? { |ex| fileinfo.extension == ex }
+  if [".png", ".jpg", ".gif", ".webp", ".jpeg", ".bmp", ".tiff", ".jfif", ".avif", ".jxl"].any? { |ex| fileinfo.extension == ex }
     filetype = Filetype::Image
   elsif [".mp4", ".webm", ".avi", ".mov", ".ogv"].any? { |ex| fileinfo.extension == ex }
     filetype = Filetype::Video
