@@ -2,8 +2,8 @@
 # https://github.com/iv-org/invidious/blob/master/src/invidious/helpers/i18n.cr
 
 LOCALES_LIST = {
-  "en-US" => "English", # English
-  "es"    => "Español", # Spanish
+  "en" => "English", # English
+  "es" => "Español", # Spanish
 }
 
 LOCALES = load_all_locales()
@@ -19,9 +19,12 @@ def load_all_locales : Hash(String, Hash(String, JSON::Any))
 end
 
 def translate(locale : String?, key : String, text : String | Hash(String, String) | Nil = nil) : String
+  if locale
+    locale = locale.split("-")[0]
+  end
   # Log a warning if "key" doesn't exist in en-US locale and return
   # that key as the text, so this is more or less transparent to the user.
-  if !LOCALES["en-US"].has_key?(key)
+  if !LOCALES["en"].has_key?(key)
     Log.warn &.emit("i18n: Missing translation key \"#{key}\"")
     return key
   end
@@ -31,7 +34,7 @@ def translate(locale : String?, key : String, text : String | Hash(String, Strin
   if locale && LOCALES.has_key?(locale) && LOCALES[locale].has_key?(key)
     raw_data = LOCALES[locale][key]
   else
-    raw_data = LOCALES["en-US"][key]
+    raw_data = LOCALES["en"][key]
   end
 
   case raw_data
