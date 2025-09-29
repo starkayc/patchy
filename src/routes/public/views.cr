@@ -8,7 +8,7 @@ module Routes::Views
     Audio = 3
   end
 
-  def root(env : HTTP::Server::Context) : String
+  def index(env : HTTP::Server::Context) : String
     locale = Headers.locale
     host = Headers.host
     scheme = Headers.scheme

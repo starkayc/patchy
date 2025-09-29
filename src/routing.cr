@@ -93,7 +93,7 @@ module Routing
 
   def register_all : Array(Radix::Node(Kemal::Route)) | Kemal::Route | Radix::Node(Kemal::Route) | Nil
     # Views
-    get "/", Routes::Views, :root
+    get "/", Routes::Views, :index
     get "/:filename", Routes::Views, :show_file
     get "/-/info/configs", Routes::Views, :uploader_configs
     get "/-/info/history", Routes::Views, :upload_history
