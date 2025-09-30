@@ -41,11 +41,14 @@
     <p class="site-info"><%= site_info %></p>
   <% end %>
   <div class="drop-area" id="drop-area">
-    <form action="/-/upload?nojs=1" method="post" enctype="multipart/form-data" id="form">
+    <form action="/-/upload?nojs=1" method="post" enctype="multipart/form-data" id="nojs-form">
       <input name="file" type="file" id="file"/>
       <input type="submit" value="Upload" id="upload-box">
     </form>
   </div>
+  <script>
+    document.getElementById("nojs-form").style.display = "none";
+  </script>
   <div id="upload-status-container" class="upload-status-container"></div>
   <div class="footer">
     <% if CONFIG.views.index.show_file_count %>

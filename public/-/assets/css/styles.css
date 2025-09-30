@@ -97,6 +97,12 @@ a[href]:hover {
 	color: var(--blue-dim)
 }
 
+.img {
+	max-width: 100%;
+	height: auto;
+	display: block;
+}
+
 .navbar {
 	display: flex;
 	flex-direction: row;
@@ -104,16 +110,16 @@ a[href]:hover {
 }
 
 @media (max-width: 720px) {
-    .navbar {
+	.navbar {
 		gap: 0.5rem;
-    }
+	}
 }
 
 @media (max-width: 410px) {
-    .navbar {
-        flex-direction: column;
+	.navbar {
+		flex-direction: column;
 		gap: 0;
-    }
+	}
 }
 
 .navbar>.end-of-flex {
@@ -310,7 +316,7 @@ nav>ul {
 	padding: 20px 20px;
 }
 
-.file-info>img {
+.file-info>.img {
 	max-width: 100%;
 	max-height: 25vh;
 	display: block;
