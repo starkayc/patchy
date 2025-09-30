@@ -39,14 +39,14 @@
 <div class="media-container">
   <div class="media">
     <% if filetype == Filetype::Image %>
-      <img src="/-/file/<%= filename_ %>" alt="<%= original_filename_ %>">
+      <img class="content" src="/-/file/<%= filename_ %>" alt="<%= original_filename_ %>">
     <% elsif filetype == Filetype::Video %>
-      <video controls <%= CONFIG.views.show_file.autoplay_video ? "autoplay" : "" %>>
+      <video class="content" controls <%= CONFIG.views.show_file.autoplay_video ? "autoplay" : "" %>>
         <source src="/-/file/<%= filename_ %>" type="<%= mime_type %>">
         Your browser does not support the video tag.
       </video>
     <% elsif filetype == Filetype::Audio %>
-      <audio controls <%= CONFIG.views.show_file.autoplay_audio ? "autoplay" : "" %>>
+      <audio class="content" controls <%= CONFIG.views.show_file.autoplay_audio ? "autoplay" : "" %>>
         <source src="/-/file/<%= filename_ %>" type="<%= mime_type %>">
         Your browser does not support the audio tag.
       </audio>
@@ -57,7 +57,7 @@
   <hr>
   <div class="navbar">
     <a href='/-/file/<%= filename_ %>' download=''><%= translate(locale, "download_file") %> (<%= original_filename_ %>)</a>
-    <% 
+    <%
       # Disable view button for .html
       if fileinfo.extension != ".html"
     %>

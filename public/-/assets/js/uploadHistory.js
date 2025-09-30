@@ -2,10 +2,16 @@ import UploadHistory from "./history.js";
 import { translate } from "./translations.js";
 
 window.addEventListener("DOMContentLoaded", () => {
+  const CONFIGElement = document.getElementById("patchy-config");
+  let CONFIG;
+  if (CONFIGElement) {
+    CONFIG = JSON.parse(CONFIGElement.textContent);
+  }
+
   const fileHistoryContainer = document.getElementById("file-history");
-  const thumbnailsEnabled = JSON.parse(
-    document.getElementById("thumbnails-enabled").textContent
-  ).msg;
+  if (fileHistoryContainer == null) {
+    throw new Error("'file-history' element id not found");
+  }
   const history = new UploadHistory();
   const currentTime = Math.ceil(new Date().getTime() / 1000);
 
@@ -109,11 +115,12 @@ window.addEventListener("DOMContentLoaded", () => {
       fileinfobox.appendChild(expiresAtElement);
     }
 
-    let img = undefined;
-
-    if (thumbnailsEnabled) {
-      img = document.createElement("img");
+    if (CONFIG.thumbnailsEnabled) {
+      const img = document.createElement("img");
+      img.className = "img";
       img.src = `/-/thumbnail/${fileinfo.id}.jpg`;
+
+      fileinfoContainer.appendChild(img);
     }
 
     const buttons = document.createElement("div");
@@ -125,11 +132,16 @@ window.addEventListener("DOMContentLoaded", () => {
     deleteButton.style.display = "inline";
     deleteButton.onclick = () => {
       const xhr = new XMLHttpRequest();
+
       const boxToRemove = document.getElementById(fileinfo.id);
-      boxToRemove.innerHTML = "";
       const removeText = document.createElement("a");
       removeText.textContent = translate_DeletingFile;
-      boxToRemove.appendChild(removeText);
+      if (boxToRemove) {
+        boxToRemove.innerHTML = "";
+        boxToRemove.appendChild(removeText);
+      } else {
+        console.error(`no element with id '${boxToRemove}' exists`)
+      }
 
       xhr.onerror = () => {
         console.error("Error:", xhr.status, xhr.statusText, xhr.responseText);
@@ -159,11 +171,7 @@ window.addEventListener("DOMContentLoaded", () => {
     };
 
     fileinfoContainer.appendChild(fileinfobox);
-    if (img !== undefined) {
-      fileinfoContainer.appendChild(img);
-    }
-
     fileinfoContainer.appendChild(buttons);
-    fileHistoryContainer.appendChild(fileinfoContainer);
+    fileHistoryContainer?.appendChild(fileinfoContainer);
   });
 });

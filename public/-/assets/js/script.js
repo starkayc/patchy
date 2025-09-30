@@ -4,7 +4,6 @@ import { translate } from "./translations.js";
 window.addEventListener("DOMContentLoaded", () => {
   const dropArea = document.getElementById("drop-area");
   const fileInput = document.getElementById("file");
-  const form = document.getElementById("form");
   const uploadStatus = document.getElementById("upload-status-container");
   const history = new UploadHistory();
 
@@ -12,6 +11,7 @@ window.addEventListener("DOMContentLoaded", () => {
   const translate_uploadText = translate("js_upload_text");
   const translate_uploadClientError = translate("js_upload_client_error");
   const translate_uploadServerError = translate("js_upload_server_error");
+  const translate_uploadUnknownError = translate("js_upload_unknown_error");
   const translate_DeleteError = translate("js_history_delete_error");
   const translate_DeleteSuccess = translate("js_history_delete_success");
   const translate_LinkCopied = translate("js_generic_link_copied_to_clipboard");
@@ -21,16 +21,13 @@ window.addEventListener("DOMContentLoaded", () => {
     "js_generic_delete_key_does_not_exist"
   );
 
-  form.style.display = "none";
-
   const dropAreaText = document.createElement("p");
   dropAreaText.textContent = translate_uploadText;
-  dropArea.appendChild(dropAreaText);
+  dropArea?.appendChild(dropAreaText);
+  dropArea?.addEventListener("drop", handleDrop, false);
+  dropArea?.addEventListener("click", () => fileInput?.click());
 
-  dropArea.addEventListener("drop", handleDrop, false);
-  dropArea.addEventListener("click", () => fileInput.click());
-
-  fileInput.addEventListener(
+  fileInput?.addEventListener(
     "change",
     () => {
       const files = fileInput.files;
@@ -39,7 +36,17 @@ window.addEventListener("DOMContentLoaded", () => {
     false
   );
 
+  ["dragenter", "dragover", "dragleave", "drop"].forEach((eventName) => {
+    window.addEventListener(eventName, preventDefaults, false);
+  });
+
+  function preventDefaults(e) {
+    e.preventDefault();
+    e.stopPropagation();
+  }
+
   document.addEventListener("paste", handlePaste, false);
+  document.addEventListener("drop", handleDrop, false);
 
   function handleDrop(e) {
     const dt = e.dataTransfer;
@@ -84,7 +91,7 @@ window.addEventListener("DOMContentLoaded", () => {
     buttons.appendChild(copyButton);
     buttons.appendChild(deleteButton);
     uploadContainer.appendChild(buttons);
-    uploadStatus.appendChild(uploadContainer);
+    uploadStatus?.appendChild(uploadContainer);
 
     uploadText.innerHTML = "0%";
     uploadText.className = "percent";

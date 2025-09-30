@@ -5,8 +5,13 @@
 <% content_for "head" do %>
 <title> <%= host %> - <%= title %></title>
 <script type="module" src="/-/assets/js/uploadHistory.js?v=<%= ASSET_COMMIT %>"></script>
-<script id="thumbnails-enabled" type="application/json">{"msg":<%= CONFIG.thumbnail_generation.enabled ? "true" : "false" %>}</script>
-<script id="delete-files" type="application/json">{"msg":<%= CONFIG.thumbnail_generation.enabled ? "true" : "false" %>}</script>
+<script id="patchy-config" type="application/json">
+<%=
+{
+  "thumbnailsEnabled" => CONFIG.thumbnail_generation.enabled
+}.to_pretty_json
+%>
+</script>
 <%= translate_js(locale, "js_history_filename") %>
 <%= translate_js(locale, "js_history_link") %>
 <%= translate_js(locale, "js_history_empty") %>

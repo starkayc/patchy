@@ -19,7 +19,7 @@
 	"file_does_not_exist": "This file does not exist",
 	"error_at_file_retrieval": "Error when retrieving file",
 	"js_history_filename": "Filename",
-	"js_upload_text": "Click here to upload a file",
+	"js_upload_text": "Click here, paste or drag and drop to upload a file",
 	"js_upload_client_error": "Client error",
 	"js_upload_server_error": "Server error",
 	"js_upload_unknown_error": "Unknown error",
