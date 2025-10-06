@@ -6,7 +6,7 @@ module Utils::Thumbnails
     {".jpg", ".jpeg", ".png", ".gif", ".bmp", ".tiff", ".webp", ".heic", ".jxl", ".avif", ".crw", ".dng",
      ".mp4", ".mkv", ".webm", ".avi", ".wmv", ".flv", "m4v", ".mov", ".amv", ".3gp", ".mpg", ".mpeg", ".yuv"}
 
-  def generate_thumbnail(filename : String, extension : String) : Nil
+  def generate_thumbnail(filename : String, extension : String) : String?
     return unless CONFIG.thumbnail_generation.enabled &&
                   !ALLOWED_EXTENSIONS.none? { |ext| extension.downcase.includes?(ext) }
     Log.debug &.emit("generating thumbnail for #{filename + extension} in background")
@@ -15,7 +15,7 @@ module Utils::Thumbnails
 
     if process.exit_reason == Process::ExitReason::Normal
       Log.debug &.emit("thumbnail for '#{filename + extension}' generated successfully")
-      Database::Files.update_thumbnail(filename)
+      return "#{filename}.jpg"
     else
       Log.debug &.emit("failed to generate thumbnail for '#{filename + extension}'. Exit code of ffmpeg: #{process.exit_code}")
     end

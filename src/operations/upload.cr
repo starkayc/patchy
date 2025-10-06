@@ -92,7 +92,7 @@ module Operations
       end
 
       begin
-        Utils::Thumbnails.generate_thumbnail(@fileinfo.filename, @fileinfo.extension)
+        @fileinfo.thumbnail = Utils::Thumbnails.generate_thumbnail(@fileinfo.filename, @fileinfo.extension)
       rescue ex
         Log.error &.emit("an error ocurred when trying to generate a thumbnail", error: ex.message)
       end
