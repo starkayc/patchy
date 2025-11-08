@@ -35,7 +35,7 @@ module Routes::Upload
       @delete_key = fileinfo.delete_key
       @delete_link = "#{scheme}://#{host}/-/delete?key=#{fileinfo.delete_key}"
       @uploaded_at = fileinfo.uploaded_at
-      @expires_at = fileinfo.uploaded_at + (CONFIG.delete_files_after * 60 * 60)
+      @expires_at = fileinfo.uploaded_at + (CONFIG.delete_files_after.to_i64 * 3600)
     end
   end
 
