@@ -7,6 +7,19 @@ files: "./data/files/"
 thumbnails: "./data/thumbnails/"
 db: "./data/db/"
 
+size_limit: 512
+enable_checksums: false
+
+files_per_ip: 32
+rate_limit_period: 20
+filename_length: 5
+
+# In hours
+delete_files_after: 14
+# In seconds
+delete_files_check: 1800
+delete_key_length: 4
+
 # http server
 server:
   port: 8080
@@ -33,19 +46,6 @@ ip_block:
 admin:
   enabled: false
   api_key: "asd"
-
-size_limit: 512
-enable_checksums: false
-
-files_per_ip: 32
-rate_limit_period: 20
-filename_length: 5
-
-# In hours
-delete_files_after: 14
-# In seconds
-delete_files_check: 1800
-delete_key_length: 4
 
 # S3 Support to upload the files to a S3 bucket.
 # Thumbnail generation will not run when using a S3 bucket
