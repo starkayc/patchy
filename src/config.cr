@@ -37,6 +37,14 @@ class Config
     include YAML::Serializable
 
     property enabled : Bool = false
+    property resolution : Resolution = Resolution.from_yaml("")
+
+    struct Resolution
+      include YAML::Serializable
+
+      property max_height : String = "720"
+      property max_width : String = "720"
+    end
   end
 
   property s3 : S3Config = S3Config.from_yaml("")

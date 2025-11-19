@@ -11,7 +11,7 @@ module Utils::Thumbnails
                   !ALLOWED_EXTENSIONS.none? { |ext| extension.downcase.includes?(ext) }
     Log.debug &.emit("generating thumbnail for #{filename + extension} in background")
 
-    process = generate_big_thumbnail(filename, extension)
+    process = generate(filename, extension, CONFIG.thumbnail_generation.resolution)
 
     if process.exit_reason == Process::ExitReason::Normal
       Log.debug &.emit("thumbnail for '#{filename + extension}' generated successfully")
@@ -21,36 +21,24 @@ module Utils::Thumbnails
     end
   end
 
-  private def generate_small_thumbnail(filename : String, extension : String) : Process::Status
-    process = Process.run("ffmpeg",
-      [
-        "-hide_banner",
-        "-i",
-        "#{CONFIG.files}/#{filename + extension}",
-        "-movflags", "faststart",
-        "-f", "mjpeg",
-        "-q:v", "2",
-        "-vf", "scale='min(350,iw)':'min(350,ih)':force_original_aspect_ratio=decrease, thumbnail=100",
-        "-frames:v", "1",
-        "-update", "1",
-        "#{CONFIG.thumbnails}/#{filename}.jpg",
-      ])
-    process
-  end
+  private def generate(filename : String, extension : String, resolution : Config::ThumbnailGeneration::Resolution) : Process::Status
+    w = resolution.max_width
+    h = resolution.max_height
 
-  private def generate_big_thumbnail(filename : String, extension : String) : Process::Status
-    process = Process.run("ffmpeg",
-      [
-        "-hide_banner",
-        "-i",
-        "#{CONFIG.files}/#{filename + extension}",
-        "-movflags", "faststart",
-        "-f", "mjpeg",
-        "-q:v", "2",
-        "-frames:v", "1",
-        "-update", "1",
-        "#{CONFIG.thumbnails}/#{filename}.jpg",
-      ])
+    arguments = [
+      "-hide_banner",
+      "-i",
+      "#{CONFIG.files}/#{filename + extension}",
+      "-movflags", "faststart",
+      "-f", "mjpeg",
+      "-q:v", "2",
+      "-vf", "scale='min(#{w},iw)':'min(#{h},ih)':force_original_aspect_ratio=decrease, thumbnail=100",
+      "-frames:v", "1",
+      "-update", "1",
+      "#{CONFIG.thumbnails}/#{filename}.jpg",
+    ]
+
+    process = Process.run("ffmpeg", arguments)
     process
   end
 end

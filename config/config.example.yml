@@ -16,6 +16,9 @@ server:
 
 thumbnail_generation:
   enabled: false
+  resolution:
+    max_height: 720
+    max_width: 720
 
 # To restrict Tor exit nodes and VPN providers IP addresses from uploading
 # content to the uploader. Sometimes they can be an annoyance, legally speaking.
