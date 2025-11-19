@@ -56,7 +56,12 @@ module Jobs
           exit(1)
         end
       else
-        Kemal.run
+        begin
+          Kemal.run
+        rescue ex
+          Log.fatal &.emit("patchy http server failed to start, exiting!", error: ex.message)
+          exit(1)
+        end
       end
     end
   end
