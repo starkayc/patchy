@@ -31,6 +31,7 @@ Log.setup do |c|
   c.bind "*", CONFIG.log_level, backend
   c.bind "db.*", :none, backend
   c.bind "http.*", :none, backend
+  c.bind "baked_file_handler.*", :none, backend
 end
 
 Kemal.config.port = CONFIG.server.port
