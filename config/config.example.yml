@@ -14,8 +14,8 @@ files_per_ip: 32
 rate_limit_period: 20
 filename_length: 5
 
-# In hours
-delete_files_after: 14
+# In hours (168 = 7 days)
+delete_files_after: 168
 # In seconds
 delete_files_check: 1800
 delete_key_length: 4

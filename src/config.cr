@@ -174,8 +174,8 @@ class Config
   # How often is the file limit per IP reset? (in seconds)
   property rate_limit_period : Int32 = 600
 
-  # Delete the files after how many days?
-  property delete_files_after : Int32 = 14
+  # Delete the files after how many hours?
+  property delete_files_after : Int32 = 168
   # How often should the check of old files be performed? (in seconds)
   property delete_files_check : Int32 = 1800
   # The lenght of the delete key
