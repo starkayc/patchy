@@ -118,7 +118,6 @@ RUN adduser -u 10000 -S patchy
 RUN mkdir -p /data && chown -R 10000:10000 /data
 
 COPY --from=builder --chown=patchy:patchy /patchy/patchy /patchy
-COPY --from=builder --chown=patchy:patchy /patchy/locales ./locales
 COPY --from=builder-ffmpeg /opt/ffmpeg/bin/ffmpeg /usr/bin/ffmpeg
 
 EXPOSE 8080

@@ -12,7 +12,7 @@ def load_all_locales : Hash(String, Hash(String, JSON::Any))
   locales = {} of String => Hash(String, JSON::Any)
 
   LOCALES_LIST.each_key do |name|
-    locales[name] = JSON.parse(File.read("locales/#{name}.json")).as_h
+    locales[name] = JSON.parse(Locales.get("#{name}.json")).as_h
   end
 
   return locales
