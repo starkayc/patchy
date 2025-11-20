@@ -57,7 +57,7 @@ module Jobs
         end
       else
         begin
-          Kemal.run
+          Kemal.run(args: nil)
         rescue ex
           Log.fatal &.emit("patchy http server failed to start, exiting!", error: ex.message)
           exit(1)
