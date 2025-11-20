@@ -9,6 +9,9 @@ module Routes::Upload
     property link_ext : String
     @[JSON::Field(key: "directLink")]
     property direct_link : String
+    @[JSON::Field(key: "directLinkExt")]
+    property direct_link_ext : String
+    @[JSON::Field(key: "thumbnailLink")]
     property thumbnail_link : String?
     property id : String
     property ext : String
@@ -27,6 +30,7 @@ module Routes::Upload
       @link = "#{scheme}://#{host}/#{fileinfo.filename}"
       @link_ext = "#{scheme}://#{host}/#{fileinfo.filename}#{fileinfo.extension}"
       @direct_link = "#{scheme}://#{host}/-/file/#{fileinfo.filename}"
+      @direct_link_ext = "#{scheme}://#{host}/-/file/#{fileinfo.filename}#{fileinfo.extension}"
       @thumbnail_link = "#{scheme}://#{host}/-/thumbnail/#{fileinfo.thumbnail}"
       @id = fileinfo.filename
       @ext = fileinfo.extension
@@ -35,7 +39,7 @@ module Routes::Upload
       @delete_key = fileinfo.delete_key
       @delete_link = "#{scheme}://#{host}/-/delete?key=#{fileinfo.delete_key}"
       @uploaded_at = fileinfo.uploaded_at
-      @expires_at = fileinfo.uploaded_at + (CONFIG.delete_files_after * 60 * 60)
+      @expires_at = fileinfo.uploaded_at + (CONFIG.delete_files_after.to_i64 * 3600)
     end
   end
 

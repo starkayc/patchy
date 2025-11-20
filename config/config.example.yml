@@ -1,11 +1,24 @@
 colorize_logs: true
 # Levels are: none, fatal, error, warn, notice, info, debug and trace
-log_level: "debug"
+log_level: "info"
 
 # File paths, you generally don't need to change this
 files: "./data/files/"
 thumbnails: "./data/thumbnails/"
 db: "./data/db/"
+
+size_limit: 512
+enable_checksums: false
+
+files_per_ip: 32
+rate_limit_period: 20
+filename_length: 5
+
+# In hours
+delete_files_after: 14
+# In seconds
+delete_files_check: 1800
+delete_key_length: 4
 
 # http server
 server:
@@ -34,21 +47,8 @@ ip_block:
     providers: []
 
 admin:
-  enabled: true
+  enabled: false
   api_key: "asd"
-
-size_limit: 512
-enable_checksums: false
-
-files_per_ip: 2
-rate_limit_period: 20
-filename_length: 3
-
-# In hours (168 = 7 days)
-delete_files_after: 168
-# In seconds
-delete_files_check: 1800
-delete_key_length: 4
 
 # S3 Support to upload the files to a S3 bucket.
 # Thumbnail generation will not run when using a S3 bucket
@@ -67,8 +67,10 @@ cache:
   max_size: 256
   # In KiB, files bigger than this will not be cached
   max_allowed_filesize: 512
-  expire_time: 1
-  clean_interval: 1
+  # seconds, nil by default.
+  expire_time: 3600
+  # seconds, nil by default.
+  clean_interval: 60
 
 # Modify what is shown on the different pages
 views:

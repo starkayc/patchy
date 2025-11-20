@@ -107,7 +107,7 @@ module Database::Files
     request = <<-SQL
       SELECT *
       FROM #{TABLE_NAME}
-      WHERE uploaded_at < strftime('%s', 'now') - #{CONFIG.delete_files_after * 3600}
+      WHERE uploaded_at < strftime('%s', 'now') - #{CONFIG.delete_files_after.to_i64 * 60 * 60}
     SQL
 
     SQL.query_all(request, as: Fileinfo)
