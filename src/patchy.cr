@@ -23,6 +23,17 @@ require "./database/*"
 module Patchy
 end
 
+# https://github.com/iv-org/invidious/blob/90e94d4e6cc126a8b7a091d12d7a5556bfe369d5/src/invidious.cr#L78
+CURRENT_BRANCH  = {{ "#{`git branch | sed -n '/* /s///p'`.strip}" }}
+CURRENT_COMMIT  = {{ "#{`git rev-list HEAD --max-count=1 --abbrev-commit`.strip}" }}
+CURRENT_VERSION = {{ "#{`git log -1 --format=%ci | awk '{print $1}' | sed s/-/./g`.strip}" }}
+
+# Taken from invidious!
+# This is used to determine the `?v=` on the end of file URLs (for cache busting). We
+# only need to expire modified assets, so we can use this to find the last commit that changes
+# any assets
+ASSET_COMMIT = {{ "#{`git rev-list HEAD --max-count=1 --abbrev-commit -- public/-/assets/`.strip}" }}
+
 CONFIG = Config.load
 
 Log.setup do |c|
@@ -45,17 +56,6 @@ Log.debug &.emit("current configuration: \n#{CONFIG.to_yaml}")
 
 Utils.create_dir(CONFIG.db, "for database")
 SQL = DB.open("sqlite3://#{CONFIG.db}/db.sqlite3")
-
-# https://github.com/iv-org/invidious/blob/90e94d4e6cc126a8b7a091d12d7a5556bfe369d5/src/invidious.cr#L78
-CURRENT_BRANCH  = {{ "#{`git branch | sed -n '/* /s///p'`.strip}" }}
-CURRENT_COMMIT  = {{ "#{`git rev-list HEAD --max-count=1 --abbrev-commit`.strip}" }}
-CURRENT_VERSION = {{ "#{`git log -1 --format=%ci | awk '{print $1}' | sed s/-/./g`.strip}" }}
-
-# Taken from invidious!
-# This is used to determine the `?v=` on the end of file URLs (for cache busting). We
-# only need to expire modified assets, so we can use this to find the last commit that changes
-# any assets
-ASSET_COMMIT = {{ "#{`git rev-list HEAD --max-count=1 --abbrev-commit -- public/-/assets/`.strip}" }}
 
 Utils.check_dependencies
 Utils::DB.create_tables
