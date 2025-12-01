@@ -228,7 +228,6 @@ class Config
     begin
       config_yaml = File.read(config_file)
       config = Config.from_yaml(config_yaml)
-      pp config
     rescue File::NotFoundError
       Log.notice &.emit("Config: Config file '#{config_file}' was not found, using the default uploader configuration")
       Log.notice &.emit("Config, Note: You can ignore this error safely if you use environment variables to configure the uploader!")
