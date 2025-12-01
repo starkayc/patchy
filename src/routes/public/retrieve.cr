@@ -25,7 +25,9 @@ module Routes::Retrieve
       env.response.headers["Content-Disposition"] = "attachment; filename*=UTF-8''#{fileinfo.original_filename}"
     end
     env.response.headers["ETag"] = "#{fileinfo.checksum}" if fileinfo.checksum
-    env.response.headers["Expires"] = Time::Format::HTTP_DATE.format(Time.unix(fileinfo.uploaded_at + CONFIG.delete_files_after.to_i64 * 3600))
+    if !(CONFIG.delete_files_check <= 0)
+      env.response.headers["Expires"] = Time::Format::HTTP_DATE.format(Time.unix(fileinfo.uploaded_at + CONFIG.delete_files_after.to_i64 * 3600))
+    end
 
     # TODO: send_file_raw and some functions
     if cached_file = Utils::Cache.select(fileinfo)
