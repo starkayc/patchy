@@ -19,6 +19,13 @@ macro msg(message)
   return
 end
 
+macro haltf(env, status_code = 200, response = "")
+  {{env}}.response.status_code = {{status_code}}
+  {{env}}.response.print {{response}}
+  {{env}}.response.close
+  return
+end
+
 # https://github.com/iv-org/invidious/blob/4b37d47ebbc4d3a0a55c8febaca2b28a68e1d9b5/src/invidious/helpers/macros.cr#L51
 # https://kemalcr.com/guide/#views-templates
 macro templated(_filename, template = "template", navbar_search = true, buffer_footer = false)
@@ -40,6 +47,10 @@ end
 module Headers
   macro locale
     env.request.headers["Accept-Language"]?.try &.split(",")[0].split(";")[0]
+  end
+
+  macro if_none_match
+    env.request.headers["If-None-Match"]?
   end
 
   macro host

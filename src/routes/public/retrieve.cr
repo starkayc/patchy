@@ -6,6 +6,7 @@ module Routes::Retrieve
   def retrieve_file(env : HTTP::Server::Context) : Nil
     host = Headers.host
     scheme = Headers.scheme
+    if_none_match = Headers.if_none_match
     filename = env.params.url["filename"].split(".").first
 
     begin
@@ -18,6 +19,15 @@ module Routes::Retrieve
       ee 500, "Error when retrieving file '#{filename}'"
     end
 
+    # Verify the ETag sent by the client
+    if if_none_match && fileinfo.checksum
+      if if_none_match == fileinfo.checksum
+        haltf env, status_code: 304
+      end
+    end
+
+    cache_control_max_age = (fileinfo.uploaded_at + CONFIG.delete_files_after.to_i64 * 3600) - Time.utc.to_unix
+
     # Download the HTML file contents instead of rendering it on the browser
     if fileinfo.extension != ".html"
       env.response.headers["Content-Disposition"] = "inline; filename*=UTF-8''#{fileinfo.original_filename}"
@@ -26,7 +36,10 @@ module Routes::Retrieve
     end
     env.response.headers["ETag"] = "#{fileinfo.checksum}" if fileinfo.checksum
     if !(CONFIG.delete_files_check <= 0)
-      env.response.headers["Expires"] = Time::Format::HTTP_DATE.format(Time.unix(fileinfo.uploaded_at + CONFIG.delete_files_after.to_i64 * 3600))
+      env.response.headers["Cache-Control"] = "public, max-age=#{cache_control_max_age}"
+    else
+      # Default max-age of 7 days if Patchy is configured to not delete files.
+      env.response.headers["Cache-Control"] = "public, max-age=604800"
     end
 
     # TODO: send_file_raw and some functions
