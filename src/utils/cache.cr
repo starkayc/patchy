@@ -2,7 +2,7 @@ module Utils::Cache
   extend self
   Log = ::Log.for("filecache")
 
-  FileCache = CONFIG.cache.enabled ? LRU.new : nil
+  @@cache : LRU? = nil
 
   struct CachedData
     include JSON::Serializable
@@ -26,8 +26,8 @@ module Utils::Cache
   class LRU
     @max_size : Int32
     @max_allowed_filesize : Int32
-    getter lru = {} of String => CachedData
     @access = [] of String
+    getter lru = {} of String => CachedData
 
     def initialize(
       @max_size = CONFIG.cache.max_size,
@@ -95,6 +95,10 @@ module Utils::Cache
       end
     end
 
+    def size
+      return @lru.size
+    end
+
     private def [](key : String)
       if @lru[key]?
         @access.delete(key)
@@ -122,22 +126,40 @@ module Utils::Cache
     end
   end
 
+  def init
+    if CONFIG.cache.enabled
+      @@cache = LRU.new
+    end
+  end
+
   def insert(fileinfo : Fileinfo, file_path : String, expire_time : Int64? = nil) : Nil
-    return if FileCache.nil?
+    return if @@cache.nil?
     file = File.open(file_path)
-    FileCache.as(LRU).set(fileinfo: fileinfo, file: file, expire_time: expire_time)
+    @@cache.as(LRU).set(fileinfo: fileinfo, file: file, expire_time: expire_time)
     file.close
   end
 
   def delete(fileinfo : Fileinfo)
-    return if FileCache.nil?
+    return if @@cache.nil?
     filename = fileinfo.filename
-    FileCache.as(LRU).del(filename)
+    @@cache.as(LRU).del(filename)
   end
 
   def select(fileinfo : Fileinfo) : Slice(UInt8)?
-    return if FileCache.nil?
+    return if @@cache.nil?
     filename = fileinfo.filename
-    FileCache.as(LRU).get(filename)
+    @@cache.as(LRU).get(filename)
+  end
+
+  def size
+    if @@cache.is_a?(LRU)
+      return @@cache.as(LRU).size
+    end
+  end
+
+  def items
+    if @@cache.is_a?(LRU)
+      return @@cache.as(LRU).lru
+    end
   end
 end

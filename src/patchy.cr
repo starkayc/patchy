@@ -62,6 +62,7 @@ Utils::DB.create_tables
 Utils.create_dir(CONFIG.files, "for files")
 Utils.create_dir(CONFIG.thumbnails, "for thumbnails")
 Routing.register_all
+Utils::Cache.init
 
 {% if flag?(:release) || flag?(:production) %}
   Kemal.config.env = "production" if !ENV.has_key?("KEMAL_ENV")
