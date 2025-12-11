@@ -36,7 +36,7 @@ jobs:
         password: ${{ secrets.TOKEN }}
 
     - name: ffmpeg ccache cache
-      uses: actions/cache@v4
+      uses: actions/cache@v5
       id: cache
       with:
         path: ffmpeg-ccache
