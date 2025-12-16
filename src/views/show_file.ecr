@@ -61,7 +61,7 @@
       # Disable view button for .html
       if fileinfo.extension != ".html"
     %>
-    <a href='/-/file/<%= filename_ %>'><%= translate(locale, "view_file") %></a>
+    <a href='/-/file/<%= filename_ %><%= extension_ %>'><%= translate(locale, "view_file") %></a>
     <% end %>
     <span class="end-of-flex"></span>
     <a href='/-/reportabuse?file=<%= filename_ %>'><%= translate(locale, "report_abuse") %></a>
