@@ -5,7 +5,7 @@ module Routes::Admin
     include JSON::Serializable
 
     @[JSON::Field(key: "cachedFiles")]
-    property cached_files : Int32? = Utils::Cache.size
+    property cached_files : Int64? = Utils::Cache.size
     @[JSON::Field(key: "memoryUsageBytes")]
     property memory_usage_bytes : Int32 = 0
     @[JSON::Field(key: "memoryUsageHuman")]

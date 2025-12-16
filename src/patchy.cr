@@ -7,6 +7,7 @@ require "digest"
 require "baked_file_handler"
 require "baked_file_system"
 require "log"
+require "redis"
 require "flib"
 
 # require "./ext/kemal_custom_exception_handler"
@@ -43,6 +44,7 @@ Log.setup do |c|
   c.bind "db.*", :none, backend
   c.bind "http.*", :none, backend
   c.bind "baked_file_handler.*", :none, backend
+  c.bind "redis.*", :none, backend
 end
 
 Kemal.config.port = CONFIG.server.port

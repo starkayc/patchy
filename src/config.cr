@@ -76,12 +76,18 @@ class Config
     include YAML::Serializable
 
     property enabled : Bool = false
-    # Number of files that can be cached
+    # Type of cache to be used, defaults to LRU
+    property type : Utils::Cache::Type = Utils::Cache::Type::LRU
+    # The Redis URL to connect to a Redis compatible database
+    property redis_url : String = ""
+
+    # Number of files that can be cached (LRU Only)
     property max_size : Int32 = 256
     # In KiB, files bigger than this will not be cached
     property max_allowed_filesize : Int32 = 512
-    property expire_time : Int64? = nil
-    property clean_interval : Int32? = nil
+    property expire_time : UInt64? = nil
+    # Interval to check for expired files. (LRU Only)
+    property clean_interval : UInt32? = nil
   end
 
   property views : Views = Views.from_yaml("")

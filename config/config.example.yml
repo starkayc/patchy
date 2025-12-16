@@ -63,13 +63,24 @@ s3:
 # Uses more memory, but improves files retrieval and reduces stress on the drive
 cache:
   enabled: false
-  # Number of files that can be cached
-  max_size: 256
-  # In KiB, files bigger than this will not be cached
-  max_allowed_filesize: 512
+  # Type of cache
+  # This can be LRU (Least Recently Used) or a Redis compatible database.
+  # LRU is recommended, but if you are using a distributed Patchy setup, Redis
+  # may be a better option to share the cache across different Patchy processes.
+  # types: "lru", "redis"
+  type: "lru"
+  # The redis URL to connect to the Redis compatible database.
+  # Example: "tcp://127.0.0.1:6379"
+  # If it's empty, it will default to "localhost:6379"
+  redis_url: ""
+
   # seconds, nil by default.
   expire_time: 3600
-  # seconds, nil by default.
+  # In KiB, files bigger than this will not be cached
+  max_allowed_filesize: 512
+  # Number of files that can be cached (LRU ONLY)
+  max_size: 256
+  # seconds, nil by default. (LRU ONLY)
   clean_interval: 60
 
 # Modify what is shown on the different pages
