@@ -238,6 +238,9 @@ class Config
       Log.notice &.emit("Config: Config file '#{config_file}' was not found, using the default uploader configuration")
       Log.notice &.emit("Config, Note: You can ignore this error safely if you use environment variables to configure the uploader!")
       config = Config.from_yaml("")
+    rescue ex
+      Log.fatal &.emit("Config: Failed to load config", error: ex.message)
+      exit(1)
     end
 
     # https://github.com/iv-org/invidious/blob/master/src/invidious/config.cr#L215
