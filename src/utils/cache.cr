@@ -8,126 +8,50 @@ module Utils::Cache
   end
 
   @@cache : (LRU | RedisCache)? = nil
+  # Variable that keeps track of the file sizes inserted into the cache
+  @@files : Hash(String, Int64) = {} of String => Int64
 
-  struct CachedData
-    include JSON::Serializable
-
-    property fileinfo : Fileinfo
-    property data : Bytes
-    property filesize : Int64
-    property expires_at : Int64?
-
-    def initialize(
-      @fileinfo,
-      @data,
-      @filesize,
-      @expires_at,
-    )
-    end
-  end
-
-  # Based on
-  # https://git.nadeko.net/Fijxu/invidious/src/commit/0dd11b2e0fe00b0a9ccc68c38a69366e77c5e6d8/src/invidious/database/videos.cr#L37
   class LRU
+    @cache : LRUCache(Bytes)
     @max_size : Int32
     @max_allowed_filesize : Int32
-    @access = [] of String
-    @lru = {} of String => CachedData
 
     def initialize(
       @max_size = CONFIG.cache.max_size,
       @max_allowed_filesize = CONFIG.cache.max_allowed_filesize,
     )
-      if CONFIG.cache.enabled
-        Log.info &.emit("using in memory LRU for caching")
-        Log.info &.emit("files smaller than this size limit will be stored into the cache: '#{(@max_allowed_filesize * 1000).humanize_bytes}'")
-        Log.info &.emit("maximum amount of files the cache can hold: #{@max_size}")
-        Log.info &.emit("max bytes that the cache can hold: #{(@max_size * @max_allowed_filesize * 1000).humanize_bytes}")
-      end
-      if clean_interval = CONFIG.cache.clean_interval
-        spawn(name: {{ @type.name.stringify }}) do
-          loop do
-            self.cleaner
-            sleep clean_interval.seconds
-          end
-        end
-      end
+      @cache = LRUCache(Bytes).new(max_size: @max_size, clean_interval: 1.second)
+      Log.info &.emit("using in memory LRU for caching")
+      Log.info &.emit("files smaller than this size limit will be stored into the cache: '#{(@max_allowed_filesize * 1000).humanize_bytes}'")
+      Log.info &.emit("maximum amount of files the cache can hold: #{@max_size}")
+      Log.info &.emit("max bytes that the cache can hold: #{(@max_size * @max_allowed_filesize * 1000).humanize_bytes}")
     end
 
-    def cleaner
-      current_time = Time.utc.to_unix
-      sample_size = (@lru.size * 0.25).ceil.to_i
-      sample = @lru.sample(sample_size)
-
-      sample.each do |filename, cached|
-        if expires_at = cached.expires_at
-          if expires_at < current_time
-            self.del(filename)
-            Log.trace &.emit("file '#{filename}', expired")
-          end
-        end
-      end
-    end
-
-    def set(fileinfo : Fileinfo, file : File, expire_time : UInt64?) : Nil
-      filesize = file.size
-      filename = fileinfo.filename
-
-      slice = Bytes.new(filesize)
-      file.read_fully(slice)
-      expire_time ? (expires_at = Time.utc.to_unix + expire_time) : (expires_at = nil)
-      cached = CachedData.new(fileinfo, slice, filesize, expires_at)
-
-      self[filename] = cached
-      Log.trace &.emit("inserted file '#{filename}' to cache")
-    end
-
-    def del(filename : String) : Nil
-      self.delete(filename)
-      Log.trace &.emit("deleted file '#{filename}' from cache")
+    def set(filename : String, filedata : Bytes, expire_time : UInt64?) : Nil
+      @cache.set(filename, filedata, expire_time)
     end
 
     def get(filename : String) : Bytes?
-      cached = self[filename]
-      if cached
-        Log.trace &.emit("retrieved file '#{filename}' from cache")
-        return cached.data
-      else
-        return
-      end
+      @cache.get(filename)
     end
 
-    def size : Int64
-      return @lru.size.to_i64
+    def del(filename : String) : Nil
+      @cache.del(filename)
+    end
+
+    def size
+      @cache.size
     end
 
     def items
-      return @lru
+      @cache.items
     end
 
-    private def [](key : String)
-      if @lru[key]?
-        @access.delete(key)
-        @access.push(key)
-        @lru[key]
-      else
-        nil
-      end
-    end
-
-    private def []=(key : String, value) : Array(String)
-      if @lru.size >= @max_size
-        lru_key = @access.shift
-        @lru.delete(lru_key)
-      end
-      @lru[key] = value
-      @access.push(key)
-    end
-
-    private def delete(key)
-      if @lru[key]?
-        @lru.delete(key)
-        @access.delete(key)
+    def expire_listener(&block : String ->)
+      @cache.on_event do |event|
+        if event.event_type == LRUCache::EventType::Exp
+          block.call(event.key)
+        end
       end
     end
   end
@@ -152,30 +76,31 @@ module Utils::Cache
       Log.info &.emit("connecting to Redis compatible DB")
       if @client.ping
         Log.info &.emit("#{"connected to Redis compatible DB"}#{redis_url.presence ? " at '#{redis_url}'" : nil}")
+        Log.info &.emit("setting 'notify-keyspace-events Ex' Redis config to inform about expired files")
+        self.notify_keyspace_events_expiration
       end
       Log.info &.emit("files smaller than this size limit will be stored into the cache: '#{(@max_allowed_filesize * 1000).humanize_bytes}'")
     end
 
-    def set(fileinfo : Fileinfo, file : File, expire_time : UInt64?)
-      filename = fileinfo.filename
-      filedata = file.gets_to_end
+    private def notify_keyspace_events_expiration
+      command = {"CONFIG", "SET", "notify-keyspace-events", "Ex"}
+      @client.run(command)
+    end
 
+    def set(filename : String, filedata : String, expire_time : UInt64?)
       begin
         @client.set(filename, filedata, ex: expire_time)
       rescue ex
         Log.error &.emit("failed to insert file '#{filename}' from cache", error: ex.message)
         return
       end
-
-      Log.trace &.emit("inserted file '#{filename}' to cache")
     end
 
-    def del(filename : String)
+    def del(filename : String) : Nil
       @client.del(filename)
-      Log.trace &.emit("deleted file '#{filename}' from cache")
     end
 
-    def get(filename : String)
+    def get(filename : String) : Bytes?
       begin
         cached = @client.get(filename)
       rescue ex
@@ -183,7 +108,6 @@ module Utils::Cache
         return
       end
       if cached
-        Log.trace &.emit("retrieved file '#{filename}' from cache")
         cached.to_slice
       else
         return
@@ -198,25 +122,59 @@ module Utils::Cache
       # TODO: Not implemented
       nil
     end
-  end
 
-  def init
-    if CONFIG.cache.enabled
-      case CONFIG.cache.type
-      when Type::LRU
-        @@cache = LRU.new
-      when Type::Redis
-        @@cache = RedisCache.new
-      else
-        @@cache = LRU.new
+    def expire_listener(&block : String ->)
+      @client.subscribe "__keyevent@0__:expired" do |subscription, connection|
+        subscription.on_message do |channel, message|
+          # message is the filename that expired
+          block.call(message)
+        end
       end
     end
   end
 
-  private def is_too_big_for_cache?(fileinfo : Fileinfo, file : File, max_allowed_filesize : Int32)
-    filesize = file.size
-    filename = fileinfo.filename
+  def init
+    return if !CONFIG.cache.enabled
 
+    case CONFIG.cache.type
+    when Type::LRU
+      @@cache = LRU.new
+    when Type::Redis
+      @@cache = RedisCache.new
+    else
+      @@cache = LRU.new
+    end
+
+    self.expire_listener
+  end
+
+  # NOTE: Since I have future ideas for Patchy being more distributed without a
+  # central database. this may need to be deleted in the future because the
+  # variable @@files is only for this Patchy process, which means that the
+  # cached files information (name and filesize) will differ from instance
+  # to instance. I guess that's fine.
+
+  # This event listener will listen to expire events to delete expired files
+  # from the @@files Hash.
+  private def expire_listener
+    cache = @@cache
+    return if cache.nil?
+
+    Log.debug &.emit("Listening to expire events")
+    spawn(name: {{ @type.name.stringify }}) do
+      if cache.is_a?(LRU)
+        cache.expire_listener do |key|
+          @@files.delete(key)
+        end
+      elsif cache.is_a?(RedisCache)
+        cache.expire_listener do |key|
+          @@files.delete(key)
+        end
+      end
+    end
+  end
+
+  private def is_too_big_for_cache?(filename : String, filesize : Int64, max_allowed_filesize : Int32)
     if filesize > max_allowed_filesize &* 1000
       Log.debug &.emit("not caching '#{filename}', size too big to be cached", size: filesize.humanize_bytes)
       true
@@ -228,31 +186,58 @@ module Utils::Cache
   def insert(fileinfo : Fileinfo, file_path : String, expire_time : UInt64? = nil) : Nil
     cache = @@cache
     return if cache.nil?
+
+    filename = fileinfo.filename
     file = File.open(file_path)
-    return if is_too_big_for_cache?(fileinfo, file, CONFIG.cache.max_allowed_filesize)
-    cache.set(fileinfo: fileinfo, file: file, expire_time: expire_time)
+    filesize = file.size
+
+    return if is_too_big_for_cache?(filename, filesize, CONFIG.cache.max_allowed_filesize)
+
+    if cache.is_a?(LRU)
+      filedata = Bytes.new(filesize)
+      file.read_fully(filedata)
+      cache.set(filename, filedata, expire_time)
+    elsif cache.is_a?(RedisCache)
+      filedata = file.gets_to_end
+      cache.set(filename, filedata, expire_time)
+    else
+      return
+    end
+
+    @@files[filename] = filesize
+
     file.close
+    Log.trace &.emit("inserted file '#{filename}' to cache")
   end
 
   def delete(fileinfo : Fileinfo) : Nil
     cache = @@cache
     return if cache.nil?
+
     filename = fileinfo.filename
     cache.del(filename)
+
+    @@files.delete(filename)
+
+    Log.trace &.emit("deleted file '#{filename}' from cache")
   end
 
-  def select(fileinfo : Fileinfo) : Slice(UInt8)?
+  def select(fileinfo : Fileinfo) : Bytes?
     cache = @@cache
     return if cache.nil?
+
     filename = fileinfo.filename
-    cache.get(filename)
+    hit = cache.get(filename)
+
+    if hit
+      Log.trace &.emit("retrieved file '#{filename}' from cache")
+      hit
+    else
+      return
+    end
   end
 
-  def size
-    return @@cache.try &.size
-  end
-
-  def items
-    return @@cache.try &.items
+  def files
+    return @@files
   end
 end

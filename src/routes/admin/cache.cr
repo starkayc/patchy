@@ -5,7 +5,7 @@ module Routes::Admin
     include JSON::Serializable
 
     @[JSON::Field(key: "cachedFiles")]
-    property cached_files : Int64? = Utils::Cache.size
+    property cached_files : Int32 = Utils::Cache.files.size
     @[JSON::Field(key: "memoryUsageBytes")]
     property memory_usage_bytes : Int32 = 0
     @[JSON::Field(key: "memoryUsageHuman")]
@@ -13,10 +13,10 @@ module Routes::Admin
     property files : Array(String) = [] of String
 
     def initialize
-      if items = Utils::Cache.items
-        items.each do |filename, v|
+      if files = Utils::Cache.files
+        files.each do |filename, filesize|
           @files << filename
-          @memory_usage_bytes = @memory_usage_bytes + v.filesize
+          @memory_usage_bytes = @memory_usage_bytes + filesize
           @memory_usage_human = @memory_usage_bytes.humanize_bytes
         end
       end
