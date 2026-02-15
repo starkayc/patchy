@@ -23,6 +23,8 @@ dependencies:
     github: jgaskins/redis
   flib:
     git: git://codeberg.org/Fijxu/flib.git
+  lru:
+    github: fijxu/crystal-lru
 
 development_dependencies:
   ameba:

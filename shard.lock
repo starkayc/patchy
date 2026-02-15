@@ -40,6 +40,10 @@ shards:
     git: https://github.com/kemalcr/kemal.git
     version: 1.8.0
 
+  lru:
+    git: https://github.com/fijxu/crystal-lru.git
+    version: 1.0.3
+
   markd:
     git: https://github.com/icyleaf/markd.git
     version: 0.5.0
