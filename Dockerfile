@@ -23,69 +23,7 @@ RUN --mount=type=cache,target=/root/.cache/crystal \
 	--release \
 	--static --warnings all -s -p -t
 
-FROM alpine:3.23 AS builder-ffmpeg
-
-ARG FFMPEG_VERSION=6.1.2
-ARG PREFIX=/opt/ffmpeg
-ENV CCACHE_DIR=/root/.ccache
-ENV USE_CCACHE=1
-
-RUN mkdir /opt/.ccache
-
-RUN apk add --no-cache \
-	build-base \
-	coreutils \
-	gcc \
-	ccache \
-	yasm \
-	libvpx-dev \
-	aom-dev \
-	x264-dev \
-	x265-dev \
-	libwebp-dev \
-	libjxl-dev \
-	libpng-dev \
-	libjpeg-turbo-dev \
-	aom-dev
-
-RUN cd /tmp/ && \
-	wget http://ffmpeg.org/releases/ffmpeg-${FFMPEG_VERSION}.tar.gz && \
-	tar zxf ffmpeg-${FFMPEG_VERSION}.tar.gz && rm ffmpeg-${FFMPEG_VERSION}.tar.gz
-
-# Compile ffmpeg.
-RUN --mount=type=cache,target=/root/.ccache \
-	cd /tmp/ffmpeg-${FFMPEG_VERSION} && \
-	./configure \
-		--enable-version3 \
-		--enable-gpl \
-		--enable-nonfree \
-		--enable-small \
-		--enable-libaom \
-		--enable-libx264 \
-		--enable-libx265 \
-		--enable-libvpx \
-		--enable-libwebp \
-		--enable-libjxl \
-		--disable-librtmp \
-		--disable-lzma \
-		--disable-debug \
-		--disable-doc \
-		--disable-ffplay \
-		--disable-ffprobe \
-		--disable-protocols \
-		--enable-protocol=file,pipe \
-		--disable-network \
-		--cc="ccache cc" --cxx="ccache c++" \
-		--extra-cflags="-I${PREFIX}/include" \
-		--extra-ldflags="-L${PREFIX}/lib" \
-		--extra-libs="-lpthread -lm" \
-		--prefix="${PREFIX}" && \
-	make && make install && make distclean
-
-# Cleanup.
-RUN rm -rf /var/cache/apk/* /tmp/*
-
-FROM alpine:3.23
+FROM git.nadeko.net/fijxu/alpine-stripped-ffmpeg:3.23-ffmpeg-6.1.2
 # shared-mime-info is required so Crystal is able to guess the mime types
 # of uploaded/retrieved files using the file `/etc/mime.types` provided
 # by that package.
@@ -118,7 +56,6 @@ RUN adduser -u 10000 -S patchy
 RUN mkdir -p /data && chown -R 10000:10000 /data
 
 COPY --from=builder --chown=patchy:patchy /patchy/patchy /patchy
-COPY --from=builder-ffmpeg /opt/ffmpeg/bin/ffmpeg /usr/bin/ffmpeg
 
 EXPOSE 8080
 
