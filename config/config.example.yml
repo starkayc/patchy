@@ -27,6 +27,10 @@ server:
   # Enabling the unix socket will disable port binding
   #unix_socket: "/tmp/patchy.sock"
 
+# Enables thumbnail generation for programs that support OpenGraph tags
+# WARNING: DO NOT ENABLE THIS IF YOU DON'T HAVE A HARDENED FFMPEG BUILD
+# READ MORE ABOUT IT HERE:
+# https://codeberg.org/Fijxu/patchy/src/branch/master/docs/security/ffmpeg.md
 thumbnail_generation:
   enabled: false
   resolution:

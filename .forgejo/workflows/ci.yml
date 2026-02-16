@@ -15,6 +15,7 @@ on:
       - .vscode/**
       - patchy.service
       - docker-compose.yml
+      - docs/**
 
 
 jobs:
