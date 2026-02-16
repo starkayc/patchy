@@ -33,6 +33,12 @@ server:
 # https://codeberg.org/Fijxu/patchy/src/branch/master/docs/security/ffmpeg.md
 thumbnail_generation:
   enabled: false
+  # When a file has no thumbnail, it will show a fallback thumbnail located in
+  # ./public/-/assets/img/nothumbnail.jpg, it can be easily replaced by adding
+  # an image file to ./public/-/assets/img/
+  fallback_thumbnail:
+    enabled: true
+    thumbnail_file: "nothumbnail.jpg"
   resolution:
     max_height: 720
     max_width: 720

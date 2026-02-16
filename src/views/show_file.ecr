@@ -19,6 +19,11 @@
 <meta property="og:url" content="<%= scheme %>://<%= host %>/<%= filename_ %>">
 <% if fileinfo.thumbnail %>
 <meta property="og:image" content="<%= scheme %>://<%= host %>/-/thumbnail/<%= filename_ %>.jpg">
+<%
+  elsif CONFIG.thumbnail_generation.enabled && CONFIG.thumbnail_generation.fallback_thumbnail.enabled
+  nothumbnail = CONFIG.thumbnail_generation.fallback_thumbnail.thumbnail_file
+%>
+<meta property="og:image" content="<%= scheme %>://<%= host %>/-/assets/img/<%= nothumbnail %>">
 <% end %>
 <% if filetype == Filetype::Image %>
 <meta property="og:image:secure_url" content="<%= scheme %>://<%= host %>/-/file/<%= filename_ %><%= extension_ %>">

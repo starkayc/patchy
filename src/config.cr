@@ -38,6 +38,14 @@ class Config
 
     property enabled : Bool = false
     property resolution : Resolution = Resolution.from_yaml("")
+    property fallback_thumbnail : CustomThumbnail = CustomThumbnail.from_yaml("")
+
+    struct CustomThumbnail
+      include YAML::Serializable
+
+      property enabled : Bool = false
+      property thumbnail_file : String = "nothumbnail.jpg"
+    end
 
     struct Resolution
       include YAML::Serializable
