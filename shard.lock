@@ -21,8 +21,8 @@ shards:
     version: 0.1.1
 
   baked_file_system:
-    git: https://github.com/schovi/baked_file_system.git
-    version: 0.13.0
+    git: https://github.com/fijxu/baked_file_system_no_gzip.git
+    version: 0.13.0+git.commit.b7d7b7ae0754417a256f68ff170290e2f2f0c6f2
 
   db:
     git: https://github.com/crystal-lang/crystal-db.git

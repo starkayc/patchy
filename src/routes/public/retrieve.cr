@@ -75,12 +75,9 @@ module Routes::Retrieve
         send_file env, "#{CONFIG.thumbnails}/#{thumbnail}"
       else
         thumbnail = CONFIG.thumbnail_generation.fallback_thumbnail.thumbnail_file
-        # TODO: This is cursed because the files in the PublicAssets are
-        # compressed so is just a waste of resources to decompress the file each
-        # time!
-        # please change later!
         baked_thumbnail = PublicAssets.get("/-/assets/img/#{thumbnail}")
-        send_file_raw env, ".jpg", baked_thumbnail.gets_to_end.to_slice
+        mime_type = MIME.from_filename(thumbnail, "application/octet-stream")
+        send_file env, baked_thumbnail.to_slice, mime_type
       end
     rescue ex
       Log.debug &.emit("thumbnail '#{thumbnail}' does not exist", error: ex.message)
