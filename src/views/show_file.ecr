@@ -43,6 +43,7 @@
 
 <div class="media-container">
   <div class="navbar">
+    <a href='/'><%= translate(locale, "go_back") %></a>
     <a href='/-/file/<%= filename_ %>' download=''><%= translate(locale, "download_file") %> (<%= original_filename_ %>)</a>
     <%
       # Disable view button for .html
@@ -68,7 +69,10 @@
         Your browser does not support the audio tag.
       </audio>
     <% else %>
-      <p>This file cannot be displayed on the browser. Download it instead</p>
+      <div class="file-no-display">
+        <p><%= translate(locale, "file_cannot_be_displayed") %></p>
+        <a href='/-/file/<%= filename_ %>' download=''><%= translate(locale, "download_file") %> (<%= original_filename_ %>)</a>
+      </div>
     <% end %>
   </div>
 </div>

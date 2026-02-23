@@ -17,6 +17,7 @@
 	"uploader_configs_chatterino_text": "You can use this uploader setting the following fields on Settings (cog in the top left corner) > External tools > Image uploader",
 	"file_history_unavailable": "File history unavailable, enable JavaScript to keep track of your uploaded files",
 	"file_does_not_exist": "This file does not exist",
+	"file_cannot_be_displayed": "This file cannot be displayed on the browser. Download it instead",
 	"error_at_file_retrieval": "Error when retrieving file",
 	"js_history_filename": "Filename",
 	"js_upload_text": "Click here, paste or drag and drop to upload a file",

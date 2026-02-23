@@ -185,6 +185,12 @@ a[href]:hover {
 	width: auto;
 }
 
+.media>.file-no-display {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+
 .drop-area {
 	text-align: center;
 	position: relative;

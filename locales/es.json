@@ -17,6 +17,7 @@
 	"uploader_configs_chatterino_text": "Puedes usar este subidor colocando los siguentes campos en Opciones (tuerca en el corner arriba a la izquierda) > External tools > Image uploader",
 	"file_history_unavailable": "Historial de subidas no disponible, habilita JavaScript para llevar la cuenta de tus archivos subidos",
 	"file_does_not_exist": "Este archivo no existe",
+	"file_cannot_be_displayed": "Este archivo no se puede mostrar en el navegador. Descárguelo para verlo",
 	"error_at_file_retrieval": "Error when retrieving file",
 	"js_upload_text": "Clickea aquí, pega o arrastra y suelta para subir un archivo",
 	"js_upload_client_error": "Error del cliente",
