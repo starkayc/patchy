@@ -42,6 +42,18 @@
 <% end %>
 
 <div class="media-container">
+  <div class="navbar">
+    <a href='/-/file/<%= filename_ %>' download=''><%= translate(locale, "download_file") %> (<%= original_filename_ %>)</a>
+    <%
+      # Disable view button for .html
+      if fileinfo.extension != ".html"
+    %>
+    <a href='/-/file/<%= filename_ %><%= extension_ %>'><%= translate(locale, "view_file") %></a>
+    <% end %>
+    <span class="end-of-flex"></span>
+    <a href='/-/reportabuse?file=<%= filename_ %>'><%= translate(locale, "report_abuse") %></a>
+  </div>
+  <hr>
   <div class="media">
     <% if filetype == Filetype::Image %>
       <img class="content" src="/-/file/<%= filename_ %>" alt="<%= original_filename_ %>">
@@ -58,17 +70,5 @@
     <% else %>
       <p>This file cannot be displayed on the browser. Download it instead</p>
     <% end %>
-  </div>
-  <hr>
-  <div class="navbar">
-    <a href='/-/file/<%= filename_ %>' download=''><%= translate(locale, "download_file") %> (<%= original_filename_ %>)</a>
-    <%
-      # Disable view button for .html
-      if fileinfo.extension != ".html"
-    %>
-    <a href='/-/file/<%= filename_ %><%= extension_ %>'><%= translate(locale, "view_file") %></a>
-    <% end %>
-    <span class="end-of-flex"></span>
-    <a href='/-/reportabuse?file=<%= filename_ %>'><%= translate(locale, "report_abuse") %></a>
   </div>
 </div>
