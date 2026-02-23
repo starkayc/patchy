@@ -38,7 +38,7 @@ shards:
 
   kemal:
     git: https://github.com/kemalcr/kemal.git
-    version: 1.8.0
+    version: 1.9.0
 
   lru:
     git: https://github.com/fijxu/crystal-lru.git
@@ -54,7 +54,7 @@ shards:
 
   redis:
     git: https://github.com/jgaskins/redis.git
-    version: 0.14.0
+    version: 0.15.3
 
   reply:
     git: https://github.com/i3oris/reply.git
