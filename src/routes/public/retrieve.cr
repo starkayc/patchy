@@ -45,12 +45,12 @@ module Routes::Retrieve
     # TODO: send_file_raw and some functions
     if cached_file = Utils::Cache.select(fileinfo)
       env.response.headers["X-Patchy-Cache"] = "HIT"
-      send_file_raw env, fileinfo, cached_file
+      send_file_raw env, fileinfo.extension, cached_file
     else
       if CONFIG.s3.enabled
         full_filename = fileinfo.filename + fileinfo.extension
         if file = Utils::S3::Client.as(Utils::S3::S3).retrieve(full_filename)
-          send_file_raw env, fileinfo, file
+          send_file_raw env, fileinfo.extension, file
         end
       else
         file_path = "#{CONFIG.files}/#{fileinfo.filename}#{fileinfo.extension}"
@@ -63,9 +63,25 @@ module Routes::Retrieve
 
   def retrieve_thumbnail(env : HTTP::Server::Context) : Nil
     thumbnail = env.params.url["thumbnail"]?
+    if thumbnail.nil?
+      ee 404, "No thumbnail ID provided"
+    end
 
+    # The thumbnail name is the same randomly generated name of the file
     begin
-      send_file env, "#{CONFIG.thumbnails}/#{thumbnail}"
+      fileinfo = Database::Files.select_with_thumbnail(thumbnail)
+      thumbnail = fileinfo.try &.thumbnail
+      if thumbnail
+        send_file env, "#{CONFIG.thumbnails}/#{thumbnail}"
+      else
+        thumbnail = CONFIG.thumbnail_generation.fallback_thumbnail.thumbnail_file
+        # TODO: This is cursed because the files in the PublicAssets are
+        # compressed so is just a waste of resources to decompress the file each
+        # time!
+        # please change later!
+        baked_thumbnail = PublicAssets.get("/-/assets/img/#{thumbnail}")
+        send_file_raw env, ".jpg", baked_thumbnail.gets_to_end.to_slice
+      end
     rescue ex
       Log.debug &.emit("thumbnail '#{thumbnail}' does not exist", error: ex.message)
       ee 404, "Thumbnail '#{thumbnail}' does not exist"

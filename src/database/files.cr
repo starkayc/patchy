@@ -99,6 +99,16 @@ module Database::Files
     SQL.query_one?(request, delete_key, as: Fileinfo)
   end
 
+  def select_with_thumbnail(thumbnail : String) : Fileinfo?
+    request = <<-SQL
+      SELECT *
+      FROM #{TABLE_NAME}
+      WHERE thumbnail = ?
+    SQL
+
+    SQL.query_one?(request, thumbnail, as: Fileinfo)
+  end
+
   # -------------------
   #  Misc
   # -------------------
