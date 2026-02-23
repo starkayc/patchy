@@ -36,23 +36,6 @@ jobs:
         username: ${{ secrets.USERNAME }}
         password: ${{ secrets.TOKEN }}
 
-    - name: ffmpeg ccache cache
-      uses: actions/cache@v5
-      id: cache
-      with:
-        path: ffmpeg-ccache
-        key: ffmpeg-ccache-${{ hashFiles('Dockerfile') }}
-
-    - name: Restore Docker cache mounts
-      uses: https://github.com/reproducible-containers/buildkit-cache-dance@v3
-      with:
-        builder: ${{ steps.setup-buildx.outputs.name }}
-        cache-map: |
-          {
-            "ffmpeg-ccache": "/root/.ccache"
-          }
-        skip-extraction: ${{ steps.cache.outputs.cache-hit }}
-
     - name: Docker meta
       id: meta
       uses: https://code.forgejo.org/docker/metadata-action@v5
