@@ -117,6 +117,13 @@ module Routing
     get "/-/api/stats", Routes::Misc, :stats
     get "/-/info/sharex.sxcu", Routes::Misc, :sharex_config
 
+    if CONFIG.cors.enabled
+      paths = CONFIG.cors.paths
+      paths.each do |path|
+        options path, Handlers::Options, :options
+      end
+    end
+
     self.register_admin if CONFIG.admin.enabled
   end
 

@@ -29,6 +29,30 @@ class Config
   # Where the SQLITE3 database will be located
   property db : String = "./data/db"
 
+  property cors : Cors = Cors.from_yaml("")
+
+  struct Cors
+    include YAML::Serializable
+
+    property enabled : Bool = false
+    property paths : Array(String) = [
+      "/-/file/:filename",
+      "/-/thumbnail/:thumbnail",
+      "/upload",
+      "/-/upload",
+    ]
+    property access_control : AccessControl = AccessControl.from_yaml("")
+
+    struct AccessControl
+      include YAML::Serializable
+
+      property allow_origin : String = "*"
+      property allow_methods : String = "GET, HEAD, OPTIONS"
+      property allow_headers : String = "Content-Type"
+      property max_age : String = "3600"
+    end
+  end
+
   # Generate thumbnails for OpenGraph compatible platforms like Chatterino
   # Whatsapp, Facebook, Discord, etc.
   property thumbnail_generation : ThumbnailGeneration = ThumbnailGeneration.from_yaml("")

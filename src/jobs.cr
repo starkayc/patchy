@@ -43,7 +43,10 @@ module Jobs
   end
 
   def kemal : Fiber
-    add_handler BakedFileHandler::BakedFileHandler.new(PublicAssets)
+    Kemal.config.add_handler BakedFileHandler::BakedFileHandler.new(PublicAssets)
+    if CONFIG.cors.enabled
+      Kemal.config.add_handler Handlers::Options::CORSHeaders.new
+    end
     spawn do
       if !CONFIG.server.unix_socket.nil?
         Utils.delete_socket

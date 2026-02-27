@@ -27,6 +27,28 @@ server:
   # Enabling the unix socket will disable port binding
   #unix_socket: "/tmp/patchy.sock"
 
+# CORS: Cross-Origin Resource Sharing
+# Will allow external websites from loading files from the domain Patchy is
+# being hosted.
+cors:
+  enabled: false
+  # Advanced options! You shouldn't change those unless you really want or need
+  # to modify them.
+  #
+  # Paths to apply OPTIONS for CORS
+  paths:
+    - "/-/file/:filename"
+    - "/-/thumbnail/:thumbnail"
+    - "/upload"
+    - "/-/upload"
+  # This are the values that are going to be used on
+  # Access-Control headers.
+  access_control:
+    allow_origin: "*"
+    allow_methods: "GET, HEAD, POST, OPTIONS"
+    allow_headers: "Content-Type"
+    max_age: "3600"
+
 # Enables thumbnail generation for programs that support OpenGraph tags
 # WARNING: DO NOT ENABLE THIS IF YOU DON'T HAVE A HARDENED FFMPEG BUILD
 # READ MORE ABOUT IT HERE:
