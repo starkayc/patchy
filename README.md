@@ -27,7 +27,7 @@ software that manages them ;)
 
 <img src="./screenshots/patchy.jpg" height="500px"/>
 
-> https://safebooru.org/index.php?page=post&s=view&id=905633
+> <https://safebooru.org/index.php?page=post&s=view&id=905633>
 
 ## Screenshots
 
@@ -66,11 +66,19 @@ software that manages them ;)
 
 ## TODO
 
-https://codeberg.org/Fijxu/patchy/issues/9
+<https://codeberg.org/Fijxu/patchy/issues/9>
 
 ## Docs
 
 [./docs](./docs/)
+
+## Repository mirrors
+
+Patchy source code is currently hosted at:
+
+- <https://git.nadeko.net/Fijxu/patchy>
+- <https://codeberg.org/Fijxu/patchy>
+- <https://app.radicle.xyz/nodes/iris.radicle.xyz/rad:z2n2ykznv2cwJZNTfbQUcvUECxPBq>
 
 ## How to host Patchy
 
@@ -113,7 +121,7 @@ https://codeberg.org/Fijxu/patchy/issues/9
 Assuming you are already using NGINX and you know how to use it, you can use
 this example server block.
 
-```
+```nginx
 server {
   # You can keep the domain prefixed with `~.` if you want
   # to allow users to use any domain to upload and retrieve
