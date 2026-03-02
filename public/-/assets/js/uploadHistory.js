@@ -13,7 +13,7 @@ window.addEventListener("DOMContentLoaded", () => {
     throw new Error("'file-history' element id not found");
   }
   const history = new UploadHistory();
-  const currentTime = Math.ceil(new Date().getTime() / 1000);
+  const currentTime = Math.ceil(Date.now() / 1000);
 
   // i18n
   const translate_Filename = translate("js_history_filename");
@@ -25,18 +25,18 @@ window.addEventListener("DOMContentLoaded", () => {
   const translate_DeletingFile = translate("js_history_delete_deleting_file");
   const translate_DeleteSuccess = translate("js_history_delete_success");
   const translate_DeleteErrorServerDown = translate(
-    "js_history_delete_error_server_down"
+    "js_history_delete_error_server_down",
   );
   const translate_DeleteError = translate("js_history_delete_error");
   const translate_DeleteErrorStatusCode = translate(
-    "js_history_delete_error_status_code"
+    "js_history_delete_error_status_code",
   );
   const translate_DeleteError404 = translate("js_history_delete_error_404");
   const translate_DeleteErrorUnknown = translate(
-    "js_history_delete_error_unknown"
+    "js_history_delete_error_unknown",
   );
   const translate_DeleteFromHistory = translate(
-    "js_history_delete_from_history"
+    "js_history_delete_from_history",
   );
   const translate_buttonDelete = translate("js_btn_delete");
 
@@ -140,7 +140,7 @@ window.addEventListener("DOMContentLoaded", () => {
         boxToRemove.innerHTML = "";
         boxToRemove.appendChild(removeText);
       } else {
-        console.error(`no element with id '${boxToRemove}' exists`)
+        console.error(`no element with id '${boxToRemove}' exists`);
       }
 
       xhr.onerror = () => {
@@ -153,7 +153,7 @@ window.addEventListener("DOMContentLoaded", () => {
           try {
             removeText.textContent = translate_DeleteSuccess;
             history.delete(fileinfo.deleteKey);
-          } catch (error) {
+          } catch (_) {
             removeText.textContent = translate_DeleteError;
           }
         } else if (xhr.status === 404) {

@@ -5,7 +5,7 @@ export function translate(elementId) {
   if (element) {
     try {
       return JSON.parse(element.textContent).msg;
-    } catch (error) {
+    } catch (_) {
       return null;
     }
   } else {

@@ -17,9 +17,6 @@ window.addEventListener("DOMContentLoaded", () => {
   const translate_LinkCopied = translate("js_generic_link_copied_to_clipboard");
   const translate_buttonDelete = translate("js_btn_delete");
   const translate_buttonCopy = translate("js_btn_copy");
-  const translate_deleteKeyDoesNotExist = translate(
-    "js_generic_delete_key_does_not_exist"
-  );
 
   const dropAreaText = document.createElement("p");
   dropAreaText.textContent = translate_uploadText;
@@ -33,7 +30,7 @@ window.addEventListener("DOMContentLoaded", () => {
       const files = fileInput.files;
       handleFiles(files);
     },
-    false
+    false,
   );
 
   ["dragenter", "dragover", "dragleave", "drop"].forEach((eventName) => {
@@ -131,7 +128,7 @@ window.addEventListener("DOMContentLoaded", () => {
           deleteButton.onclick = () =>
             deleteFile(deleteLink, deleteKey, uploadContainer);
           history.add(response);
-        } catch (error) {
+        } catch (_) {
           statusLink.textContent = translate_uploadUnknownError;
         }
       } else if (xhr.status >= 400 && xhr.status < 500) {
@@ -161,7 +158,7 @@ window.addEventListener("DOMContentLoaded", () => {
         "Error deleting file:",
         xhr.status,
         xhr.statusText,
-        xhr.responseText
+        xhr.responseText,
       );
       deleteText.textContent = translate_DeleteError;
     };

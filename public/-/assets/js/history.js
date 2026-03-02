@@ -1,9 +1,9 @@
 class UploadHistory {
   static itemName = "upload-history";
 
-  constructor(uploadHistory) {
+  constructor() {
     const localStorageHistory = window.localStorage.getItem(
-      UploadHistory.itemName
+      UploadHistory.itemName,
     );
 
     if (!localStorageHistory) {
@@ -31,7 +31,7 @@ class UploadHistory {
   delete(deleteKey) {
     this.uploadHistory.forEach((v, index) => {
       const fileinfo = JSON.parse(v);
-      if (fileinfo.deleteKey == deleteKey) {
+      if (fileinfo.deleteKey === deleteKey) {
         this.uploadHistory.splice(index, 1);
       }
     });
