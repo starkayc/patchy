@@ -14,6 +14,7 @@ window.addEventListener("DOMContentLoaded", () => {
   const translate_uploadUnknownError = translate("js_upload_unknown_error");
   const translate_DeleteError = translate("js_history_delete_error");
   const translate_DeleteSuccess = translate("js_history_delete_success");
+  const translate_DeletingFile = translate("js_history_delete_deleting_file");
   const translate_LinkCopied = translate("js_generic_link_copied_to_clipboard");
   const translate_buttonDelete = translate("js_btn_delete");
   const translate_buttonCopy = translate("js_btn_copy");
@@ -152,6 +153,8 @@ window.addEventListener("DOMContentLoaded", () => {
     uploadContainer.innerHTML = "";
     uploadContainer.appendChild(deleteText);
     deleteText.className = "delete-text";
+    deleteText.textContent = translate_DeletingFile;
+    uploadContainer.appendChild(deleteText);
 
     xhr.onerror = () => {
       console.error(
