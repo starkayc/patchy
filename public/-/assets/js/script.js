@@ -151,7 +151,6 @@ window.addEventListener("DOMContentLoaded", () => {
     const xhr = new XMLHttpRequest();
     const deleteText = document.createElement("a");
     uploadContainer.innerHTML = "";
-    uploadContainer.appendChild(deleteText);
     deleteText.className = "delete-text";
     deleteText.textContent = translate_DeletingFile;
     uploadContainer.appendChild(deleteText);
