@@ -1,0 +1,73 @@
+name: Sync from Upstream
+
+on:
+  schedule:
+    - cron: "15 */6 * * *" # Every 6 hours at :15
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Configure git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Fetch upstream
+        run: |
+          git remote add upstream https://codeberg.org/Fijxu/patchy
+          git fetch upstream master
+
+      - name: Check for new upstream commits
+        id: check
+        run: |
+          COUNT=$(git rev-list HEAD..upstream/master --count)
+          echo "new_commits=$COUNT" >> $GITHUB_OUTPUT
+          echo "Found $COUNT new upstream commit(s)"
+
+      - name: Create and merge sync branch
+        if: steps.check.outputs.new_commits != '0'
+        id: merge
+        run: |
+          git checkout -b upstream-sync
+          if git merge upstream/master --no-edit; then
+            echo "conflicts=false" >> $GITHUB_OUTPUT
+          else
+            echo "conflicts=true" >> $GITHUB_OUTPUT
+            git add -A
+            git commit -m "chore: merge upstream (contains conflicts — resolve before merging)"
+          fi
+
+      - name: Push sync branch
+        if: steps.check.outputs.new_commits != '0'
+        run: git push origin upstream-sync --force
+
+      - name: Create Pull Request
+        if: steps.check.outputs.new_commits != '0'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          CONFLICT_NOTE=""
+          if [ "${{ steps.merge.outputs.conflicts }}" = "true" ]; then
+            CONFLICT_NOTE="\n\n> [!WARNING]\n> Merge conflicts were detected. Resolve them before merging."
+          fi
+
+          gh pr create \
+            --title "chore: sync ${{ steps.check.outputs.new_commits }} upstream commit(s) from Codeberg" \
+            --body "Automated sync from [upstream](https://codeberg.org/Fijxu/patchy).
+
+          Contains **${{ steps.check.outputs.new_commits }}** new commit(s). Review the changes below and merge to incorporate upstream updates.${CONFLICT_NOTE}" \
+            --base main \
+            --head upstream-sync \
+            --label "upstream-sync" \
+          || echo "PR already exists or no changes to sync"

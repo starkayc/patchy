@@ -1,0 +1,112 @@
+module Operations
+  extend self
+
+  class Upload
+    @uploaded_file : HTTP::FormData::Part
+    @ip_addr : String
+    getter fileinfo : Fileinfo = Fileinfo.new
+    @ip : IPInfo = IPInfo.new
+
+    def initialize(@uploaded_file, @ip_addr)
+      @fileinfo.uploaded_at = Time.utc.to_unix
+    end
+
+    private def generate_checksum(file_path : String) : Nil
+      if CONFIG.enable_checksums
+        @fileinfo.checksum = Utils::Hashing.hash_file(file_path)
+      end
+    end
+
+    private def writefile : Nil
+      buffer = uninitialized UInt8[16]
+      slice = buffer.to_slice
+      @uploaded_file.body.read_fully(slice)
+
+      self.detect_extension(slice)
+
+      full_filename = @fileinfo.filename + @fileinfo.extension
+      file_path = "#{CONFIG.files}/#{full_filename}"
+
+      if CONFIG.s3.enabled
+        body = IO::Memory.new
+        IO.copy(@uploaded_file.body, body)
+        # Rewind the IO first so the S3 library can calculate the correct
+        # sha256 sum
+        # https://github.com/taylorfinnell/awscr-s3/issues/149#issuecomment-2925707541
+        body.rewind
+        Utils::S3::Client.as(Utils::S3::S3).upload(full_filename, body)
+      else
+        File.open(file_path, "wb") do |output|
+          output.write(slice)
+          IO.copy(@uploaded_file.body, output)
+        end
+        self.generate_checksum(file_path)
+      end
+    end
+
+    private def valid_extension?(extension : String) : Nil
+      if CONFIG.blocked_extensions.includes?(extension.split(".")[1]?)
+        raise ExtensionNotAllowed.new(extension)
+      end
+    end
+
+    private def detect_extension(slice : Bytes) : Nil
+      extension = Utils::MagicBytes.detect(slice)
+
+      if extension
+        self.valid_extension?(extension)
+        @fileinfo.extension = extension
+      else
+        # Detect by filename if it wasn't detected by magic bytes
+        extension = File.extname("#{@uploaded_file.filename}")
+        self.valid_extension?(extension)
+        @fileinfo.extension = extension
+      end
+    end
+
+    def process : Nil
+      if filename = @uploaded_file.filename
+        @fileinfo.original_filename = filename
+      else
+        Log.debug &.emit("No file provided by the user")
+        raise NoFileProvided.new
+      end
+
+      @fileinfo.filename = Utils.generate_filename
+
+      # control_v.png and control_v.gif are filenames that are used for files
+      # uploaded using Chatterino, so we change the original filename to the
+      # randomly generated one.
+      if ["control_v.png", "control_v.gif"].includes?(@fileinfo.original_filename)
+        @fileinfo.original_filename = @fileinfo.filename
+      end
+
+      self.writefile
+
+      @fileinfo.ip = @ip_addr.to_s
+      @ip.ip = @ip_addr.to_s
+      @ip.date = @fileinfo.uploaded_at
+
+      if CONFIG.delete_key_length > 0
+        @fileinfo.delete_key = Random.base58(CONFIG.delete_key_length)
+      end
+
+      begin
+        @fileinfo.thumbnail = Utils::Thumbnails.generate_thumbnail(@fileinfo.filename, @fileinfo.extension)
+      rescue ex
+        Log.error &.emit("an error ocurred when trying to generate a thumbnail", error: ex.message)
+      end
+
+      begin
+        Database::Files.insert(@fileinfo)
+        exists = Database::IPS.insert(@ip).rows_affected == 0
+        Database::IPS.increase_count(@ip) if exists
+      rescue ex
+        Log.error &.emit("an error ocurred when trying to insert the data into the DB", error: ex.message)
+        raise DBError.new
+      end
+
+      return @fileinfo
+    end
+  end
+end

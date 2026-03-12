@@ -1,0 +1,74 @@
+version: 2.0
+shards:
+  ameba:
+    git: https://github.com/crystal-ameba/ameba.git
+    version: 1.6.4
+
+  awscr-s3:
+    git: https://github.com/taylorfinnell/awscr-s3.git
+    version: 0.10.0
+
+  awscr-signer:
+    git: https://github.com/taylorfinnell/awscr-signer.git
+    version: 0.9.0
+
+  backtracer:
+    git: https://github.com/sija/backtracer.cr.git
+    version: 1.2.4
+
+  baked_file_handler:
+    git: https://github.com/ralsina/baked_file_handler.git
+    version: 0.1.1
+
+  baked_file_system:
+    git: https://github.com/fijxu/baked_file_system_no_gzip.git
+    version: 0.13.0+git.commit.b7d7b7ae0754417a256f68ff170290e2f2f0c6f2
+
+  db:
+    git: https://github.com/crystal-lang/crystal-db.git
+    version: 0.14.0
+
+  exception_page:
+    git: https://github.com/crystal-loot/exception_page.git
+    version: 0.5.0
+
+  flib:
+    git: https://codeberg.org/fijxu/flib.git
+    version: 0.1.3+git.commit.b6478c66604cfda01743bef0dbe7ca6a534feefb
+
+  kemal:
+    git: https://github.com/kemalcr/kemal.git
+    version: 1.9.0
+
+  lru:
+    git: https://github.com/fijxu/crystal-lru.git
+    version: 1.0.3
+
+  markd:
+    git: https://github.com/icyleaf/markd.git
+    version: 0.5.0
+
+  radix:
+    git: https://github.com/luislavena/radix.git
+    version: 0.4.1
+
+  redis:
+    git: https://github.com/jgaskins/redis.git
+    version: 0.15.3
+
+  reply:
+    git: https://github.com/i3oris/reply.git
+    version: 0.4.0
+
+  source-typer:
+    git: https://github.com/vici37/cr-source-typer.git
+    version: 0.3.5+git.commit.022b9d33e424826c5b20ab20b6cb4dd2f3b96db3
+
+  spectator:
+    git: https://gitlab.com/arctic-fox/spectator.git
+    version: 0.12.2
+
+  sqlite3:
+    git: https://github.com/crystal-lang/crystal-sqlite3.git
+    version: 0.22.0
+

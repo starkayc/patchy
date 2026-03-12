@@ -1,0 +1,88 @@
+require "./baked_fs"
+
+# Pretty cool way to write background jobs! :)
+module Jobs
+  extend self
+  Log = ::Log.for(self)
+
+  def check_old_files : Fiber?
+    if CONFIG.delete_files_check <= 0
+      Log.info &.emit("file deletion is disabled")
+      return
+    end
+    spawn do
+      loop do
+        Utils.check_old_files
+        sleep CONFIG.delete_files_check.seconds
+      end
+    end
+  end
+
+  def retrieve_tor_exit_nodes : Fiber?
+    return if !CONFIG.ip_block.tor.enabled
+
+    Log.info &.emit("blocking Tor exit nodes")
+    spawn do
+      loop do
+        Utils::IpBlocks::Tor.update_tor_exit_nodes
+        sleep CONFIG.ip_block.tor.update_interval.seconds
+      end
+    end
+  end
+
+  def retrieve_vpn_addresses : Fiber?
+    return if !CONFIG.ip_block.vpn.enabled
+
+    Log.info &.emit("blocking VPN addresses")
+    spawn do
+      loop do
+        Utils::IpBlocks::VPN.update_vpn_blocks
+        sleep CONFIG.ip_block.vpn.update_interval.seconds
+      end
+    end
+  end
+
+  def kemal : Fiber
+    Kemal.config.add_handler BakedFileHandler::BakedFileHandler.new(PublicAssets)
+    if CONFIG.cors.enabled
+      Kemal.config.add_handler Handlers::Options::CORSHeaders.new
+    end
+    spawn do
+      if !CONFIG.server.unix_socket.nil?
+        Utils.delete_socket
+        Kemal.run &.server.not_nil!.bind_unix "#{CONFIG.server.unix_socket}"
+        Log.info &.emit("changing socket permissions to 777")
+        begin
+          File.chmod("#{CONFIG.server.unix_socket}", File::Permissions::All)
+        rescue ex
+          Log.fatal &.emit("failed to set unix socket permissions to 777", error: ex.message)
+          exit(1)
+        end
+      else
+        begin
+          Kemal.run(args: nil)
+        rescue ex
+          Log.fatal &.emit("patchy http server failed to start, exiting!", error: ex.message)
+          exit(1)
+        end
+      end
+    end
+  end
+
+  def gc : Fiber
+    spawn do
+      loop do
+        GC.collect
+        sleep 10.seconds
+      end
+    end
+  end
+
+  def run : Fiber
+    check_old_files
+    retrieve_tor_exit_nodes
+    retrieve_vpn_addresses
+    kemal
+    gc
+  end
+end

@@ -1,0 +1,74 @@
+<% content_for "head" do %>
+<title> <%= host %> - <%= translate(locale, "main_title") %></title>
+<script type="module" src="/-/assets/js/script.js?v=<%= ASSET_COMMIT %>"></script>
+<%= translate_js(locale, "js_upload_text") %>
+<%= translate_js(locale, "js_upload_client_error") %>
+<%= translate_js(locale, "js_upload_server_error") %>
+<%= translate_js(locale, "js_upload_unknown_error") %>
+<%= translate_js(locale, "js_generic_link_copied_to_clipboard") %>
+<%= translate_js(locale, "js_btn_delete") %>
+<%= translate_js(locale, "js_btn_copy") %>
+<%= translate_js(locale, "js_generic_delete_key_does_not_exist") %>
+<%= translate_js(locale, "js_history_delete_success") %>
+<% end %>
+
+<div class="container">
+  <% if CONFIG.views.index.navbar.enabled %>
+    <div class="navbar">
+      <% if CONFIG.views.index.navbar.show_uploader_configs %>
+      <a href='/-/info/configs'><%= translate(locale, "uploader_configs") %></a>
+      <% end %>
+      <% if CONFIG.views.index.navbar.show_upload_history %>
+      <a href='/-/info/history'><%= translate(locale, "upload_history") %></a>
+      <% end %>
+      <% if CONFIG.views.index.navbar.show_settings %>
+      <a href='/-/settings'><%= translate(locale, "index_settings") %></a>
+      <% end %>
+      <span class="end-of-flex"></span>
+      <% if CONFIG.views.index.navbar.show_admin %>
+      <a href='/-/admin'><%= translate(locale, "admin_panel") %></a>
+      <% end %>
+      <% if CONFIG.views.index.navbar.show_login %>
+      <a href='/-/login'><%= translate(locale, "Login") %></a>
+      <% end %>
+    </div>
+    <hr>
+  <% end %>
+  <% if CONFIG.views.index.show_title %>
+    <h1><%= host %></h1>
+  <% end %>
+  <% if !(site_info = CONFIG.views.index.site_info).empty? %>
+    <p class="site-info"><%= site_info %></p>
+  <% end %>
+  <div class="drop-area" id="drop-area">
+    <form action="/-/upload?nojs=1" method="post" enctype="multipart/form-data" id="nojs-form">
+      <input name="file" type="file" id="file"/>
+      <input type="submit" value="Upload" id="upload-box">
+    </form>
+  </div>
+  <script>
+    document.getElementById("nojs-form").style.display = "none";
+  </script>
+  <div id="upload-status-container" class="upload-status-container"></div>
+  <div class="footer">
+    <% if CONFIG.views.index.show_file_count %>
+      <a><%= translate(locale, "files_hosted") %>: <%= files_hosted %></a>
+    <% end %>
+    <div class="alternative-domains">
+      <% if !CONFIG.alternative_domains.empty? %>
+        <a><%= translate(locale, "alternative_domains") %>: </a>
+        <% CONFIG.alternative_domains.each do | domain | %>
+          <a href="https://<%= domain %>"><%= domain %></a>
+        <% end %>
+      <% end %>
+    </div>
+    <% if CONFIG.views.index.show_version %>
+      <a href='https://codeberg.org/Fijxu/patchy'>
+        patchy (<%= CURRENT_COMMIT %> - <%= CURRENT_VERSION %> @ <%= CURRENT_BRANCH %>)
+      </a>
+    <% end %>
+    <% if !CONFIG.abuse_email.empty? %>
+      <a href='mailto:<%= CONFIG.abuse_email %>'><%= translate(locale, "abuse_email") %></a>
+    <% end %>
+  </div>
+</div>

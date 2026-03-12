@@ -1,0 +1,40 @@
+name: patchy
+version: 0.9.9
+
+authors:
+  - Fijxu <fijxu@nadeko.net>
+
+targets:
+  patchy:
+    main: src/patchy.cr
+
+dependencies:
+  awscr-s3:
+    github: taylorfinnell/awscr-s3
+  kemal:
+    github: kemalcr/kemal
+  sqlite3:
+    github: crystal-lang/crystal-sqlite3
+  baked_file_handler:
+    github: ralsina/baked_file_handler
+  baked_file_system:
+    github: fijxu/baked_file_system_no_gzip
+  redis:
+    github: jgaskins/redis
+  flib:
+    git: git://codeberg.org/Fijxu/flib.git
+  lru:
+    github: fijxu/crystal-lru
+
+development_dependencies:
+  ameba:
+    github: crystal-ameba/ameba
+  spectator:
+    gitlab: arctic-fox/spectator
+    version: ~> 0.12.0
+  source-typer:
+    github: Vici37/cr-source-typer
+
+crystal: '>= 1.12.2'
+
+license: AGPL-3.0-only

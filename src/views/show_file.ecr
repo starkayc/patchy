@@ -1,0 +1,78 @@
+<%
+  original_filename_ = HTML.escape(fileinfo.original_filename)
+  filename_ = HTML.escape(fileinfo.filename)
+  extension_ = HTML.escape(fileinfo.extension)
+
+  filetype = Filetype::File
+  if [".png", ".jpg", ".gif", ".webp", ".jpeg", ".bmp", ".tiff", ".jfif", ".avif", ".jxl"].any? { |ex| fileinfo.extension == ex }
+    filetype = Filetype::Image
+  elsif [".mp4", ".webm", ".avi", ".mov", ".ogv"].any? { |ex| fileinfo.extension == ex }
+    filetype = Filetype::Video
+  elsif [".flac", ".wav", ".mp3", ".acc", ".ogg", ".opus"].any? { |ex| fileinfo.extension == ex }
+    filetype = Filetype::Audio
+  end
+%>
+
+<% content_for "head" do %>
+<title><%= original_filename_ %></title>
+<meta property="og:title" content="<%= original_filename_ %>">
+<meta property="og:url" content="<%= scheme %>://<%= host %>/<%= filename_ %>">
+<% if fileinfo.thumbnail %>
+<meta property="og:image" content="<%= scheme %>://<%= host %>/-/thumbnail/<%= filename_ %>.jpg">
+<%
+  elsif CONFIG.thumbnail_generation.enabled && CONFIG.thumbnail_generation.fallback_thumbnail.enabled
+  nothumbnail = CONFIG.thumbnail_generation.fallback_thumbnail.thumbnail_file
+%>
+<meta property="og:image" content="<%= scheme %>://<%= host %>/-/assets/img/<%= nothumbnail %>">
+<% end %>
+<% if filetype == Filetype::Image %>
+<meta property="og:image:secure_url" content="<%= scheme %>://<%= host %>/-/file/<%= filename_ %><%= extension_ %>">
+<meta property="og:image:type" content="<%= mime_type %>">
+<% elsif filetype == Filetype::Video %>
+<meta property="og:video" content="<%= scheme %>://<%= host %>/-/file/<%= filename_ %><%= extension_ %>">
+<meta property="og:video:secure_url" content="<%= scheme %>://<%= host %>/-/file/<%= filename_ %><%= extension_ %>">
+<meta property="og:video:type" content="<%= mime_type %>">
+<meta property="og:type" content="video.other">
+<% elsif filetype == Filetype::Audio %>
+<meta property="og:audio" content="<%= scheme %>://<%= host %>/-/file/<%= filename_ %><%= extension_ %>">
+<meta property="og:audio:secure_url" content="<%= scheme %>://<%= host %>/-/file/<%= filename_ %><%= extension_ %>">
+<meta property="og:audio:type" content="<%= mime_type %>">
+<% end %>
+
+<% end %>
+
+<div class="media-container">
+  <div class="navbar">
+    <a href='/'><%= translate(locale, "go_back") %></a>
+    <a href='/-/file/<%= filename_ %>' download=''><%= translate(locale, "download_file") %> (<%= original_filename_ %>)</a>
+    <%
+      # Disable view button for .html
+      if fileinfo.extension != ".html"
+    %>
+    <a href='/-/file/<%= filename_ %><%= extension_ %>'><%= translate(locale, "view_file") %></a>
+    <% end %>
+    <span class="end-of-flex"></span>
+    <a href='/-/reportabuse?file=<%= filename_ %>'><%= translate(locale, "report_abuse") %></a>
+  </div>
+  <hr>
+  <div class="media">
+    <% if filetype == Filetype::Image %>
+      <img class="content" src="/-/file/<%= filename_ %>" alt="<%= original_filename_ %>">
+    <% elsif filetype == Filetype::Video %>
+      <video class="content" controls <%= CONFIG.views.show_file.autoplay_video ? "autoplay" : "" %>>
+        <source src="/-/file/<%= filename_ %>" type="<%= mime_type %>">
+        Your browser does not support the video tag.
+      </video>
+    <% elsif filetype == Filetype::Audio %>
+      <audio class="content" controls <%= CONFIG.views.show_file.autoplay_audio ? "autoplay" : "" %>>
+        <source src="/-/file/<%= filename_ %>" type="<%= mime_type %>">
+        Your browser does not support the audio tag.
+      </audio>
+    <% else %>
+      <div class="file-no-display">
+        <p><%= translate(locale, "file_cannot_be_displayed") %></p>
+        <a href='/-/file/<%= filename_ %>' download=''><%= translate(locale, "download_file") %> (<%= original_filename_ %>)</a>
+      </div>
+    <% end %>
+  </div>
+</div>

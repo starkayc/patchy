@@ -1,0 +1,143 @@
+colorize_logs: true
+# Levels are: none, fatal, error, warn, notice, info, debug and trace
+log_level: "info"
+
+# File paths, you generally don't need to change this
+files: "./data/files/"
+thumbnails: "./data/thumbnails/"
+db: "./data/db/"
+
+size_limit: 512
+enable_checksums: false
+
+files_per_ip: 32
+rate_limit_period: 20
+filename_length: 5
+
+# Analytics
+analytics:
+  # Cloudflare Web Analytics beacon token (keep this out of version control)
+  cloudflare_token: ""
+
+# In hours (168 = 7 days)
+delete_files_after: 168
+# In seconds
+delete_files_check: 1800
+delete_key_length: 4
+
+# http server
+server:
+  port: 8080
+  host: 0.0.0.0
+  # Enabling the unix socket will disable port binding
+  #unix_socket: "/tmp/patchy.sock"
+
+# CORS: Cross-Origin Resource Sharing
+# Will allow external websites from loading files from the domain Patchy is
+# being hosted.
+cors:
+  enabled: false
+  # Advanced options! You shouldn't change those unless you really want or need
+  # to modify them.
+  #
+  # Paths to apply OPTIONS for CORS
+  paths:
+    - "/-/file/:filename"
+    - "/-/thumbnail/:thumbnail"
+    - "/upload"
+    - "/-/upload"
+  # This are the values that are going to be used on
+  # Access-Control headers.
+  access_control:
+    allow_origin: "*"
+    allow_methods: "GET, HEAD, POST, OPTIONS"
+    allow_headers: "Content-Type"
+    max_age: "3600"
+
+# Enables thumbnail generation for programs that support OpenGraph tags
+# WARNING: DO NOT ENABLE THIS IF YOU DON'T HAVE A HARDENED FFMPEG BUILD
+# READ MORE ABOUT IT HERE:
+# https://codeberg.org/Fijxu/patchy/src/branch/master/docs/security/ffmpeg.md
+thumbnail_generation:
+  enabled: false
+  # When a file has no thumbnail, it will show a fallback thumbnail located in
+  # ./public/-/assets/img/nothumbnail.jpg, it can be easily replaced by adding
+  # an image file to ./public/-/assets/img/
+  fallback_thumbnail:
+    enabled: true
+    thumbnail_file: "nothumbnail.jpg"
+  resolution:
+    max_height: 720
+    max_width: 720
+
+# To restrict Tor exit nodes and VPN providers IP addresses from uploading
+# content to the uploader. Sometimes they can be an annoyance, legally speaking.
+ip_block:
+  tor:
+    enabled: false
+    update_interval: 3600
+  vpn:
+    enabled: false
+    update_interval: 86400
+    # Providers supported:
+    # "Mullvad", "AirVPN"
+    providers: []
+
+admin:
+  enabled: false
+  api_key: "asd"
+
+# S3 Support to upload the files to a S3 bucket.
+# Thumbnail generation will not run when using a S3 bucket
+s3:
+  enabled: false
+  # Ignored if is not AWS
+  region: us-east-1
+  key: "key"
+  secret: "secret"
+  endpoint: "https://someendpoint.example"
+
+# Uses more memory, but improves files retrieval and reduces stress on the drive
+cache:
+  enabled: false
+  # Type of cache
+  # This can be LRU (Least Recently Used) or a Redis compatible database.
+  # LRU is recommended, but if you are using a distributed Patchy setup, Redis
+  # may be a better option to share the cache across different Patchy processes.
+  # types: "lru", "redis"
+  type: "lru"
+  # The redis URL to connect to the Redis compatible database.
+  # Example: "tcp://127.0.0.1:6379"
+  # If it's empty, it will default to "localhost:6379"
+  redis_url: ""
+
+  # seconds, nil by default.
+  expire_time: 3600
+  # In KiB, files bigger than this will not be cached
+  max_allowed_filesize: 512
+  # Number of files that can be cached (LRU ONLY)
+  max_size: 256
+  # seconds, nil by default. (LRU ONLY)
+  clean_interval: 60
+
+# Modify what is shown on the different pages
+views:
+  index:
+    site_info: "Welcome to Patchy - A temporary file uploader"
+    show_title: true
+    show_file_count: true
+    show_version: true
+    navbar:
+      enabled: true
+      show_uploader_configs: true
+      show_upload_history: true
+      show_admin: true
+      show_login: true
+  show_file:
+    autoplay_video: false
+    autoplay_audio: false
+
+blocked_extensions:
+  - "exe"
+# alternative_domains:
+#   - "example.com"

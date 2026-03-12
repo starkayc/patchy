@@ -1,0 +1,14 @@
+{
+  "linter": {
+    "enabled": true,
+    "includes": [
+      "public/-/assets/js/*.js"
+    ],
+    "rules": {
+      "recommended": true
+    }
+  },
+  "formatter": {
+    "useEditorconfig": true
+  }
+}
