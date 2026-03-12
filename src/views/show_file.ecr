@@ -57,6 +57,85 @@ document.addEventListener('DOMContentLoaded', () => {
   const canvas   = document.getElementById('ap-canvas');
   const player   = document.getElementById('audio-player');
   const lastfmKey = player.dataset.lastfmKey;
+  const waveCanvas = document.getElementById('ap-waveform');
+  const wctx = waveCanvas ? waveCanvas.getContext('2d') : null;
+  let analyser = null, audioCtx = null, waveRaf = null, waveRunning = false;
+
+  function setupAnalyser() {
+    if (analyser) return;
+    try {
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      const src = audioCtx.createMediaElementSource(audio);
+      analyser = audioCtx.createAnalyser();
+      analyser.fftSize = 64;
+      analyser.smoothingTimeConstant = 0.82;
+      src.connect(analyser);
+      analyser.connect(audioCtx.destination);
+    } catch(e) {}
+  }
+
+  function drawWaveform(playing) {
+    if (!wctx || !waveCanvas) return;
+    const dpr = window.devicePixelRatio || 1;
+    const W = waveCanvas.offsetWidth * dpr;
+    const H = waveCanvas.offsetHeight * dpr;
+    if (W <= 0 || H <= 0) return;
+    if (waveCanvas.width !== W || waveCanvas.height !== H) {
+      waveCanvas.width = W;
+      waveCanvas.height = H;
+    }
+    wctx.clearRect(0, 0, W, H);
+    const N = 36;
+    const accent = getComputedStyle(player).getPropertyValue('--ap-accent').trim() || '#fc3c44';
+    let bins;
+    if (analyser && playing) {
+      bins = new Uint8Array(analyser.frequencyBinCount);
+      analyser.getByteFrequencyData(bins);
+    }
+    const gap = 2.5 * dpr;
+    const barW = (W - gap * (N - 1)) / N;
+    for (let i = 0; i < N; i++) {
+      let amp;
+      if (bins) {
+        const idx = Math.floor((i / N) * bins.length * 0.75);
+        amp = bins[idx] / 255;
+      } else {
+        amp = 0.04 + 0.02 * Math.sin(Date.now() / 1200 + i * 0.45);
+      }
+      const h = Math.max(2 * dpr, amp * H);
+      const x = i * (barW + gap);
+      const y = (H - h) / 2;
+      wctx.fillStyle = accent;
+      wctx.globalAlpha = playing ? Math.max(0.2, amp * 0.85 + 0.15) : 0.18;
+      const r = Math.min(barW / 2, 3 * dpr);
+      wctx.beginPath();
+      if (wctx.roundRect) { wctx.roundRect(x, y, barW, h, r); }
+      else { wctx.rect(x, y, barW, h); }
+      wctx.fill();
+    }
+  }
+
+  function tickWave() {
+    if (!waveRunning) return;
+    drawWaveform(true);
+    waveRaf = requestAnimationFrame(tickWave);
+  }
+
+  function startWaveAnim() {
+    waveRunning = true;
+    if (!waveRaf) tickWave();
+  }
+
+  function pauseWaveAnim() {
+    waveRunning = false;
+    if (waveRaf) { cancelAnimationFrame(waveRaf); waveRaf = null; }
+    drawWaveform(false);
+  }
+
+  drawWaveform(false); // draw idle state on load
+  audio.addEventListener('play',  startWaveAnim);
+  audio.addEventListener('pause', pauseWaveAnim);
+  window.addEventListener('resize', () => { if (!waveRunning) drawWaveform(false); });
 
   const SVG_PLAY  = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>';
   const SVG_PAUSE = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>';
@@ -107,7 +186,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   if (lastfmKey) {
     const raw       = document.getElementById('ap-title').textContent;
-    const trackName = raw.replace(/\.\w{1,5}$/, '').replace(/^\d+[-._\s]+/, '').trim();
+    const trackName = raw.replace(/\.\w{1,5}$/, '').replace(/^[\[(]?\d+(?:-\d+)?[\])]?[-._\s]+/, '').trim();
     const q         = encodeURIComponent(trackName);
     const PLACEHOLDER = '2a96cbd8b46e442fc41c2b86b821562f';
 
@@ -155,9 +234,10 @@ document.addEventListener('DOMContentLoaded', () => {
     thumb.style.left = pct + '%';
   });
 
-  audio.addEventListener('ended', () => { playBtn.innerHTML = SVG_PLAY; });
+  audio.addEventListener('ended', () => { playBtn.innerHTML = SVG_PLAY; pauseWaveAnim(); });
 
   playBtn.addEventListener('click', () => {
+    setupAnalyser();
     if (audio.paused) { audio.play(); playBtn.innerHTML = SVG_PAUSE; }
     else              { audio.pause(); playBtn.innerHTML = SVG_PLAY; }
   });
@@ -183,6 +263,7 @@ document.addEventListener('DOMContentLoaded', () => {
   volFill.style.width = '100%';
 
   <% if CONFIG.views.show_file.autoplay_audio %>
+  setupAnalyser();
   audio.play().then(() => playBtn.innerHTML = SVG_PAUSE).catch(() => {});
   <% end %>
 });
@@ -217,14 +298,22 @@ document.addEventListener('DOMContentLoaded', () => {
       <div id="ap-page-bg" class="ap-page-bg"></div>
       <div class="audio-player" id="audio-player" data-lastfm-key="<%= CONFIG.lastfm_api_key %>">
         <canvas id="ap-canvas" width="20" height="20" style="display:none"></canvas>
-        <img id="ap-art" class="ap-art-img" alt="Album art" style="display:none">
+        <img id="ap-art" class="ap-art-img" alt="Album art" crossorigin="anonymous" style="display:none">
         <div id="ap-art-placeholder" class="ap-art-placeholder">
-          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
+          <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="24" cy="24" r="22" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.12)" stroke-width="1.5"/>
+            <circle cx="24" cy="24" r="18" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="0.75"/>
+            <circle cx="24" cy="24" r="14" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+            <circle cx="24" cy="24" r="10" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="0.75"/>
+            <circle cx="24" cy="24" r="6"  fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.10)" stroke-width="1"/>
+            <circle cx="24" cy="24" r="2.5" fill="rgba(255,255,255,0.35)"/>
+          </svg>
         </div>
         <div class="ap-meta">
           <div class="ap-title" id="ap-title"><%= original_filename_ %></div>
           <div class="ap-artist" id="ap-artist"></div>
         </div>
+        <canvas id="ap-waveform" class="ap-waveform" aria-hidden="true"></canvas>
         <div class="ap-scrub">
           <span id="ap-elapsed" class="ap-time">0:00</span>
           <div id="ap-progress" class="ap-bar">
