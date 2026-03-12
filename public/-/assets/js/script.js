@@ -20,6 +20,7 @@ window.addEventListener("DOMContentLoaded", () => {
 
   const dropAreaText = document.createElement("p");
   dropAreaText.textContent = translate_uploadText;
+  dropAreaText.className = "drop-area-text";
   dropArea?.appendChild(dropAreaText);
 
   const sizeLimit = dropArea?.dataset.sizeLimit;

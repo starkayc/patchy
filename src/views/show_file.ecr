@@ -38,13 +38,81 @@
 <meta property="og:audio:secure_url" content="<%= scheme %>://<%= host %>/-/file/<%= filename_ %><%= extension_ %>">
 <meta property="og:audio:type" content="<%= mime_type %>">
 <% end %>
+<% if filetype == Filetype::Audio %>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const audio = document.getElementById('audio-el');
+  const playBtn = document.getElementById('ap-play');
+  const playIcon = document.getElementById('ap-play-icon');
+  const elapsed = document.getElementById('ap-elapsed');
+  const duration = document.getElementById('ap-duration');
+  const progress = document.getElementById('ap-progress');
+  const fill = document.getElementById('ap-fill');
+  const thumb = document.getElementById('ap-thumb');
+  const volSlider = document.getElementById('ap-vol');
+  const volFill = document.getElementById('ap-vol-fill');
 
+  function fmt(s) {
+    if (!isFinite(s)) return '0:00';
+    const m = Math.floor(s / 60), sec = Math.floor(s % 60);
+    return m + ':' + String(sec).padStart(2, '0');
+  }
+
+  audio.addEventListener('loadedmetadata', () => {
+    duration.textContent = fmt(audio.duration);
+  });
+
+  audio.addEventListener('timeupdate', () => {
+    elapsed.textContent = fmt(audio.currentTime);
+    const pct = audio.duration ? (audio.currentTime / audio.duration) * 100 : 0;
+    fill.style.width = pct + '%';
+    thumb.style.left = pct + '%';
+  });
+
+  audio.addEventListener('ended', () => {
+    playIcon.textContent = '▶';
+  });
+
+  playBtn.addEventListener('click', () => {
+    if (audio.paused) { audio.play(); playIcon.textContent = '⏸'; }
+    else { audio.pause(); playIcon.textContent = '▶'; }
+  });
+
+  // Scrubbing
+  let scrubbing = false;
+  function scrubTo(e) {
+    const rect = progress.getBoundingClientRect();
+    const x = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left;
+    const pct = Math.max(0, Math.min(1, x / rect.width));
+    fill.style.transition = 'none';
+    audio.currentTime = pct * audio.duration;
+  }
+  progress.addEventListener('mousedown',  e => { scrubbing = true; scrubTo(e); });
+  progress.addEventListener('touchstart', e => { scrubbing = true; scrubTo(e); }, { passive: true });
+  window.addEventListener('mousemove',  e => { if (scrubbing) scrubTo(e); });
+  window.addEventListener('touchmove',  e => { if (scrubbing) scrubTo(e); }, { passive: true });
+  window.addEventListener('mouseup',  () => { scrubbing = false; fill.style.transition = ''; });
+  window.addEventListener('touchend', () => { scrubbing = false; fill.style.transition = ''; });
+
+  // Volume
+  volSlider.addEventListener('input', () => {
+    audio.volume = volSlider.value;
+    volFill.style.width = (volSlider.value * 100) + '%';
+  });
+  volFill.style.width = (volSlider.value * 100) + '%';
+
+  <% if CONFIG.views.show_file.autoplay_audio %>
+  audio.play().then(() => playIcon.textContent = '⏸').catch(() => {});
+  <% end %>
+});
+</script>
+<% end %>
 <% end %>
 
 <div class="media-container">
   <div class="navbar">
-    <a href='/'><%= translate(locale, "go_back") %></a>
-    <a href='/-/file/<%= filename_ %>' download=''><%= translate(locale, "download_file") %> (<%= original_filename_ %>)</a>
+    <a href='/'>← <%= translate(locale, "go_back") %></a>
+    <a href='/-/file/<%= filename_ %>' download=''>⬇ <%= translate(locale, "download_file") %> (<%= original_filename_ %>)</a>
     <%
       # Disable view button for .html
       if fileinfo.extension != ".html"
@@ -64,14 +132,44 @@
         Your browser does not support the video tag.
       </video>
     <% elsif filetype == Filetype::Audio %>
-      <audio class="content" controls <%= CONFIG.views.show_file.autoplay_audio ? "autoplay" : "" %>>
-        <source src="/-/file/<%= filename_ %>" type="<%= mime_type %>">
-        Your browser does not support the audio tag.
-      </audio>
+      <audio id="audio-el" src="/-/file/<%= filename_ %>" preload="metadata"></audio>
+      <div class="audio-player">
+        <div class="ap-artwork">
+          <svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="40" cy="40" r="38" stroke="rgba(255,255,255,0.08)" stroke-width="2"/>
+            <circle cx="40" cy="40" r="24" fill="rgba(255,255,255,0.06)"/>
+            <circle cx="40" cy="40" r="6" fill="rgba(255,255,255,0.3)"/>
+            <path d="M34 28 L34 52 L56 40 Z" fill="rgba(255,255,255,0.15)"/>
+          </svg>
+        </div>
+        <div class="ap-title"><%= original_filename_ %></div>
+        <div class="ap-scrub">
+          <span id="ap-elapsed" class="ap-time">0:00</span>
+          <div id="ap-progress" class="ap-bar">
+            <div id="ap-fill" class="ap-bar-fill"></div>
+            <div id="ap-thumb" class="ap-bar-thumb"></div>
+          </div>
+          <span id="ap-duration" class="ap-time">0:00</span>
+        </div>
+        <div class="ap-controls">
+          <button id="ap-play" class="ap-play-btn" aria-label="Play / Pause">
+            <span id="ap-play-icon">▶</span>
+          </button>
+        </div>
+        <div class="ap-volume">
+          <svg class="ap-vol-icon" viewBox="0 0 20 20" fill="currentColor">
+            <path d="M9 4L5 7.5H2v5h3L9 16V4zm4.07 1.93a7 7 0 010 12.14M11.54 7.46a4 4 0 010 5.08"/>
+          </svg>
+          <div class="ap-vol-track">
+            <div id="ap-vol-fill" class="ap-vol-fill"></div>
+            <input id="ap-vol" class="ap-vol-input" type="range" min="0" max="1" step="0.01" value="1">
+          </div>
+        </div>
+      </div>
     <% else %>
       <div class="file-no-display">
         <p><%= translate(locale, "file_cannot_be_displayed") %></p>
-        <a href='/-/file/<%= filename_ %>' download=''><%= translate(locale, "download_file") %> (<%= original_filename_ %>)</a>
+        <a href='/-/file/<%= filename_ %>' download=''>⬇ <%= translate(locale, "download_file") %> (<%= original_filename_ %>)</a>
       </div>
     <% end %>
   </div>
