@@ -40,12 +40,12 @@ jobs:
         id: merge
         run: |
           git checkout -b upstream-sync
-          if git merge upstream/master --no-edit; then
+          if git merge upstream/master --allow-unrelated-histories --no-edit; then
             echo "conflicts=false" >> $GITHUB_OUTPUT
           else
             echo "conflicts=true" >> $GITHUB_OUTPUT
             git add -A
-            git commit -m "chore: merge upstream (contains conflicts — resolve before merging)"
+            git diff --cached --quiet || git commit -m "chore: merge upstream (contains conflicts — resolve before merging)"
           fi
 
       - name: Push sync branch
