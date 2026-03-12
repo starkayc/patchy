@@ -56,6 +56,8 @@ jobs:
         with:
           context: .
           file: Dockerfile
+          build-args: |
+            CURRENT_BRANCH=${{ github.ref_name }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           platforms: linux/amd64
@@ -63,4 +65,4 @@ jobs:
           provenance: true
           sbom: true
           cache-from: type=gha
-          cache-to: type=gha,mode=max
+          cache-to: type=gha,mode=max,ignore-error=true

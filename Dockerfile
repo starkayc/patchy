@@ -18,6 +18,11 @@ COPY ./.git/ ./.git/
 COPY ./public/ ./public/
 COPY ./locales/ ./locales/
 
+# Passed from CI so the Crystal compile-time macro gets the real branch name
+# even when the checkout is in detached HEAD state (e.g. GitHub Actions).
+ARG CURRENT_BRANCH
+ENV CURRENT_BRANCH=${CURRENT_BRANCH}
+
 RUN --mount=type=cache,target=/root/.cache/crystal \
 	crystal build ./src/patchy.cr \
 	--release \
