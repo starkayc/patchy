@@ -64,5 +64,5 @@ jobs:
           push: true
           provenance: true
           sbom: true
-          cache-from: type=gha,scope=docker-build-v1
-          cache-to: type=gha,mode=max,ignore-error=true,scope=docker-build-v1
+          cache-from: type=registry,ref=ghcr.io/${{ github.repository }}:buildcache
+          cache-to: type=registry,ref=ghcr.io/${{ github.repository }}:buildcache,mode=max,image-manifest=true,oci-mediatypes=true

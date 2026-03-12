@@ -28,7 +28,7 @@ RUN --mount=type=cache,target=/root/.cache/crystal \
 	--release \
 	--static --warnings all -s -p -t
 
-FROM git.nadeko.net/fijxu/alpine-stripped-ffmpeg:3.23-ffmpeg-6.1.2
+FROM alpine:3.23
 # shared-mime-info is required so Crystal is able to guess the mime types
 # of uploaded/retrieved files using the file `/etc/mime.types` provided
 # by that package.
@@ -37,6 +37,7 @@ FROM git.nadeko.net/fijxu/alpine-stripped-ffmpeg:3.23-ffmpeg-6.1.2
 RUN apk add --no-cache \
 	tini \
 	mailcap \
+	ffmpeg \
 	libvpx \
 	x264-libs \
 	x265-libs \
@@ -45,7 +46,7 @@ RUN apk add --no-cache \
 	libwebpmux \
 	libjxl \
 	libpng \
-	libjpeg
+	libjpeg-turbo
 
 RUN rm -rf /var/cache/apk/* /tmp/*
 
