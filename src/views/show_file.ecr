@@ -190,10 +190,10 @@ document.addEventListener('DOMContentLoaded', () => {
     artImg.src = url;
   }
 
-  // Try embedded cover art first (extracted at upload time from ID3/FLAC tags)
+  // Use embedded cover art when available; only fall back to Last.fm when there is none
   if (embeddedArt) applyArt(embeddedArt);
 
-  if (lastfmKey) {
+  if (lastfmKey && !embeddedArt) {
     const raw       = document.getElementById('ap-title').textContent;
     const trackName = raw.replace(/\.\w{1,5}$/, '').replace(/^[\[(]?\d+(?:-\d+)?[\])]?[-._\s]+/, '').trim();
     const q         = encodeURIComponent(trackName);
