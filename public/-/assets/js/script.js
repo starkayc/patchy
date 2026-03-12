@@ -30,7 +30,6 @@ window.addEventListener("DOMContentLoaded", () => {
     dropAreaSub.className = "drop-area-limit";
     dropArea?.appendChild(dropAreaSub);
   }
-  dropArea?.addEventListener("drop", handleDrop, false);
   dropArea?.addEventListener("click", () => fileInput?.click());
 
   fileInput?.addEventListener(
@@ -38,6 +37,7 @@ window.addEventListener("DOMContentLoaded", () => {
     () => {
       const files = fileInput.files;
       handleFiles(files);
+      fileInput.value = "";
     },
     false,
   );
@@ -91,7 +91,6 @@ window.addEventListener("DOMContentLoaded", () => {
     const deleteButton = document.createElement("button");
 
     uploadContainer.className = "upload-status";
-    uploadContainer.id = "upload-status";
     uploadContainer.appendChild(uploadText);
     uploadContainer.appendChild(statusLink);
     buttons.appendChild(copyButton);
@@ -99,7 +98,7 @@ window.addEventListener("DOMContentLoaded", () => {
     uploadContainer.appendChild(buttons);
     uploadStatus?.appendChild(uploadContainer);
 
-    uploadText.innerHTML = "0%";
+    uploadText.textContent = "0%";
     uploadText.className = "percent";
     statusLink.className = "status";
     copyButton.className = "button copy-button";
@@ -112,7 +111,7 @@ window.addEventListener("DOMContentLoaded", () => {
     xhr.upload.addEventListener("progress", (e) => {
       if (e.lengthComputable) {
         const percentComplete = Math.round((e.loaded / e.total) * 100);
-        uploadText.innerHTML = `${percentComplete}%`;
+        uploadText.textContent = `${percentComplete}%`;
       }
     });
 
@@ -186,7 +185,6 @@ window.addEventListener("DOMContentLoaded", () => {
   function copyToClipboard(text, copyButton) {
     navigator.clipboard.writeText(text);
     const prevState = copyButton.innerHTML;
-    copyButton.innerHTML = translate_LinkCopied;
     copyButton.innerHTML = translate_LinkCopied;
     setTimeout(() => {
       copyButton.innerHTML = prevState;
