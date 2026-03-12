@@ -8,7 +8,7 @@
     filetype = Filetype::Image
   elsif [".mp4", ".webm", ".avi", ".mov", ".ogv"].any? { |ex| fileinfo.extension == ex }
     filetype = Filetype::Video
-  elsif [".flac", ".wav", ".mp3", ".acc", ".ogg", ".opus"].any? { |ex| fileinfo.extension == ex }
+  elsif [".flac", ".wav", ".mp3", ".aac", ".ogg", ".opus"].any? { |ex| fileinfo.extension == ex }
     filetype = Filetype::Audio
   end
 %>
@@ -61,6 +61,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const waveCanvas = document.getElementById('ap-waveform');
   const wctx = waveCanvas ? waveCanvas.getContext('2d') : null;
   let analyser = null, audioCtx = null, waveRaf = null, waveRunning = false;
+  let artSeq = 0;
 
   function setupAnalyser() {
     if (analyser) return;
@@ -169,13 +170,17 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function applyArt(url) {
+    const seq = ++artSeq;
     artImg.onload = () => {
+      if (seq !== artSeq) return;
       artImg.style.display = 'block';
       artWrap.style.display = 'none';
+      const mediaContainer = document.querySelector('.media-container');
       if (pageBg) {
         pageBg.style.backgroundImage = `url('${url}')`;
         pageBg.classList.add('has-art');
       }
+      if (mediaContainer) mediaContainer.classList.add('has-art');
       const color = extractColor(artImg);
       if (color) {
         player.style.setProperty('--ap-accent', color);
@@ -195,7 +200,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const PLACEHOLDER = '2a96cbd8b46e442fc41c2b86b821562f';
 
     function bestImage(images) {
-      // Walk all sizes (small→mega), keep last non-empty non-placeholder URL
+      // Walk all sizes (small→extralarge), keep last non-empty non-placeholder URL
+      // Mirrors getBestImage() from the OBS overlay — last entry is always the largest
       let url = '';
       for (const img of (images || [])) {
         if (img['#text'] && !img['#text'].includes(PLACEHOLDER)) url = img['#text'];
@@ -203,20 +209,38 @@ document.addEventListener('DOMContentLoaded', () => {
       return url;
     }
 
-    // Step 1: track.search → canonical artist name
+    // Step 1: track.search → canonical name, artist, and MBID
     fetch(`https://ws.audioscrobbler.com/2.0/?method=track.search&track=${q}&api_key=${lastfmKey}&format=json&limit=1`)
       .then(r => r.json())
       .then(data => {
-        const track = data?.results?.trackmatches?.track?.[0];
-        if (!track) return;
-        const artist = track.artist || '';
+        const result = data?.results?.trackmatches?.track?.[0];
+        if (!result) return;
+
+        const artist    = result.artist || '';
+        const canonical = result.name   || trackName; // use Last.fm's own name, not the filename
+        const mbid      = result.mbid;
+
         if (artist) artistEl.textContent = artist;
-        // Step 2: track.getInfo → album.image (far more reliable than search result images)
-        return fetch(`https://ws.audioscrobbler.com/2.0/?method=track.getInfo&track=${q}&artist=${encodeURIComponent(artist)}&api_key=${lastfmKey}&format=json&autocorrect=1`)
+
+        // Step 2: track.getInfo — prefer MBID (no name ambiguity), fall back to name+artist
+        const infoParams = mbid
+          ? `mbid=${encodeURIComponent(mbid)}`
+          : `track=${encodeURIComponent(canonical)}&artist=${encodeURIComponent(artist)}&autocorrect=1`;
+
+        return fetch(`https://ws.audioscrobbler.com/2.0/?method=track.getInfo&${infoParams}&api_key=${lastfmKey}&format=json`)
           .then(r => r.json())
           .then(info => {
             const url = bestImage(info?.track?.album?.image);
-            if (url) applyArt(url);
+            if (url) { applyArt(url); return; }
+
+            // Step 3: fall back to artist image — mirrors track.artist.image in the OBS overlay
+            if (!artist) return;
+            return fetch(`https://ws.audioscrobbler.com/2.0/?method=artist.getInfo&artist=${encodeURIComponent(artist)}&api_key=${lastfmKey}&format=json&autocorrect=1`)
+              .then(r => r.json())
+              .then(aInfo => {
+                const aUrl = bestImage(aInfo?.artist?.image);
+                if (aUrl) applyArt(aUrl);
+              });
           });
       })
       .catch(() => {});
@@ -248,6 +272,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   let scrubbing = false;
   function scrubTo(e) {
+    if (!audio.duration) return;
     const rect = progress.getBoundingClientRect();
     const x = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left;
     fill.style.transition = 'none';
@@ -343,8 +368,22 @@ document.addEventListener('DOMContentLoaded', () => {
       </div>
     <% else %>
       <div class="file-no-display">
-        <p><%= translate(locale, "file_cannot_be_displayed") %></p>
-        <a href='/-/file/<%= filename_ %>' download=''>⬇ <%= translate(locale, "download_file") %> (<%= original_filename_ %>)</a>
+        <div class="fnd-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/>
+          </svg>
+        </div>
+        <p class="fnd-title"><%= original_filename_ %></p>
+        <p class="fnd-sub"><%= translate(locale, "file_cannot_be_displayed") %></p>
+        <a class="fnd-btn" href='/-/file/<%= filename_ %>' download=''>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="7 10 12 15 17 10"/>
+            <line x1="12" y1="15" x2="12" y2="3"/>
+          </svg>
+          <%= translate(locale, "download_file") %>
+        </a>
       </div>
     <% end %>
   </div>

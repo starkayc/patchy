@@ -170,6 +170,32 @@ a[href]:hover {
   z-index: 1;
 }
 
+/* On audio pages the fixed ap-page-bg sits behind everything;
+   keep the navbar visually above it at all times */
+.media-container > .navbar {
+  position: relative;
+  z-index: 2;
+}
+
+/* When album art is loaded, soften the navbar to match the coloured backdrop */
+.media-container.has-art > .navbar {
+  background: rgba(0, 0, 0, 0.35);
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+.media-container.has-art > .navbar a[href] {
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.media-container.has-art > .navbar a[href]:hover {
+  background-color: rgba(255, 255, 255, 0.12);
+  color: #fff;
+}
+
+.media-container.has-art > hr {
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
 .site-info {
   text-align: center;
   font-size: 1rem;
@@ -414,8 +440,69 @@ input[type="submit"]:active {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 1rem;
+  gap: 0.75rem;
+  background: rgba(28, 28, 30, 0.75);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--separator);
+  border-radius: 20px;
+  padding: 2.5rem 2rem;
+  width: min(360px, 90vw);
+  text-align: center;
+}
+
+.fnd-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 14px;
+  background: var(--bg-card);
+  display: flex;
+  align-items: center;
+  justify-content: center;
   color: var(--fg-secondary);
+  margin-bottom: 0.25rem;
+}
+
+.fnd-icon svg {
+  width: 28px;
+  height: 28px;
+}
+
+.fnd-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--fg);
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
+}
+
+.fnd-sub {
+  font-size: 0.8rem;
+  color: var(--fg-tertiary);
+  margin: 0;
+  line-height: 1.4;
+}
+
+.fnd-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+  padding: 0.55rem 1.25rem;
+  border-radius: 99px;
+  background: var(--accent);
+  color: #fff;
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background-color 0.15s ease;
+}
+
+.fnd-btn:hover {
+  background: var(--accent-hover);
 }
 
 /* ------ Audio player ------ */

@@ -3,7 +3,7 @@ module Utils::Thumbnails
   Log = ::Log.for(self)
 
   private AUDIO_EXTENSIONS =
-    {".mp3", ".flac", ".ogg", ".opus", ".aac"}
+    {".mp3", ".flac", ".ogg", ".opus", ".aac", ".wav"}
 
   private ALLOWED_EXTENSIONS =
     {".jpg", ".jpeg", ".png", ".gif", ".bmp", ".tiff", ".webp", ".heic", ".jxl", ".avif", ".crw", ".dng",
