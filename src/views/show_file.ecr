@@ -56,7 +56,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const pageBg   = document.getElementById('ap-page-bg');
   const canvas   = document.getElementById('ap-canvas');
   const player   = document.getElementById('audio-player');
-  const lastfmKey = player.dataset.lastfmKey;
+  const lastfmKey  = player.dataset.lastfmKey;
+  const embeddedArt = player.dataset.thumbnail;
   const waveCanvas = document.getElementById('ap-waveform');
   const wctx = waveCanvas ? waveCanvas.getContext('2d') : null;
   let analyser = null, audioCtx = null, waveRaf = null, waveRunning = false;
@@ -184,6 +185,9 @@ document.addEventListener('DOMContentLoaded', () => {
     artImg.src = url;
   }
 
+  // Try embedded cover art first (extracted at upload time from ID3/FLAC tags)
+  if (embeddedArt) applyArt(embeddedArt);
+
   if (lastfmKey) {
     const raw       = document.getElementById('ap-title').textContent;
     const trackName = raw.replace(/\.\w{1,5}$/, '').replace(/^[\[(]?\d+(?:-\d+)?[\])]?[-._\s]+/, '').trim();
@@ -296,7 +300,9 @@ document.addEventListener('DOMContentLoaded', () => {
     <% elsif filetype == Filetype::Audio %>
       <audio id="audio-el" src="/-/file/<%= filename_ %>" preload="metadata"></audio>
       <div id="ap-page-bg" class="ap-page-bg"></div>
-      <div class="audio-player" id="audio-player" data-lastfm-key="<%= CONFIG.lastfm_api_key %>">
+      <div class="audio-player" id="audio-player"
+        data-lastfm-key="<%= CONFIG.lastfm.enabled ? CONFIG.lastfm.api_key : "" %>"
+        data-thumbnail="<%= fileinfo.thumbnail ? "/-/thumbnail/#{fileinfo.thumbnail}" : "" %>">
         <canvas id="ap-canvas" width="20" height="20" style="display:none"></canvas>
         <img id="ap-art" class="ap-art-img" alt="Album art" crossorigin="anonymous" style="display:none">
         <div id="ap-art-placeholder" class="ap-art-placeholder">

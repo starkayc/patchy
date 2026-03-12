@@ -232,10 +232,17 @@ class Config
   # Abuse email that is going to be displayed on the website of the uploader
   property abuse_email : String = ""
 
-  # Last.fm API key used to fetch album art on the audio player.
-  # Get one free at https://www.last.fm/api/account/create
-  # Leave empty to disable.
-  property lastfm_api_key : String = ""
+  # Last.fm integration for fetching album art on the audio player.
+  property lastfm : LastFM = LastFM.from_yaml("")
+
+  struct LastFM
+    include YAML::Serializable
+
+    # Set to true and provide an api_key to enable Last.fm album art fetching.
+    # Get a free API key at https://www.last.fm/api/account/create
+    property enabled : Bool = false
+    property api_key : String = ""
+  end
 
   # Blocked extensions that are not allowed to be uploaded to the server
   property blocked_extensions : Array(String) = [] of String

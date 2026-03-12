@@ -142,7 +142,8 @@ blocked_extensions:
 # alternative_domains:
 #   - "example.com"
 
-# Last.fm API key for fetching album art on the audio player.
-# Get one free at https://www.last.fm/api/account/create
-# Leave empty to disable.
-lastfm_api_key: ""
+# Last.fm integration for fetching album art on the audio player.
+# Get a free API key at https://www.last.fm/api/account/create
+# lastfm:
+#   enabled: false
+#   api_key: ""

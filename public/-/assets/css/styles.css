@@ -166,6 +166,8 @@ a[href]:hover {
 
 .media-container {
   padding: 1.5rem 1rem;
+  position: relative;
+  z-index: 1;
 }
 
 .site-info {
