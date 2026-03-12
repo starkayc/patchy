@@ -486,7 +486,8 @@ input[type="submit"]:active {
   line-height: 1.4;
 }
 
-.fnd-btn {
+.fnd-btn,
+.fnd-btn[href] {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
@@ -501,8 +502,10 @@ input[type="submit"]:active {
   transition: background-color 0.15s ease;
 }
 
-.fnd-btn:hover {
+.fnd-btn:hover,
+.fnd-btn[href]:hover {
   background: var(--accent-hover);
+  color: #fff;
 }
 
 /* ------ Audio player ------ */
