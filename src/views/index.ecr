@@ -63,9 +63,7 @@
       <% end %>
     </div>
     <% if CONFIG.views.index.show_version %>
-      <a href='https://codeberg.org/Fijxu/patchy'>
-        patchy (<%= CURRENT_COMMIT %> - <%= CURRENT_VERSION %> @ <%= CURRENT_BRANCH %>)
-      </a>
+      <a href='https://github.com/starkayc/patchy/commit/<%= CURRENT_COMMIT %>'>patchy (<%= CURRENT_COMMIT %> - <%= CURRENT_VERSION %> @ <%= CURRENT_BRANCH %>)</a>
     <% end %>
     <% if !CONFIG.abuse_email.empty? %>
       <a href='mailto:<%= CONFIG.abuse_email %>'><%= translate(locale, "abuse_email") %></a>
