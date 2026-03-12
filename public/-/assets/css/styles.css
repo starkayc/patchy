@@ -360,7 +360,8 @@ input[type="submit"]:active {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 0.4rem;
+  align-items: baseline;
+  gap: 0.25rem 0.4rem;
 }
 
 .percent {
@@ -445,4 +446,125 @@ nav > ul {
   margin: 0;
   padding: 0;
   text-align: center;
+}
+
+/* ------ Uploader configs ------ */
+
+.configs-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  color: var(--fg);
+  margin: 0 0 1.5rem;
+}
+
+.config-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.config-card {
+  background: var(--bg-card);
+  border: 1px solid var(--separator);
+  border-radius: 18px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.35);
+}
+
+.config-card-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.config-card-name {
+  font-size: 1.1rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--fg);
+}
+
+.config-card-badge {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  color: var(--accent);
+  background: rgba(41, 151, 255, 0.12);
+  border: 1px solid rgba(41, 151, 255, 0.25);
+  border-radius: 6px;
+  padding: 0.2rem 0.55rem;
+}
+
+.config-card-desc {
+  font-size: 0.875rem;
+  color: var(--fg-secondary);
+  margin: 0 0 1.25rem;
+  line-height: 1.5;
+}
+
+.config-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.config-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.config-field-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--fg-tertiary);
+}
+
+.config-field-value {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--bg-elevated);
+  border: 1px solid var(--separator);
+  border-radius: 10px;
+  padding: 0.55rem 0.85rem;
+}
+
+.config-field-value code {
+  flex: 1;
+  font-family:
+    "SF Mono", ui-monospace, "Cascadia Code", "Fira Code", Menlo, monospace;
+  font-size: 0.85rem;
+  color: var(--fg);
+  overflow-x: auto;
+  white-space: nowrap;
+}
+
+.config-download-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: var(--accent);
+  color: #ffffff !important;
+  font-size: 0.875rem;
+  font-weight: 600;
+  padding: 0.6rem 1.2rem;
+  border-radius: 10px;
+  text-decoration: none !important;
+  transition:
+    background-color 0.15s ease,
+    transform 0.1s ease;
+}
+
+.config-download-btn:hover {
+  background: var(--accent-hover);
+  text-decoration: none !important;
+}
+
+.config-download-btn:active {
+  transform: scale(0.98);
 }

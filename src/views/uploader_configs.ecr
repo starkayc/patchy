@@ -4,22 +4,72 @@
 
 <% content_for "head" do %>
 <title> <%= host %> - <%= title %></title>
+<script>
+function copyValue(btn, value) {
+  navigator.clipboard.writeText(value).then(() => {
+    const orig = btn.textContent;
+    btn.textContent = 'Copied!';
+    setTimeout(() => btn.textContent = orig, 1500);
+  });
+}
+</script>
 <% end %>
 
 <div class="container">
-  <a href='/'><%= translate(locale, "go_back") %></a>
+  <a href='/'>← <%= translate(locale, "go_back") %></a>
   <hr>
-  <h2><%= title %>
-  <h3>Chatterino</h3>
-    <p>
-      <%= translate(locale, "uploader_configs_chatterino_text") %>
-      <p>Request URL: <b><a><%= scheme %>://<%= host %>/-/upload</a></b></p>
-      <p>Form field: <b><a>data</a></b></p>
-      <p>Image link: <b><a>{link}</a></b></p>
-      <p>Delete link: <b><a>{deleteLink}</a></b></p>
-    </p>
-  <h3>ShareX</h3>
-    <p>
-      <%= translate(locale, "uploader_configs_sharex_text") %> <a href='./sharex.sxcu'><%= host || "sharex" %>.sxcu</a>
-    </p>
+  <h2 class="configs-title"><%= title %></h2>
+
+  <div class="config-cards">
+
+    <!-- Chatterino -->
+    <div class="config-card">
+      <div class="config-card-header">
+        <span class="config-card-name">Chatterino</span>
+        <span class="config-card-badge">Image uploader</span>
+      </div>
+      <p class="config-card-desc"><%= translate(locale, "uploader_configs_chatterino_text") %></p>
+      <div class="config-fields">
+        <div class="config-field">
+          <span class="config-field-label">Request URL</span>
+          <div class="config-field-value">
+            <code><%= scheme %>://<%= host %>/-/upload</code>
+            <button class="button copy-button" onclick="copyValue(this, '<%= scheme %>://<%= host %>/-/upload')">Copy</button>
+          </div>
+        </div>
+        <div class="config-field">
+          <span class="config-field-label">Form field</span>
+          <div class="config-field-value">
+            <code>file</code>
+            <button class="button copy-button" onclick="copyValue(this, 'file')">Copy</button>
+          </div>
+        </div>
+        <div class="config-field">
+          <span class="config-field-label">Image link</span>
+          <div class="config-field-value">
+            <code>{link}</code>
+            <button class="button copy-button" onclick="copyValue(this, '{link}')">Copy</button>
+          </div>
+        </div>
+        <div class="config-field">
+          <span class="config-field-label">Delete link</span>
+          <div class="config-field-value">
+            <code>{deleteLink}</code>
+            <button class="button copy-button" onclick="copyValue(this, '{deleteLink}')">Copy</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ShareX -->
+    <div class="config-card">
+      <div class="config-card-header">
+        <span class="config-card-name">ShareX</span>
+        <span class="config-card-badge">Image &amp; file uploader</span>
+      </div>
+      <p class="config-card-desc"><%= translate(locale, "uploader_configs_sharex_text") %></p>
+      <a class="config-download-btn" href='./sharex.sxcu' download><%= host || "sharex" %>.sxcu</a>
+    </div>
+
+  </div>
 </div>
