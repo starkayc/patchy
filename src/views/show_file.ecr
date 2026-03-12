@@ -135,8 +135,8 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   drawWaveform(false); // draw idle state on load
-  audio.addEventListener('play',  startWaveAnim);
-  audio.addEventListener('pause', pauseWaveAnim);
+  audio.addEventListener('play',  () => { startWaveAnim(); artImg.classList.add('playing'); artWrap.classList.add('playing'); });
+  audio.addEventListener('pause', () => { pauseWaveAnim(); artImg.classList.remove('playing'); artWrap.classList.remove('playing'); });
   window.addEventListener('resize', () => { if (!waveRunning) drawWaveform(false); });
 
   const SVG_PLAY  = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>';
@@ -247,7 +247,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function updateDuration() {
-    if (isFinite(audio.duration) && audio.duration > 0) dur.textContent = fmt(audio.duration);
+    if (isFinite(audio.duration) && audio.duration > 0) dur.textContent = '-' + fmt(audio.duration);
   }
   audio.addEventListener('loadedmetadata', updateDuration);
   audio.addEventListener('durationchange', updateDuration);
@@ -257,12 +257,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
   audio.addEventListener('timeupdate', () => {
     elapsed.textContent = fmt(audio.currentTime);
+    dur.textContent = audio.duration ? '-' + fmt(audio.duration - audio.currentTime) : '--:--';
     const pct = audio.duration ? (audio.currentTime / audio.duration) * 100 : 0;
     fill.style.width = pct + '%';
     thumb.style.left = pct + '%';
   });
 
-  audio.addEventListener('ended', () => { playBtn.innerHTML = SVG_PLAY; pauseWaveAnim(); });
+  audio.addEventListener('ended', () => { playBtn.innerHTML = SVG_PLAY; pauseWaveAnim(); artImg.classList.remove('playing'); artWrap.classList.remove('playing'); });
 
   playBtn.addEventListener('click', () => {
     setupAnalyser();
@@ -340,19 +341,19 @@ document.addEventListener('DOMContentLoaded', () => {
             <circle cx="24" cy="24" r="2.5" fill="rgba(255,255,255,0.35)"/>
           </svg>
         </div>
-        <div class="ap-meta">
-          <div class="ap-title" id="ap-title"><%= original_filename_ %></div>
-          <div class="ap-artist" id="ap-artist"></div>
-        </div>
-        <canvas id="ap-waveform" class="ap-waveform" aria-hidden="true"></canvas>
         <div class="ap-scrub">
-          <span id="ap-elapsed" class="ap-time">0:00</span>
+          <span id="ap-elapsed" class="ap-time">--:--</span>
           <div id="ap-progress" class="ap-bar">
             <div id="ap-fill" class="ap-bar-fill"></div>
             <div id="ap-thumb" class="ap-bar-thumb"></div>
           </div>
           <span id="ap-duration" class="ap-time">--:--</span>
         </div>
+        <div class="ap-meta">
+          <div class="ap-title" id="ap-title"><%= original_filename_ %></div>
+          <div class="ap-artist" id="ap-artist"></div>
+        </div>
+        <canvas id="ap-waveform" class="ap-waveform" aria-hidden="true"></canvas>
         <div class="ap-controls">
           <button id="ap-play" class="ap-play-btn" aria-label="Play / Pause"></button>
         </div>
