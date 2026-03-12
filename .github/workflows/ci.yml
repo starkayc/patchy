@@ -64,5 +64,5 @@ jobs:
           push: true
           provenance: true
           sbom: true
-          cache-from: type=gha
-          cache-to: type=gha,mode=max,ignore-error=true
+          cache-from: type=gha,scope=docker-build-v1
+          cache-to: type=gha,mode=max,ignore-error=true,scope=docker-build-v1
