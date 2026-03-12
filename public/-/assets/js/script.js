@@ -21,6 +21,14 @@ window.addEventListener("DOMContentLoaded", () => {
   const dropAreaText = document.createElement("p");
   dropAreaText.textContent = translate_uploadText;
   dropArea?.appendChild(dropAreaText);
+
+  const sizeLimit = dropArea?.dataset.sizeLimit;
+  if (sizeLimit) {
+    const dropAreaSub = document.createElement("p");
+    dropAreaSub.textContent = `Max file size: ${sizeLimit}`;
+    dropAreaSub.className = "drop-area-limit";
+    dropArea?.appendChild(dropAreaSub);
+  }
   dropArea?.addEventListener("drop", handleDrop, false);
   dropArea?.addEventListener("click", () => fileInput?.click());
 
