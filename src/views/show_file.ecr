@@ -106,26 +106,47 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   if (lastfmKey) {
-    const raw = document.getElementById('ap-title').textContent;
-    const q   = encodeURIComponent(raw.replace(/\.\w{1,5}$/, '').replace(/^\d+[-._\s]+/, '').trim());
+    const raw       = document.getElementById('ap-title').textContent;
+    const trackName = raw.replace(/\.\w{1,5}$/, '').replace(/^\d+[-._\s]+/, '').trim();
+    const q         = encodeURIComponent(trackName);
+    const PLACEHOLDER = '2a96cbd8b46e442fc41c2b86b821562f';
+
+    function bestImage(images) {
+      // Walk all sizes (small→mega), keep last non-empty non-placeholder URL
+      let url = '';
+      for (const img of (images || [])) {
+        if (img['#text'] && !img['#text'].includes(PLACEHOLDER)) url = img['#text'];
+      }
+      return url;
+    }
+
+    // Step 1: track.search → canonical artist name
     fetch(`https://ws.audioscrobbler.com/2.0/?method=track.search&track=${q}&api_key=${lastfmKey}&format=json&limit=1`)
       .then(r => r.json())
       .then(data => {
         const track = data?.results?.trackmatches?.track?.[0];
         if (!track) return;
-        if (track.artist) artistEl.textContent = track.artist;
-        const img = (track.image || []).find(i => i.size === 'extralarge') ||
-                    (track.image || []).find(i => i.size === 'large');
-        const url = img?.['#text'];
-        // Last.fm returns a 1x1 grey placeholder for missing art — skip it
-        if (url && !url.includes('2a96cbd8b46e442fc41c2b86b821562f')) applyArt(url);
+        const artist = track.artist || '';
+        if (artist) artistEl.textContent = artist;
+        // Step 2: track.getInfo → album.image (far more reliable than search result images)
+        return fetch(`https://ws.audioscrobbler.com/2.0/?method=track.getInfo&track=${q}&artist=${encodeURIComponent(artist)}&api_key=${lastfmKey}&format=json&autocorrect=1`)
+          .then(r => r.json())
+          .then(info => {
+            const url = bestImage(info?.track?.album?.image);
+            if (url) applyArt(url);
+          });
       })
       .catch(() => {});
   }
 
-  function updateDuration() { if (isFinite(audio.duration)) dur.textContent = fmt(audio.duration); }
+  function updateDuration() {
+    if (isFinite(audio.duration) && audio.duration > 0) dur.textContent = fmt(audio.duration);
+  }
   audio.addEventListener('loadedmetadata', updateDuration);
   audio.addEventListener('durationchange', updateDuration);
+  audio.addEventListener('canplay', updateDuration);
+  // Metadata may already be loaded if the browser cached the file
+  if (audio.readyState >= 1) updateDuration();
 
   audio.addEventListener('timeupdate', () => {
     elapsed.textContent = fmt(audio.currentTime);
@@ -210,7 +231,7 @@ document.addEventListener('DOMContentLoaded', () => {
             <div id="ap-fill" class="ap-bar-fill"></div>
             <div id="ap-thumb" class="ap-bar-thumb"></div>
           </div>
-          <span id="ap-duration" class="ap-time">0:00</span>
+          <span id="ap-duration" class="ap-time">--:--</span>
         </div>
         <div class="ap-controls">
           <button id="ap-play" class="ap-play-btn" aria-label="Play / Pause"></button>
