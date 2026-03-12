@@ -232,6 +232,11 @@ class Config
   # Abuse email that is going to be displayed on the website of the uploader
   property abuse_email : String = ""
 
+  # Last.fm API key used to fetch album art on the audio player.
+  # Get one free at https://www.last.fm/api/account/create
+  # Leave empty to disable.
+  property lastfm_api_key : String = ""
+
   # Blocked extensions that are not allowed to be uploaded to the server
   property blocked_extensions : Array(String) = [] of String
 

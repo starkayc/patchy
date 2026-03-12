@@ -32,11 +32,11 @@ module Routing
       "sandbox allow-popups allow-popups-to-escape-sandbox allow-downloads allow-scripts allow-same-origin allow-forms",
       "default-src 'self'",
       "script-src 'self' 'unsafe-inline' https://pls.starkayc.moe https://static.cloudflareinsights.com",
-      "img-src 'self' data:",
+      "img-src 'self' data: https://lastfm.freetls.fastly.net",
       "media-src 'self' data:",
       "style-src 'self' 'unsafe-inline'",
       "font-src 'self' data:",
-      "connect-src 'self' https://pls.starkayc.moe https://cloudflareinsights.com",
+      "connect-src 'self' https://pls.starkayc.moe https://cloudflareinsights.com https://ws.audioscrobbler.com",
     }.join(";")
 
     if env.request.resource.starts_with?(ADMIN_API_ROUTE_PATH)

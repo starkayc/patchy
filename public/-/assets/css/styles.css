@@ -418,43 +418,96 @@ input[type="submit"]:active {
 
 /* ------ Audio player ------ */
 
+.ap-page-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background: var(--bg);
+  pointer-events: none;
+}
+
+.ap-page-bg.has-art {
+  background-size: cover;
+  background-position: center;
+  filter: blur(60px) brightness(0.35) saturate(2.5);
+  transform: scale(1.1);
+}
+
+.media:has(.audio-player) {
+  height: auto;
+  max-height: none;
+  padding: 2rem 1rem 3rem;
+  position: relative;
+  z-index: 1;
+}
+
 .audio-player {
+  --ap-accent: #fc3c44;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 1.5rem;
-  background: var(--bg-card);
-  border: 1px solid var(--separator);
-  border-radius: 28px;
-  padding: 2.5rem 2rem 2rem;
-  width: min(420px, 90vw);
-  box-shadow: 0 8px 48px rgba(0, 0, 0, 0.6);
+  gap: 1.25rem;
+  background: rgba(28, 28, 30, 0.75);
+  backdrop-filter: blur(40px);
+  -webkit-backdrop-filter: blur(40px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 24px;
+  padding: 2rem 2rem 1.75rem;
+  width: min(380px, 90vw);
+  box-shadow: 0 16px 64px rgba(0, 0, 0, 0.7);
+  position: relative;
+  z-index: 1;
 }
 
-.ap-artwork {
-  width: 140px;
-  height: 140px;
-  border-radius: 50%;
-  background: radial-gradient(circle at 35% 35%, #3a3a3c, #1c1c1e);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 4px 32px rgba(0, 0, 0, 0.5);
+.ap-art-img {
+  width: 200px;
+  height: 200px;
+  border-radius: 12px;
+  object-fit: cover;
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.6);
+  display: block;
   flex-shrink: 0;
 }
 
-.ap-artwork svg {
+.ap-art-placeholder {
+  width: 200px;
+  height: 200px;
+  border-radius: 12px;
+  background: linear-gradient(145deg, #2c2c2e, #1c1c1e);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.6);
+  flex-shrink: 0;
+}
+
+.ap-art-placeholder svg {
+  width: 72px;
+  height: 72px;
+  color: rgba(255, 255, 255, 0.2);
+}
+
+.ap-meta {
+  text-align: center;
   width: 100%;
-  height: 100%;
 }
 
 .ap-title {
-  font-size: 0.95rem;
-  font-weight: 600;
+  font-size: 1rem;
+  font-weight: 700;
   color: var(--fg);
   letter-spacing: -0.02em;
-  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   max-width: 100%;
+}
+
+.ap-artist {
+  font-size: 0.875rem;
+  color: var(--ap-accent);
+  font-weight: 500;
+  margin-top: 0.2rem;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -468,7 +521,7 @@ input[type="submit"]:active {
 }
 
 .ap-time {
-  font-size: 0.72rem;
+  font-size: 0.7rem;
   font-variant-numeric: tabular-nums;
   color: var(--fg-tertiary);
   font-weight: 500;
@@ -479,7 +532,7 @@ input[type="submit"]:active {
 .ap-bar {
   flex: 1;
   height: 4px;
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.15);
   border-radius: 99px;
   position: relative;
   cursor: pointer;
@@ -524,8 +577,8 @@ input[type="submit"]:active {
 }
 
 .ap-play-btn {
-  width: 60px;
-  height: 60px;
+  width: 56px;
+  height: 56px;
   border-radius: 50%;
   background: var(--fg);
   border: none;
@@ -533,12 +586,15 @@ input[type="submit"]:active {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.3rem;
   color: var(--bg);
-  transition:
-    transform 0.1s ease,
-    background-color 0.15s ease;
+  transition: transform 0.1s ease;
   flex-shrink: 0;
+  padding: 0;
+}
+
+.ap-play-btn svg {
+  width: 26px;
+  height: 26px;
 }
 
 .ap-play-btn:hover {
@@ -557,8 +613,8 @@ input[type="submit"]:active {
 }
 
 .ap-vol-icon {
-  width: 18px;
-  height: 18px;
+  width: 16px;
+  height: 16px;
   color: var(--fg-tertiary);
   flex-shrink: 0;
   stroke: currentColor;
@@ -570,8 +626,8 @@ input[type="submit"]:active {
 
 .ap-vol-track {
   flex: 1;
-  height: 4px;
-  background: rgba(255, 255, 255, 0.1);
+  height: 3px;
+  background: rgba(255, 255, 255, 0.15);
   border-radius: 99px;
   position: relative;
   cursor: pointer;
@@ -579,7 +635,7 @@ input[type="submit"]:active {
 
 .ap-vol-fill {
   height: 100%;
-  background: rgba(255, 255, 255, 0.4);
+  background: rgba(255, 255, 255, 0.5);
   border-radius: 99px;
   width: 100%;
   pointer-events: none;

@@ -41,26 +41,91 @@
 <% if filetype == Filetype::Audio %>
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-  const audio = document.getElementById('audio-el');
-  const playBtn = document.getElementById('ap-play');
-  const playIcon = document.getElementById('ap-play-icon');
-  const elapsed = document.getElementById('ap-elapsed');
-  const duration = document.getElementById('ap-duration');
+  const audio    = document.getElementById('audio-el');
+  const playBtn  = document.getElementById('ap-play');
+  const elapsed  = document.getElementById('ap-elapsed');
+  const dur      = document.getElementById('ap-duration');
   const progress = document.getElementById('ap-progress');
-  const fill = document.getElementById('ap-fill');
-  const thumb = document.getElementById('ap-thumb');
+  const fill     = document.getElementById('ap-fill');
+  const thumb    = document.getElementById('ap-thumb');
   const volSlider = document.getElementById('ap-vol');
-  const volFill = document.getElementById('ap-vol-fill');
+  const volFill  = document.getElementById('ap-vol-fill');
+  const artImg   = document.getElementById('ap-art');
+  const artWrap  = document.getElementById('ap-art-placeholder');
+  const artistEl = document.getElementById('ap-artist');
+  const pageBg   = document.getElementById('ap-page-bg');
+  const canvas   = document.getElementById('ap-canvas');
+  const player   = document.getElementById('audio-player');
+  const lastfmKey = player.dataset.lastfmKey;
+
+  const SVG_PLAY  = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>';
+  const SVG_PAUSE = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>';
+  playBtn.innerHTML = SVG_PLAY;
 
   function fmt(s) {
     if (!isFinite(s)) return '0:00';
-    const m = Math.floor(s / 60), sec = Math.floor(s % 60);
-    return m + ':' + String(sec).padStart(2, '0');
+    return Math.floor(s/60) + ':' + String(Math.floor(s%60)).padStart(2,'0');
   }
 
-  audio.addEventListener('loadedmetadata', () => {
-    duration.textContent = fmt(audio.duration);
-  });
+  function extractColor(img) {
+    try {
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, 20, 20);
+      const d = ctx.getImageData(0, 0, 20, 20).data;
+      let bH=0, bS=0;
+      for (let i=0; i<d.length; i+=4) {
+        const r=d[i]/255, g=d[i+1]/255, b=d[i+2]/255;
+        const mx=Math.max(r,g,b), mn=Math.min(r,g,b), l=(mx+mn)/2;
+        if (mx!==mn) {
+          const s = l>0.5 ? (mx-mn)/(2-mx-mn) : (mx-mn)/(mx+mn);
+          if (s>bS) {
+            bS=s;
+            bH = mx===r ? ((g-b)/(mx-mn)+6)%6 : mx===g ? (b-r)/(mx-mn)+2 : (r-g)/(mx-mn)+4;
+          }
+        }
+      }
+      return bS > 0.15 ? `hsl(${bH*60},${Math.min(bS*100+15,85)}%,60%)` : null;
+    } catch(e) { return null; }
+  }
+
+  function applyArt(url) {
+    artImg.onload = () => {
+      artImg.style.display = 'block';
+      artWrap.style.display = 'none';
+      if (pageBg) {
+        pageBg.style.backgroundImage = `url('${url}')`;
+        pageBg.classList.add('has-art');
+      }
+      const color = extractColor(artImg);
+      if (color) {
+        player.style.setProperty('--ap-accent', color);
+      }
+    };
+    artImg.onerror = () => {};
+    artImg.src = url;
+  }
+
+  if (lastfmKey) {
+    const raw = document.getElementById('ap-title').textContent;
+    const q   = encodeURIComponent(raw.replace(/\.\w{1,5}$/, '').replace(/^\d+[-._\s]+/, '').trim());
+    fetch(`https://ws.audioscrobbler.com/2.0/?method=track.search&track=${q}&api_key=${lastfmKey}&format=json&limit=1`)
+      .then(r => r.json())
+      .then(data => {
+        const track = data?.results?.trackmatches?.track?.[0];
+        if (!track) return;
+        if (track.artist) artistEl.textContent = track.artist;
+        const img = (track.image || []).find(i => i.size === 'extralarge') ||
+                    (track.image || []).find(i => i.size === 'large');
+        const url = img?.['#text'];
+        // Last.fm returns a 1x1 grey placeholder for missing art — skip it
+        if (url && !url.includes('2a96cbd8b46e442fc41c2b86b821562f')) applyArt(url);
+      })
+      .catch(() => {});
+  }
+
+  function updateDuration() { if (isFinite(audio.duration)) dur.textContent = fmt(audio.duration); }
+  audio.addEventListener('loadedmetadata', updateDuration);
+  audio.addEventListener('durationchange', updateDuration);
 
   audio.addEventListener('timeupdate', () => {
     elapsed.textContent = fmt(audio.currentTime);
@@ -69,23 +134,19 @@ document.addEventListener('DOMContentLoaded', () => {
     thumb.style.left = pct + '%';
   });
 
-  audio.addEventListener('ended', () => {
-    playIcon.textContent = '▶';
-  });
+  audio.addEventListener('ended', () => { playBtn.innerHTML = SVG_PLAY; });
 
   playBtn.addEventListener('click', () => {
-    if (audio.paused) { audio.play(); playIcon.textContent = '⏸'; }
-    else { audio.pause(); playIcon.textContent = '▶'; }
+    if (audio.paused) { audio.play(); playBtn.innerHTML = SVG_PAUSE; }
+    else              { audio.pause(); playBtn.innerHTML = SVG_PLAY; }
   });
 
-  // Scrubbing
   let scrubbing = false;
   function scrubTo(e) {
     const rect = progress.getBoundingClientRect();
     const x = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left;
-    const pct = Math.max(0, Math.min(1, x / rect.width));
     fill.style.transition = 'none';
-    audio.currentTime = pct * audio.duration;
+    audio.currentTime = Math.max(0, Math.min(1, x / rect.width)) * audio.duration;
   }
   progress.addEventListener('mousedown',  e => { scrubbing = true; scrubTo(e); });
   progress.addEventListener('touchstart', e => { scrubbing = true; scrubTo(e); }, { passive: true });
@@ -94,15 +155,14 @@ document.addEventListener('DOMContentLoaded', () => {
   window.addEventListener('mouseup',  () => { scrubbing = false; fill.style.transition = ''; });
   window.addEventListener('touchend', () => { scrubbing = false; fill.style.transition = ''; });
 
-  // Volume
   volSlider.addEventListener('input', () => {
     audio.volume = volSlider.value;
     volFill.style.width = (volSlider.value * 100) + '%';
   });
-  volFill.style.width = (volSlider.value * 100) + '%';
+  volFill.style.width = '100%';
 
   <% if CONFIG.views.show_file.autoplay_audio %>
-  audio.play().then(() => playIcon.textContent = '⏸').catch(() => {});
+  audio.play().then(() => playBtn.innerHTML = SVG_PAUSE).catch(() => {});
   <% end %>
 });
 </script>
@@ -133,16 +193,17 @@ document.addEventListener('DOMContentLoaded', () => {
       </video>
     <% elsif filetype == Filetype::Audio %>
       <audio id="audio-el" src="/-/file/<%= filename_ %>" preload="metadata"></audio>
-      <div class="audio-player">
-        <div class="ap-artwork">
-          <svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <circle cx="40" cy="40" r="38" stroke="rgba(255,255,255,0.08)" stroke-width="2"/>
-            <circle cx="40" cy="40" r="24" fill="rgba(255,255,255,0.06)"/>
-            <circle cx="40" cy="40" r="6" fill="rgba(255,255,255,0.3)"/>
-            <path d="M34 28 L34 52 L56 40 Z" fill="rgba(255,255,255,0.15)"/>
-          </svg>
+      <div id="ap-page-bg" class="ap-page-bg"></div>
+      <div class="audio-player" id="audio-player" data-lastfm-key="<%= CONFIG.lastfm_api_key %>">
+        <canvas id="ap-canvas" width="20" height="20" style="display:none"></canvas>
+        <img id="ap-art" class="ap-art-img" alt="Album art" style="display:none">
+        <div id="ap-art-placeholder" class="ap-art-placeholder">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
         </div>
-        <div class="ap-title"><%= original_filename_ %></div>
+        <div class="ap-meta">
+          <div class="ap-title" id="ap-title"><%= original_filename_ %></div>
+          <div class="ap-artist" id="ap-artist"></div>
+        </div>
         <div class="ap-scrub">
           <span id="ap-elapsed" class="ap-time">0:00</span>
           <div id="ap-progress" class="ap-bar">
@@ -152,12 +213,10 @@ document.addEventListener('DOMContentLoaded', () => {
           <span id="ap-duration" class="ap-time">0:00</span>
         </div>
         <div class="ap-controls">
-          <button id="ap-play" class="ap-play-btn" aria-label="Play / Pause">
-            <span id="ap-play-icon">▶</span>
-          </button>
+          <button id="ap-play" class="ap-play-btn" aria-label="Play / Pause"></button>
         </div>
         <div class="ap-volume">
-          <svg class="ap-vol-icon" viewBox="0 0 20 20" fill="currentColor">
+          <svg class="ap-vol-icon" viewBox="0 0 20 20">
             <path d="M9 4L5 7.5H2v5h3L9 16V4zm4.07 1.93a7 7 0 010 12.14M11.54 7.46a4 4 0 010 5.08"/>
           </svg>
           <div class="ap-vol-track">
