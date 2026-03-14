@@ -219,6 +219,7 @@ class Config
   # The lenght of the delete key
   property delete_key_length : Int32 = 6
 
+<<<<<<< HEAD
   property analytics : Analytics = Analytics.from_yaml("")
 
   struct Analytics
@@ -244,6 +245,11 @@ class Config
     property api_key : String = ""
   end
 
+=======
+  # Abuse email that is going to be displayed on the website of the uploader
+  property abuse_email : String = ""
+
+>>>>>>> upstream/master
   # Blocked extensions that are not allowed to be uploaded to the server
   property blocked_extensions : Array(String) = [] of String
 

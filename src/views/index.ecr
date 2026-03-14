@@ -40,7 +40,11 @@
   <% if !(site_info = CONFIG.views.index.site_info).empty? %>
     <p class="site-info"><%= site_info %></p>
   <% end %>
+<<<<<<< HEAD
   <div class="drop-area" id="drop-area"<% if CONFIG.size_limit > 0 %> data-size-limit="<%= CONFIG.size_limit %> MiB"<% end %>>
+=======
+  <div class="drop-area" id="drop-area">
+>>>>>>> upstream/master
     <form action="/-/upload?nojs=1" method="post" enctype="multipart/form-data" id="nojs-form">
       <input name="file" type="file" id="file"/>
       <input type="submit" value="Upload" id="upload-box">
@@ -63,7 +67,13 @@
       <% end %>
     </div>
     <% if CONFIG.views.index.show_version %>
+<<<<<<< HEAD
       <a href='https://github.com/starkayc/patchy/commit/<%= CURRENT_COMMIT %>'>patchy (<%= CURRENT_COMMIT %> - <%= CURRENT_VERSION %> @ <%= CURRENT_BRANCH %>)</a>
+=======
+      <a href='https://codeberg.org/Fijxu/patchy'>
+        patchy (<%= CURRENT_COMMIT %> - <%= CURRENT_VERSION %> @ <%= CURRENT_BRANCH %>)
+      </a>
+>>>>>>> upstream/master
     <% end %>
     <% if !CONFIG.abuse_email.empty? %>
       <a href='mailto:<%= CONFIG.abuse_email %>'><%= translate(locale, "abuse_email") %></a>

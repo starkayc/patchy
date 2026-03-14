@@ -4,6 +4,7 @@
 
 <% content_for "head" do %>
 <title> <%= host %> - <%= title %></title>
+<<<<<<< HEAD
 <script>
 function copyValue(btn, value) {
   navigator.clipboard.writeText(value).then(() => {
@@ -72,4 +73,24 @@ function copyValue(btn, value) {
     </div>
 
   </div>
+=======
+<% end %>
+
+<div class="container">
+  <a href='/'><%= translate(locale, "go_back") %></a>
+  <hr>
+  <h2><%= title %>
+  <h3>Chatterino</h3>
+    <p>
+      <%= translate(locale, "uploader_configs_chatterino_text") %>
+      <p>Request URL: <b><a><%= scheme %>://<%= host %>/-/upload</a></b></p>
+      <p>Form field: <b><a>data</a></b></p>
+      <p>Image link: <b><a>{link}</a></b></p>
+      <p>Delete link: <b><a>{deleteLink}</a></b></p>
+    </p>
+  <h3>ShareX</h3>
+    <p>
+      <%= translate(locale, "uploader_configs_sharex_text") %> <a href='./sharex.sxcu'><%= host || "sharex" %>.sxcu</a>
+    </p>
+>>>>>>> upstream/master
 </div>

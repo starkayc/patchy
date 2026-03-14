@@ -1,0 +1,57 @@
+name: 'patchy CI'
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - "main"
+      - "master"
+    paths-ignore:
+      - "*.md"
+      - LICENCE
+      - .git*
+      - screenshots/*
+      - config/**
+      - .vscode/**
+      - patchy.service
+      - docker-compose.yml
+      - docs/**
+
+
+jobs:
+  build:
+    runs-on: runner
+
+    steps:
+    - uses: https://code.forgejo.org/actions/checkout@v6
+
+    - uses: https://code.forgejo.org/docker/setup-buildx-action@v3
+      name: Setup Docker BuildX system
+      id: setup-buildx
+
+    - name: Login to Docker Container Registry
+      uses: https://code.forgejo.org/docker/login-action@v3.7.0
+      with:
+        registry: git.nadeko.net
+        username: ${{ secrets.USERNAME }}
+        password: ${{ secrets.TOKEN }}
+
+    - name: Docker meta
+      id: meta
+      uses: https://code.forgejo.org/docker/metadata-action@v5
+      with:
+        images: git.nadeko.net/fijxu/patchy
+        tags: |
+          type=sha,format=short,prefix={{date 'YYYY.MM.DD'}}-,enable=${{ github.ref == format('refs/heads/{0}', 'master') }}
+          type=raw,value=latest,enable=${{ github.ref == format('refs/heads/{0}', 'master') }}
+
+    - uses: https://code.forgejo.org/docker/build-push-action@v6
+      name: Build images
+      with:
+        context: .
+        file: Dockerfile
+        tags: ${{ steps.meta.outputs.tags }}
+        platforms: linux/amd64
+        push: true
+        cache-from: type=gha
+        cache-to: type=gha,mode=max

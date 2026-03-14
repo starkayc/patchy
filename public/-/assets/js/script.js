@@ -20,6 +20,7 @@ window.addEventListener("DOMContentLoaded", () => {
 
   const dropAreaText = document.createElement("p");
   dropAreaText.textContent = translate_uploadText;
+<<<<<<< HEAD
   dropAreaText.className = "drop-area-text";
   dropArea?.appendChild(dropAreaText);
 
@@ -30,6 +31,10 @@ window.addEventListener("DOMContentLoaded", () => {
     dropAreaSub.className = "drop-area-limit";
     dropArea?.appendChild(dropAreaSub);
   }
+=======
+  dropArea?.appendChild(dropAreaText);
+  dropArea?.addEventListener("drop", handleDrop, false);
+>>>>>>> upstream/master
   dropArea?.addEventListener("click", () => fileInput?.click());
 
   fileInput?.addEventListener(
@@ -37,7 +42,10 @@ window.addEventListener("DOMContentLoaded", () => {
     () => {
       const files = fileInput.files;
       handleFiles(files);
+<<<<<<< HEAD
       fileInput.value = "";
+=======
+>>>>>>> upstream/master
     },
     false,
   );
@@ -91,6 +99,10 @@ window.addEventListener("DOMContentLoaded", () => {
     const deleteButton = document.createElement("button");
 
     uploadContainer.className = "upload-status";
+<<<<<<< HEAD
+=======
+    uploadContainer.id = "upload-status";
+>>>>>>> upstream/master
     uploadContainer.appendChild(uploadText);
     uploadContainer.appendChild(statusLink);
     buttons.appendChild(copyButton);
@@ -98,7 +110,11 @@ window.addEventListener("DOMContentLoaded", () => {
     uploadContainer.appendChild(buttons);
     uploadStatus?.appendChild(uploadContainer);
 
+<<<<<<< HEAD
     uploadText.textContent = "0%";
+=======
+    uploadText.innerHTML = "0%";
+>>>>>>> upstream/master
     uploadText.className = "percent";
     statusLink.className = "status";
     copyButton.className = "button copy-button";
@@ -111,7 +127,11 @@ window.addEventListener("DOMContentLoaded", () => {
     xhr.upload.addEventListener("progress", (e) => {
       if (e.lengthComputable) {
         const percentComplete = Math.round((e.loaded / e.total) * 100);
+<<<<<<< HEAD
         uploadText.textContent = `${percentComplete}%`;
+=======
+        uploadText.innerHTML = `${percentComplete}%`;
+>>>>>>> upstream/master
       }
     });
 
@@ -186,6 +206,10 @@ window.addEventListener("DOMContentLoaded", () => {
     navigator.clipboard.writeText(text);
     const prevState = copyButton.innerHTML;
     copyButton.innerHTML = translate_LinkCopied;
+<<<<<<< HEAD
+=======
+    copyButton.innerHTML = translate_LinkCopied;
+>>>>>>> upstream/master
     setTimeout(() => {
       copyButton.innerHTML = prevState;
     }, 2000);

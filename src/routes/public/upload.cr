@@ -31,7 +31,11 @@ module Routes::Upload
       @link_ext = "#{scheme}://#{host}/#{fileinfo.filename}#{fileinfo.extension}"
       @direct_link = "#{scheme}://#{host}/-/file/#{fileinfo.filename}"
       @direct_link_ext = "#{scheme}://#{host}/-/file/#{fileinfo.filename}#{fileinfo.extension}"
+<<<<<<< HEAD
       @thumbnail_link = fileinfo.thumbnail ? "#{scheme}://#{host}/-/thumbnail/#{fileinfo.thumbnail}" : nil
+=======
+      @thumbnail_link = "#{scheme}://#{host}/-/thumbnail/#{fileinfo.thumbnail}"
+>>>>>>> upstream/master
       @id = fileinfo.filename
       @ext = fileinfo.extension
       @name = fileinfo.original_filename

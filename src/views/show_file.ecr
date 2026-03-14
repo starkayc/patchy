@@ -8,7 +8,11 @@
     filetype = Filetype::Image
   elsif [".mp4", ".webm", ".avi", ".mov", ".ogv"].any? { |ex| fileinfo.extension == ex }
     filetype = Filetype::Video
+<<<<<<< HEAD
   elsif [".flac", ".wav", ".mp3", ".aac", ".ogg", ".opus"].any? { |ex| fileinfo.extension == ex }
+=======
+  elsif [".flac", ".wav", ".mp3", ".acc", ".ogg", ".opus"].any? { |ex| fileinfo.extension == ex }
+>>>>>>> upstream/master
     filetype = Filetype::Audio
   end
 %>
@@ -38,6 +42,7 @@
 <meta property="og:audio:secure_url" content="<%= scheme %>://<%= host %>/-/file/<%= filename_ %><%= extension_ %>">
 <meta property="og:audio:type" content="<%= mime_type %>">
 <% end %>
+<<<<<<< HEAD
 <% if filetype == Filetype::Audio %>
 <script>
 document.addEventListener('DOMContentLoaded', () => {
@@ -299,12 +304,20 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 </script>
 <% end %>
+=======
+
+>>>>>>> upstream/master
 <% end %>
 
 <div class="media-container">
   <div class="navbar">
+<<<<<<< HEAD
     <a href='/'>← <%= translate(locale, "go_back") %></a>
     <a href='/-/file/<%= filename_ %>' download=''>⬇ <%= translate(locale, "download_file") %> (<%= original_filename_ %>)</a>
+=======
+    <a href='/'><%= translate(locale, "go_back") %></a>
+    <a href='/-/file/<%= filename_ %>' download=''><%= translate(locale, "download_file") %> (<%= original_filename_ %>)</a>
+>>>>>>> upstream/master
     <%
       # Disable view button for .html
       if fileinfo.extension != ".html"
@@ -324,6 +337,7 @@ document.addEventListener('DOMContentLoaded', () => {
         Your browser does not support the video tag.
       </video>
     <% elsif filetype == Filetype::Audio %>
+<<<<<<< HEAD
       <audio id="audio-el" src="/-/file/<%= filename_ %>" preload="metadata"></audio>
       <div id="ap-page-bg" class="ap-page-bg"></div>
       <div class="audio-player" id="audio-player"
@@ -385,6 +399,16 @@ document.addEventListener('DOMContentLoaded', () => {
           </svg>
           <%= translate(locale, "download_file") %>
         </a>
+=======
+      <audio class="content" controls <%= CONFIG.views.show_file.autoplay_audio ? "autoplay" : "" %>>
+        <source src="/-/file/<%= filename_ %>" type="<%= mime_type %>">
+        Your browser does not support the audio tag.
+      </audio>
+    <% else %>
+      <div class="file-no-display">
+        <p><%= translate(locale, "file_cannot_be_displayed") %></p>
+        <a href='/-/file/<%= filename_ %>' download=''><%= translate(locale, "download_file") %> (<%= original_filename_ %>)</a>
+>>>>>>> upstream/master
       </div>
     <% end %>
   </div>
