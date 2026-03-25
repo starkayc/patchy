@@ -55,6 +55,8 @@ Kemal.config.host_binding = CONFIG.server.host
 Kemal.config.shutdown_message = false
 Kemal.config.app_name = "Patchy"
 Kemal.config.powered_by_header = false
+# Kemal DSL: https://crystaldoc.info/github/kemalcr/kemal/v1.9.0/toplevel.html#add_context_storage_type(type)-macro
+add_context_storage_type(Preferences)
 
 # Show current configuration
 Log.trace &.emit("current configuration: \n#{CONFIG.to_yaml}")

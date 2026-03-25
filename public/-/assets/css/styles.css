@@ -97,6 +97,10 @@ a[href]:hover {
 	color: var(--blue-dim)
 }
 
+fieldset {
+    border: none;
+}
+
 .img {
 	max-width: 100%;
 	height: auto;
@@ -336,4 +340,16 @@ nav>ul {
 .file-info-box {
 	display: flex;
 	flex-direction: column;
+}
+
+.select-box {
+	background: var(--bg1);
+	color: var(--fg3);
+	border: 1px solid var(--bg2);
+	border-radius: 2px;
+}
+
+.label {
+    margin-right: 20px;
+    color: var(--fg3)
 }

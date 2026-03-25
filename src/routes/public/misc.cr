@@ -51,4 +51,9 @@ module Routes::Misc
 "ErrorMessage": "{json:error}"
 })
   end
+
+  # def style(env : HTTP::Server::Context) : String
+  #   default_style_file = PublicAssets.get("/-/assets/img/#{thumbnail}")
+  #   send_file env, default_style_file.to_slice
+  # end
 end

@@ -87,6 +87,7 @@ module Routes::Views
     locale = Headers.locale
     host = Headers.host
     scheme = Headers.scheme
+    user_settings = Headers.user_settings
 
     templated "settings"
   end

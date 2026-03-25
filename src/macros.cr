@@ -68,4 +68,8 @@ module Headers
   macro user_agent
     env.get("user_agent").as(String)
   end
+
+  macro user_settings
+    env.get("preferences").as(Preferences)
+  end
 end

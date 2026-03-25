@@ -28,6 +28,16 @@ module Routing
     env.set "ip", env.request.headers["X-Real-IP"]? || env.request.remote_address.as?(Socket::IPAddress).try &.address || nil
     env.set "user_agent", env.request.headers["User-Agent"]?
 
+    begin
+      if prefs_cookie = env.request.cookies["PREFS"]?
+        user_settings = Preferences.from_json(URI.decode_www_form(prefs_cookie.value))
+      end
+    rescue
+      user_settings = Preferences.from_json("{}")
+    end
+
+    env.set "preferences", user_settings
+
     env.response.headers["Content-Security-Policy"] = {
       "sandbox allow-popups allow-popups-to-escape-sandbox allow-downloads allow-scripts allow-same-origin allow-forms",
       "default-src 'self'",
@@ -99,6 +109,8 @@ module Routing
     get "/-/info/history", Routes::Views, :upload_history
     get "/-/settings", Routes::Views, :settings
     get "/-/admin", Routes::Views, :admin
+    # Reserved path
+    # get "/-/admin/settings", Routes::Views, :admin
     get "/-/login", Routes::Views, :login
     get "/-/reportabuse", Routes::Views, :reportabuse
 
@@ -116,6 +128,9 @@ module Routing
     # Misc
     get "/-/api/stats", Routes::Misc, :stats
     get "/-/info/sharex.sxcu", Routes::Misc, :sharex_config
+
+    # Preferences
+    post "/-/settings/update_settings", Routes::UserSettings, :update_settings
 
     if CONFIG.cors.enabled
       paths = CONFIG.cors.paths
