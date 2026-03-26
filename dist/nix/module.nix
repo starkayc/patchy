@@ -25,13 +25,13 @@ in
     user = lib.mkOption {
       type = lib.types.str;
       default = "patchy";
-      description = "User account under which http3-ytproxy runs.";
+      description = "User account under which patchy runs.";
     };
 
     group = lib.mkOption {
       type = lib.types.str;
       default = "patchy";
-      description = "Group under which http3-ytproxy runs.";
+      description = "Group under which patchy runs.";
     };
 
     settings = lib.mkOption {
@@ -59,7 +59,7 @@ in
     };
 
     systemd.services.patchy = {
-      description = "Youtube /videoplayback proxy";
+      description = "Temporary and light file uploader";
       wants = [ "network-online.target" ];
       after = [ "network-online.target" ];
       wantedBy = [ "multi-user.target" ];
