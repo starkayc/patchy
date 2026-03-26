@@ -22,7 +22,6 @@ window.addEventListener("DOMContentLoaded", () => {
   const dropAreaText = document.createElement("p");
   dropAreaText.textContent = translate_uploadText;
   dropArea?.appendChild(dropAreaText);
-  dropArea?.addEventListener("drop", handleDrop, false);
   dropArea?.addEventListener("click", () => fileInput?.click());
 
   fileInput?.addEventListener(
