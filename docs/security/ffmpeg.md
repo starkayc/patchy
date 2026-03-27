@@ -38,8 +38,8 @@ requests to a remote host.
 
 ## Why, is it really necessary, how this could be abused?
 
-ffmpeg doesn't care about the file extension that is being server, it will read
-the file and assume it's codec or format based on their contents, this makes
+ffmpeg doesn't care about the file extension of the file that is reading, it will
+read the file and assume it's codec or format based on their contents, this makes
 attackers able to upload a `.png` but with other type of content unrelated to a
 real `.png` file, it could be a text file and ffmpeg will threat it like a text
 file.
