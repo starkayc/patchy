@@ -39,17 +39,22 @@ module Routes::Misc
     # So it's able to download the file instead of displaying it
     env.response.headers["Content-Disposition"] = "attachment; filename=\"#{host}.sxcu\""
 
-    return %({
-"Version": "14.0.1",
-"DestinationType": "ImageUploader, FileUploader",
-"RequestMethod": "POST",
-"RequestURL": "#{scheme}://#{host}/-/upload",
-"Body": "MultipartFormData",
-"FileFormName": "file",
-"URL": "{json:link}",
-"DeletionURL": "{json:deleteLink}",
-"ErrorMessage": "{json:error}"
-})
+    config =
+      <<-JSON
+      {
+        "Version": "14.0.1",
+        "DestinationType": "ImageUploader, FileUploader",
+        "RequestMethod": "POST",
+        "RequestURL": "#{scheme}://#{host}/-/upload",
+        "Body": "MultipartFormData",
+        "FileFormName": "file",
+        "URL": "{json:link}",
+        "DeletionURL": "{json:deleteLink}",
+        "ErrorMessage": "{json:error}"
+      }
+      JSON
+
+    return config
   end
 
   def theme(env : HTTP::Server::Context)
