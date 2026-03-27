@@ -9,7 +9,7 @@ module Utils::Themes
 
   private def load_themes
     Log.info &.emit("Loading themes...")
-    available_theme_files = ::Themes.files
+    available_theme_files = BakedFiles::BuiltInThemes.files
     # Add default theme
     @@themes << "Default"
     available_theme_files.each do |file|

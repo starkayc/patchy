@@ -77,7 +77,7 @@ module Routes::Retrieve
         send_file env, "#{CONFIG.thumbnails}/#{thumbnail}"
       else
         thumbnail = CONFIG.thumbnail_generation.fallback_thumbnail.thumbnail_file
-        baked_thumbnail = PublicAssets.get("/-/assets/img/#{thumbnail}")
+        baked_thumbnail = BakedFiles::PublicAssets.get("/-/assets/img/#{thumbnail}")
         mime_type = MIME.from_filename(thumbnail, "application/octet-stream")
         send_file env, baked_thumbnail.to_slice, mime_type
       end

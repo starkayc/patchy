@@ -43,7 +43,7 @@ module Jobs
   end
 
   def kemal : Fiber
-    Kemal.config.add_handler BakedFileHandler::BakedFileHandler.new(PublicAssets)
+    Kemal.config.add_handler BakedFileHandler::BakedFileHandler.new(BakedFiles::PublicAssets)
     if CONFIG.cors.enabled
       Kemal.config.add_handler Handlers::Options::CORSHeaders.new
     end
