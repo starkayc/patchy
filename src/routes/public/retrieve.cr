@@ -5,8 +5,6 @@ module Routes::Retrieve
 
   # /-/file/:filename
   def retrieve_file(env : HTTP::Server::Context) : Nil
-    host = Headers.host
-    scheme = Headers.scheme
     if_none_match = Headers.if_none_match
     filename = env.params.url["filename"].split(".").first
 
