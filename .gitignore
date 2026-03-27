@@ -9,3 +9,6 @@ thumbnails
 db.sqlite3
 config/config.yml
 patchy
+
+# The history of GDB commands for debugging purposes
+.gdb_history
