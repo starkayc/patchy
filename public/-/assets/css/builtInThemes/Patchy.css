@@ -1,0 +1,28 @@
+:root {
+  --bg_h: #1a0d1c;
+  --bg: #261329;
+  --bg_s: #2e1831;
+  --bg1: #3d1f42;
+  --bg2: #4f2855;
+  --bg3: #613268;
+  --bg4: #7d3f85;
+
+  --fg: #f5e6f7;
+  --fg1: #e8d0eb;
+  --fg2: #d4a8da;
+  --fg3: #d4a8da;
+  --fg4: #a855b3;
+
+  --red: #c94f4f;
+  --green: #6b9e5e;
+  --yellow: #bf86c8;
+  --blue: #7194c0;
+  --purple: #e19daf;
+  --aqua: #5e9e8f;
+  --gray: #8a6b8f;
+  --orange: #c97a4f;
+
+  --blue-dim: #5896e2;
+  --purple-dim: #e0869e;
+  --yellow-dim: #b86ec4;
+}

@@ -4,9 +4,5 @@ struct Preferences
   include JSON::Serializable
   include URI::Params::Serializable
 
-  enum Theme
-    Gruvbox
-  end
-
-  property theme : Theme = Theme::Gruvbox
+  property theme : String = "Gruvbox"
 end

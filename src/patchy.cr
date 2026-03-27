@@ -55,6 +55,7 @@ Kemal.config.host_binding = CONFIG.server.host
 Kemal.config.shutdown_message = false
 Kemal.config.app_name = "Patchy"
 Kemal.config.powered_by_header = false
+Kemal.config.public_folder = "./public"
 # Kemal DSL: https://crystaldoc.info/github/kemalcr/kemal/v1.9.0/toplevel.html#add_context_storage_type(type)-macro
 add_context_storage_type(Preferences)
 
@@ -70,6 +71,7 @@ Utils.create_dir(CONFIG.files, "for files")
 Utils.create_dir(CONFIG.thumbnails, "for thumbnails")
 Routing.register_all
 Utils::Cache.init
+Utils::Themes.init
 
 {% if flag?(:release) || flag?(:production) %}
   Kemal.config.env = "production" if !ENV.has_key?("KEMAL_ENV")

@@ -16,7 +16,7 @@
           <div class="">
             <label for="theme" class="label"><%= translate(locale, "user_settings_theme") %></label>
             <select name="theme" id="theme" class="select-box">
-                <% Preferences::Theme.each do |option| %>
+                <% Utils::Themes.themes.each do |option| %>
                     <option value="<%= option %>" <% if preferences.theme == option %> selected <% end %>><%= option %></option>
                 <% end %>
             </select>

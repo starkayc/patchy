@@ -52,8 +52,11 @@ module Routes::Misc
 })
   end
 
-  # def style(env : HTTP::Server::Context) : String
-  #   default_style_file = PublicAssets.get("/-/assets/img/#{thumbnail}")
-  #   send_file env, default_style_file.to_slice
-  # end
+  def theme(env : HTTP::Server::Context)
+    preferences = Headers.user_settings
+    theme = preferences.theme
+
+    style = PublicAssets.get("/-/assets/css/builtInThemes/#{theme}.css")
+    send_file env, style.to_slice, "text/css"
+  end
 end

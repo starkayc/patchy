@@ -1,10 +1,17 @@
+<%
+  preferences = Headers.user_settings
+%>
+
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="/-/assets/css/styles.css?v=<%= ASSET_COMMIT %>">
+  <link rel="stylesheet" href="/-/assets/css/default.css?v=<%= ASSET_COMMIT %>">
+  <% if preferences.theme != "Default" %>
+    <link rel="stylesheet" href="/-/assets/css/theme.css?v=<%= ASSET_COMMIT %>">
+  <% end %>
   <link rel="icon" type="image/x-icon" href="/-/assets/favicon.ico?v=<%= ASSET_COMMIT %>" />
   <link rel="icon" type="image/png" href="/-/assets/favicon.png?v=<%= ASSET_COMMIT %>" />
   <%= yield_content "head" %>

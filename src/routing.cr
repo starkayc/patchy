@@ -28,6 +28,7 @@ module Routing
     env.set "ip", env.request.headers["X-Real-IP"]? || env.request.remote_address.as?(Socket::IPAddress).try &.address || nil
     env.set "user_agent", env.request.headers["User-Agent"]?
 
+    user_settings = Preferences.from_json("{}")
     begin
       if prefs_cookie = env.request.cookies["PREFS"]?
         user_settings = Preferences.from_json(URI.decode_www_form(prefs_cookie.value))
@@ -131,6 +132,8 @@ module Routing
 
     # Preferences
     post "/-/settings/update_settings", Routes::UserSettings, :update_settings
+
+    get "/-/assets/css/theme.css", Routes::Misc, :theme
 
     if CONFIG.cors.enabled
       paths = CONFIG.cors.paths
