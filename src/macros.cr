@@ -70,6 +70,6 @@ module Headers
   end
 
   macro user_settings
-    env.get("preferences").as(Preferences)
+    env.get("user_settings").as(::UserSettings)
   end
 end

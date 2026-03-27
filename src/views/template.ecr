@@ -1,5 +1,5 @@
 <%
-  preferences = Headers.user_settings
+  user_settings = Headers.user_settings
 %>
 
 <!DOCTYPE html>
@@ -9,7 +9,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="/-/assets/css/default.css?v=<%= ASSET_COMMIT %>">
-  <% if preferences.theme != "Default" %>
+  <% if user_settings.theme != "Default" %>
     <link rel="stylesheet" href="/-/assets/css/theme.css?v=<%= ASSET_COMMIT %>">
   <% end %>
   <link rel="icon" type="image/x-icon" href="/-/assets/favicon.ico?v=<%= ASSET_COMMIT %>" />

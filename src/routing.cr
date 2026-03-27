@@ -28,16 +28,16 @@ module Routing
     env.set "ip", env.request.headers["X-Real-IP"]? || env.request.remote_address.as?(Socket::IPAddress).try &.address || nil
     env.set "user_agent", env.request.headers["User-Agent"]?
 
-    user_settings = Preferences.from_json("{}")
+    user_settings = ::UserSettings.from_json("{}")
     begin
       if prefs_cookie = env.request.cookies["PREFS"]?
-        user_settings = Preferences.from_json(URI.decode_www_form(prefs_cookie.value))
+        user_settings = ::UserSettings.from_json(URI.decode_www_form(prefs_cookie.value))
       end
     rescue
-      user_settings = Preferences.from_json("{}")
+      user_settings = ::UserSettings.from_json("{}")
     end
 
-    env.set "preferences", user_settings
+    env.set "user_settings", user_settings
 
     env.response.headers["Content-Security-Policy"] = {
       "sandbox allow-popups allow-popups-to-escape-sandbox allow-downloads allow-scripts allow-same-origin allow-forms",
@@ -130,7 +130,7 @@ module Routing
     get "/-/api/stats", Routes::Misc, :stats
     get "/-/info/sharex.sxcu", Routes::Misc, :sharex_config
 
-    # Preferences
+    # User settings
     post "/-/settings/update_settings", Routes::UserSettings, :update_settings
 
     get "/-/assets/css/theme.css", Routes::Misc, :theme

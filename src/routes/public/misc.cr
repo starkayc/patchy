@@ -53,8 +53,8 @@ module Routes::Misc
   end
 
   def theme(env : HTTP::Server::Context)
-    preferences = Headers.user_settings
-    theme = preferences.theme
+    user_settings = Headers.user_settings
+    theme = user_settings.theme
 
     style = BakedFiles::BuiltInThemes.get("#{theme}.css")
     send_file env, style.to_slice, "text/css"

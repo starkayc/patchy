@@ -57,7 +57,7 @@ Kemal.config.app_name = "Patchy"
 Kemal.config.powered_by_header = false
 Kemal.config.public_folder = "./public"
 # Kemal DSL: https://crystaldoc.info/github/kemalcr/kemal/v1.9.0/toplevel.html#add_context_storage_type(type)-macro
-add_context_storage_type(Preferences)
+add_context_storage_type(::UserSettings)
 
 # Show current configuration
 Log.trace &.emit("current configuration: \n#{CONFIG.to_yaml}")

@@ -1,6 +1,6 @@
 require "uri/params/serializable"
 
-struct Preferences
+struct UserSettings
   include JSON::Serializable
   include URI::Params::Serializable
 

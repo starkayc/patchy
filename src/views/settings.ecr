@@ -1,6 +1,5 @@
 <%
   title = translate(locale, "index_settings")
-  preferences = env.get("preferences").as(Preferences)
 %>
 
 <% content_for "head" do %>
@@ -17,7 +16,7 @@
             <label for="theme" class="label"><%= translate(locale, "user_settings_theme") %></label>
             <select name="theme" id="theme" class="select-box">
                 <% Utils::Themes.themes.each do |option| %>
-                    <option value="<%= option %>" <% if preferences.theme == option %> selected <% end %>><%= option %></option>
+                    <option value="<%= option %>" <% if user_settings.theme == option %> selected <% end %>><%= option %></option>
                 <% end %>
             </select>
           </div>
