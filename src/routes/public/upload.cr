@@ -47,6 +47,7 @@ module Routes::Upload
     host = Headers.host
     scheme = Headers.scheme
     ip_addr = Headers.ip_addr
+    user_settings = Headers.user_settings
     no_js = env.params.query.has_key?("nojs")
     env.response.content_type = "application/json"
 
@@ -65,7 +66,7 @@ module Routes::Upload
 
     HTTP::FormData.parse(env.request) do |upload|
       begin
-        up = Operations::Upload.new(upload, ip_addr)
+        up = Operations::Upload.new(upload, ip_addr, user_settings)
         up.process
         fileinfo = up.fileinfo
       rescue ex

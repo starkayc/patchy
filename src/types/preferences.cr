@@ -4,5 +4,5 @@ struct UserSettings
   include JSON::Serializable
   include URI::Params::Serializable
 
-  property theme : String = "Gruvbox"
+  property filename_length : Int32 = CONFIG.filename_length
 end

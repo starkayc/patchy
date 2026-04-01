@@ -173,6 +173,10 @@ class Config
 
   # Filename length
   property filename_length : Int32 = 5
+  # Used for user settings
+  property max_filename_length : Int32 = 16
+  # Used for user settings
+  property min_filename_length : Int32 = 5
   # In MiB
   property size_limit : Int16 = 512
   property enable_checksums : Bool = true
@@ -233,6 +237,11 @@ class Config
   def self.check_config(config : Config) : String?
     if config.filename_length <= 0
       Log.fatal &.emit("Config: filename_length cannot be less or equal to 0")
+      exit(1)
+    end
+
+    if config.min_filename_length > config.max_filename_length
+      Log.fatal &.emit("Config: min_filename_length can't be greater than max_filename_length", min_filename_length: config.min_filename_length, max_filename_length: config.max_filename_length)
       exit(1)
     end
 

@@ -6,8 +6,9 @@ module Operations
     @ip_addr : String
     getter fileinfo : Fileinfo = Fileinfo.new
     @ip : IPInfo = IPInfo.new
+    @user_settings : ::UserSettings
 
-    def initialize(@uploaded_file, @ip_addr)
+    def initialize(@uploaded_file, @ip_addr, @user_settings)
       @fileinfo.uploaded_at = Time.utc.to_unix
     end
 
@@ -72,7 +73,7 @@ module Operations
         raise NoFileProvided.new
       end
 
-      @fileinfo.filename = Utils.generate_filename
+      @fileinfo.filename = Utils.generate_filename(@user_settings.filename_length)
 
       # control_v.png and control_v.gif are filenames that are used for files
       # uploaded using Chatterino, so we change the original filename to the

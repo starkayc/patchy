@@ -133,8 +133,6 @@ module Routing
     # User settings
     post "/-/settings/update_settings", Routes::UserSettings, :update_settings
 
-    get "/-/assets/css/theme.css", Routes::Misc, :theme
-
     if CONFIG.cors.enabled
       paths = CONFIG.cors.paths
       paths.each do |path|

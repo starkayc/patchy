@@ -50,7 +50,7 @@
 }
 
 html {
-	font-family: 'InterVariable', 'Roboto', sans-serif;
+	font-family: "InterVariable", "Roboto", sans-serif;
 	background: var(--bg_h);
 	background-attachment: fixed;
 	background-repeat: no-repeat;
@@ -76,7 +76,7 @@ h2,
 h3,
 h4,
 h5 {
-	color: var(--fg3)
+	color: var(--fg3);
 }
 
 a {
@@ -89,12 +89,12 @@ hr {
 
 a[href] {
 	text-decoration: none;
-	color: var(--blue)
+	color: var(--blue);
 }
 
 a[href]:hover {
 	text-decoration: underline;
-	color: var(--blue-dim)
+	color: var(--blue-dim);
 }
 
 fieldset {
@@ -127,7 +127,7 @@ fieldset {
 	}
 }
 
-.navbar>.end-of-flex {
+.navbar > .end-of-flex {
 	margin-left: auto;
 }
 
@@ -149,7 +149,7 @@ fieldset {
 	text-align: center;
 }
 
-.bottom>p {
+.bottom > p {
 	margin: 10px 0px;
 }
 
@@ -182,14 +182,14 @@ fieldset {
 	max-height: 85vh;
 }
 
-.media>.content {
+.media > .content {
 	max-height: 100%;
 	max-width: 100%;
 	height: auto;
 	width: auto;
 }
 
-.media>.file-no-display {
+.media > .file-no-display {
 	display: flex;
 	flex-direction: column;
 	align-items: center;
@@ -250,7 +250,7 @@ input[type="submit"]:hover {
 }
 
 nav a,
-nav>ul {
+nav > ul {
 	list-style: none;
 	margin: 0;
 	padding: 0;
@@ -273,7 +273,6 @@ nav>ul {
 	justify-content: space-between;
 	padding: 7px;
 }
-
 
 .link-container {
 	display: flex;
@@ -300,7 +299,7 @@ nav>ul {
 
 .delete-button {
 	background-color: var(--yellow);
-	margin-left: 6px
+	margin-left: 6px;
 }
 
 .delete-button:hover {
@@ -330,7 +329,7 @@ nav>ul {
 	padding: 20px 20px;
 }
 
-.file-info>.img {
+.file-info > .img {
 	max-width: 100%;
 	max-height: 25vh;
 	display: block;
@@ -351,5 +350,25 @@ nav>ul {
 
 .label {
 	margin-right: 20px;
-	color: var(--fg3)
+	color: var(--fg3);
+}
+
+.user-settings-description-box {
+	width: 350px;
+	padding-left: 10px;
+	display: inline-block;
+	vertical-align: top;
+	color: var(--fg3);
+}
+
+.user-settings-description-elements {
+	display: flex;
+	flex-direction: column;
+}
+
+input[type="number"] {
+	background: var(--bg1);
+	color: var(--fg3);
+	border: 1px solid var(--bg2);
+	border-radius: 2px;
 }

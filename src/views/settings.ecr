@@ -13,12 +13,18 @@
   <form class="" action="/-/settings/update_settings" method="post">
       <fieldset>
           <div class="">
-            <label for="theme" class="label"><%= translate(locale, "user_settings_theme") %></label>
-            <select name="theme" id="theme" class="select-box">
-                <% Utils::Themes.themes.each do |option| %>
-                    <option value="<%= option %>" <% if user_settings.theme == option %> selected <% end %>><%= option %></option>
-                <% end %>
-            </select>
+            <label for="filename_length" class="label"><%= translate(locale, "user_settings_filename_length") %></label>
+            <input name="filename_length" id="filename_length" type="number" min="<%= CONFIG.min_filename_length %>" max="<%= CONFIG.max_filename_length %>" value="<%= user_settings.filename_length %>">
+            <div class="user-settings-description-box">
+                <div class="user-settings-description-elements">
+                    <span class="">
+                        <%= translate(locale, "user_settings_filename_length_min") %>: <%= CONFIG.min_filename_length %>
+                    </span>
+                    <span class="">
+                        <%= translate(locale, "user_settings_filename_length_max") %>: <%= CONFIG.max_filename_length %>
+                    </span>
+                </div>
+            </div>
           </div>
 
           <br>

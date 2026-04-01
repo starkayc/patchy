@@ -62,8 +62,8 @@ module Utils
   end
 
   # TODO: Check if there are no other possibilities to get a random filename and exit
-  def generate_filename : String
-    filename = Random.base58(CONFIG.filename_length)
+  def generate_filename(filename_length : Int32 = CONFIG.filename_length) : String
+    filename = Random.base58(filename_length)
 
     loop do
       file = Database::Files.select(filename)
