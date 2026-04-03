@@ -42,28 +42,38 @@ module Jobs
     end
   end
 
-  def kemal : Fiber
+  def kemal : Fiber?
     Kemal.config.add_handler BakedFileHandler::BakedFileHandler.new(BakedFiles::PublicAssets)
     if CONFIG.cors.enabled
       Kemal.config.add_handler Handlers::Options::CORSHeaders.new
     end
+
     spawn do
-      if !CONFIG.server.unix_socket.nil?
-        Utils.delete_socket
-        Kemal.run &.server.not_nil!.bind_unix "#{CONFIG.server.unix_socket}"
-        Log.info &.emit("changing socket permissions to 777")
-        begin
-          File.chmod("#{CONFIG.server.unix_socket}", File::Permissions::All)
-        rescue ex
-          Log.fatal &.emit("failed to set unix socket permissions to 777", error: ex.message)
-          exit(1)
+      begin
+        Kemal.run(args: nil) do |kemal_config|
+          if !CONFIG.server.unix_socket.nil?
+            Utils.delete_socket
+            kemal_config.server.not_nil!.bind_unix "#{CONFIG.server.unix_socket}"
+          end
         end
-      else
-        begin
-          Kemal.run(args: nil)
-        rescue ex
-          Log.fatal &.emit("patchy http server failed to start, exiting!", error: ex.message)
-          exit(1)
+      rescue ex
+        Log.fatal &.emit("patchy http server failed to start, exiting!", error: ex.message)
+        exit(1)
+      end
+    end
+
+    if !CONFIG.server.unix_socket.nil?
+      loop do
+        sleep 1
+        if Kemal.config.running
+          Log.info &.emit("changing socket permissions to 777")
+          begin
+            File.chmod("#{CONFIG.server.unix_socket}", File::Permissions::All)
+            break
+          rescue ex
+            Log.fatal &.emit("failed to set unix socket permissions to 777", error: ex.message)
+            exit(1)
+          end
         end
       end
     end
