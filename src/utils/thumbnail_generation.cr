@@ -28,14 +28,14 @@ module Utils::Thumbnails
     arguments = [
       "-hide_banner",
       "-i",
-      "#{CONFIG.files}/#{filename + extension}",
+      "#{CONFIG.storage.files}/#{filename + extension}",
       "-movflags", "faststart",
       "-f", "mjpeg",
       "-q:v", "2",
       "-vf", "scale='min(#{w},iw)':'min(#{h},ih)':force_original_aspect_ratio=decrease, thumbnail=100",
       "-frames:v", "1",
       "-update", "1",
-      "#{CONFIG.thumbnails}/#{filename}.jpg",
+      "#{CONFIG.storage.thumbnails}/#{filename}.jpg",
     ]
 
     process = Process.run("ffmpeg", arguments)

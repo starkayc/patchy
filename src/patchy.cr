@@ -62,13 +62,13 @@ add_context_storage_type(::UserSettings)
 # Show current configuration
 Log.trace &.emit("current configuration: \n#{CONFIG.to_yaml}")
 
-Utils.create_dir(CONFIG.db, "for database")
-SQL = DB.open("sqlite3://#{CONFIG.db}/db.sqlite3")
+Utils.create_dir(CONFIG.storage.db, "for database")
+SQL = DB.open("sqlite3://#{CONFIG.storage.db}/db.sqlite3")
 
 Utils.check_dependencies
 Utils::DB.create_tables
-Utils.create_dir(CONFIG.files, "for files")
-Utils.create_dir(CONFIG.thumbnails, "for thumbnails")
+Utils.create_dir(CONFIG.storage.files, "for files")
+Utils.create_dir(CONFIG.storage.thumbnails, "for thumbnails")
 Routing.register_all
 Utils::Cache.init
 

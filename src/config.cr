@@ -283,11 +283,11 @@ class Config
       end
     end
 
-    if config.files.ends_with?('/')
-      config.files = config.files.chomp('/')
+    if config.storage.files.ends_with?('/')
+      config.storage.files = config.storage.files.chomp('/')
     end
-    if config.thumbnails.ends_with?('/')
-      config.thumbnails = config.thumbnails.chomp('/')
+    if config.storage.thumbnails.ends_with?('/')
+      config.storage.thumbnails = config.storage.thumbnails.chomp('/')
     end
   end
 

@@ -52,7 +52,7 @@ module Routes::Retrieve
           send_file_raw env, fileinfo.extension, file
         end
       else
-        file_path = "#{CONFIG.files}/#{fileinfo.filename}#{fileinfo.extension}"
+        file_path = "#{CONFIG.storage.files}/#{fileinfo.filename}#{fileinfo.extension}"
         Utils::Cache.insert(fileinfo, file_path, CONFIG.cache.expire_time)
         env.response.headers["X-Patchy-Cache"] = "MISS"
         send_file env, file_path
@@ -72,7 +72,7 @@ module Routes::Retrieve
       fileinfo = Database::Files.select_with_thumbnail(thumbnail)
       thumbnail = fileinfo.try &.thumbnail
       if thumbnail
-        send_file env, "#{CONFIG.thumbnails}/#{thumbnail}"
+        send_file env, "#{CONFIG.storage.thumbnails}/#{thumbnail}"
       else
         thumbnail = CONFIG.thumbnail_generation.fallback_thumbnail.thumbnail_file
         baked_thumbnail = BakedFiles::PublicAssets.get("/-/assets/img/#{thumbnail}")

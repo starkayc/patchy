@@ -26,7 +26,7 @@ module Operations
       self.detect_extension(slice)
 
       full_filename = @fileinfo.filename + @fileinfo.extension
-      file_path = "#{CONFIG.files}/#{full_filename}"
+      file_path = "#{CONFIG.storage.files}/#{full_filename}"
 
       if CONFIG.s3.enabled
         body = IO::Memory.new

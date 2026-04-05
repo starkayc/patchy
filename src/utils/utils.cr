@@ -33,13 +33,13 @@ module Utils
       # TODO: Check if it's able to bypass the path using a filename with a `/` in their name
       Log.debug &.emit("deleting file '#{full_filename}'")
       begin
-        File.delete("#{CONFIG.files}/#{full_filename}")
+        File.delete("#{CONFIG.storage.files}/#{full_filename}")
 
         if thumbnail
-          File.delete("#{CONFIG.thumbnails}/#{thumbnail}")
+          File.delete("#{CONFIG.storage.thumbnails}/#{thumbnail}")
         end
       rescue File::NotFoundError
-        Log.error &.emit("file '#{full_filename}' doesn't exist on the '#{CONFIG.files}', folder, deleting it from the database")
+        Log.error &.emit("file '#{full_filename}' doesn't exist on the '#{CONFIG.storage.files}', folder, deleting it from the database")
       rescue ex : File::AccessDeniedError
         Log.error &.emit("file '#{full_filename}' failed to be deleted due to bad permissions, deleting it from the database, error", error: ex.message)
       rescue ex
