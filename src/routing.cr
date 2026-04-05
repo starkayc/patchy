@@ -85,15 +85,15 @@ module Routing
     ip_info = Database::IPS.select(ip)
     return if ip_info.nil?
 
-    if CONFIG.files_per_ip > 0
+    if CONFIG.rate_limits.files_per_ip > 0
       time_since_first_upload = Time.utc.to_unix - ip_info.date
-      time_until_unban = ip_info.date - Time.utc.to_unix + CONFIG.rate_limit_period
+      time_until_unban = ip_info.date - Time.utc.to_unix + CONFIG.rate_limits.rate_limit_period
 
-      if time_since_first_upload > CONFIG.rate_limit_period
+      if time_since_first_upload > CONFIG.rate_limits.rate_limit_period
         Database::IPS.delete(ip_info.ip)
       end
 
-      if ip_info.count >= CONFIG.files_per_ip && time_since_first_upload < CONFIG.rate_limit_period
+      if ip_info.count >= CONFIG.rate_limits.files_per_ip && time_since_first_upload < CONFIG.rate_limits.rate_limit_period
         ee 401, "Rate limited! Try again in #{time_until_unban} seconds"
       end
     end

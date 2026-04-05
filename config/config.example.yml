@@ -10,8 +10,14 @@ db: "./data/db/"
 size_limit: 512
 enable_checksums: false
 
-files_per_ip: 32
-rate_limit_period: 20
+# Rate limit uploads per IP address
+rate_limits:
+  # How many files can be uploaded in the `rate_limit_period` time span.
+  files_per_ip: 32
+  # After 600 seconds, the limits for a specific IP will be lifted and
+  # that IP address will be able to upload files again.
+  rate_limit_period: 600
+
 filename_length: 5
 max_filename_length: 16
 min_filename_length: 5

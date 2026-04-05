@@ -210,10 +210,20 @@ class Config
     property vpn : VPN = VPN.from_yaml("")
   end
 
-  # How many files an IP address can upload to the server. Setting this to 0
-  # disables rate limits in the rate limit period
+  property rate_limits : RateLimits = RateLimits.from_yaml("")
+
+  struct RateLimits
+    include YAML::Serializable
+
+    # How many files an IP address can upload to the server. Setting this to 0
+    # disables rate limits in the rate limit period
+    property files_per_ip : Int32 = 32
+    # How often is the file limit per IP reset? (in seconds)
+    property rate_limit_period : Int32 = 600
+  end
+
+  # Deprecated
   property files_per_ip : Int32 = 32
-  # How often is the file limit per IP reset? (in seconds)
   property rate_limit_period : Int32 = 600
 
   # Delete the files after how many hours?
@@ -234,7 +244,7 @@ class Config
   # and in `/api/stats`
   property alternative_domains : Array(String) = [] of String
 
-  def self.check_config(config : Config) : String?
+  def self.check_config(config : Config) : Nil
     if config.filename_length <= 0
       Log.fatal &.emit("Config: filename_length cannot be less or equal to 0")
       exit(1)
@@ -269,6 +279,25 @@ class Config
     if config.thumbnails.ends_with?('/')
       config.thumbnails = config.thumbnails.chomp('/')
     end
+  end
+
+  private def self.check_deprecated_options(config : Config) : Config
+    found = 0
+    deprecated(config.files_per_ip, config.rate_limits.files_per_ip, found)
+    deprecated(config.rate_limit_period, config.rate_limits.rate_limit_period, found)
+
+    if found > 0
+      Log.warn &.emit("Config: #{found} deprecated config options were found, please update them to their new options. You can find an example in the config.example.yml file")
+    end
+
+    config
+  end
+
+  private macro deprecated(old_option, new_option, found)
+    {{new_option}} = {{old_option}}
+    {{found}} += 1
+    s = %q(Config: Deprecated config option {{ old_option.id.split(".")[1..].join(".") }}, use {{ new_option.id.split(".")[1..].join(".") }} instead)
+    Log.warn &.emit(s)
   end
 
   def self.load(config_file : String = "config/config.yml") : Config
@@ -331,6 +360,7 @@ class Config
     {% end %}
 
     check_config(config)
+    check_deprecated_options(config)
     config
   end
 end
