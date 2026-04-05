@@ -22,11 +22,21 @@ class Config
     property unix_socket : String?
   end
 
-  # Where the uploaded files will be located
+  property storage : Storage = Storage.from_yaml("")
+
+  struct Storage
+    include YAML::Serializable
+    # Where the uploaded files will be located
+    property files : String = "./data/files"
+    # Where the thumbnails will be located when they are successfully generated
+    property thumbnails : String = "./data/thumbnails"
+    # Where the SQLITE3 database will be located
+    property db : String = "./data/db"
+  end
+
+  # Deprecated
   property files : String = "./data/files"
-  # Where the thumbnails will be located when they are successfully generated
   property thumbnails : String = "./data/thumbnails"
-  # Where the SQLITE3 database will be located
   property db : String = "./data/db"
 
   property cors : Cors = Cors.from_yaml("")
@@ -285,6 +295,9 @@ class Config
     found = 0
     deprecated(config.files_per_ip, config.rate_limits.files_per_ip, found)
     deprecated(config.rate_limit_period, config.rate_limits.rate_limit_period, found)
+    deprecated(config.files, config.storage.files, found)
+    deprecated(config.db, config.storage.db, found)
+    deprecated(config.thumbnails, config.storage.thumbnails, found)
 
     if found > 0
       Log.warn &.emit("Config: #{found} deprecated config options were found, please update them to their new options. You can find an example in the config.example.yml file")

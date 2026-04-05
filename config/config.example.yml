@@ -3,9 +3,10 @@ colorize_logs: true
 log_level: "info"
 
 # File paths, you generally don't need to change this
-files: "./data/files/"
-thumbnails: "./data/thumbnails/"
-db: "./data/db/"
+storage:
+  files: "./data/files/"
+  thumbnails: "./data/thumbnails/"
+  db: "./data/db/"
 
 size_limit: 512
 enable_checksums: false
