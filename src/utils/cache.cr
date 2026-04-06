@@ -124,8 +124,8 @@ module Utils::Cache
     end
 
     def expire_listener(&block : String ->) : Redis::Subscription
-      @client.subscribe "__keyevent@0__:expired" do |subscription, connection|
-        subscription.on_message do |channel, message|
+      @client.subscribe "__keyevent@0__:expired" do |subscription, _|
+        subscription.on_message do |_, message|
           # message is the filename that expired
           block.call(message)
         end
