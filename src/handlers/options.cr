@@ -4,7 +4,7 @@ module Handlers::Options
   class CORSHeaders < Kemal::Handler
     only CONFIG.cors.paths, "GET"
 
-    def call(env)
+    def call(env : HTTP::Server::Context) : Nil
       return call_next(env) unless only_match?(env)
       env.response.headers["Access-Control-Allow-Origin"] = "*"
       call_next(env)

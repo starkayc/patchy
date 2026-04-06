@@ -15,7 +15,7 @@ module Routes::UserSettings
     )
   end
 
-  def update_settings(env : HTTP::Server::Context)
+  def update_settings(env : HTTP::Server::Context) : Nil
     host = Headers.host
 
     begin
@@ -30,7 +30,7 @@ module Routes::UserSettings
     return env.redirect "/-/settings"
   end
 
-  def parse_settings(new_user_settings : ::UserSettings)
+  def parse_settings(new_user_settings : ::UserSettings) : UserSettings
     new_user_settings.filename_length = new_user_settings.filename_length.clamp(CONFIG.min_filename_length, CONFIG.max_filename_length)
     return new_user_settings
   end

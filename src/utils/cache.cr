@@ -47,7 +47,7 @@ module Utils::Cache
       @cache.items
     end
 
-    def expire_listener(&block : String ->)
+    def expire_listener(&block : String ->) : Fiber
       @cache.on_event do |event|
         if event.event_type == LRUCache::EventType::Exp
           block.call(event.key)
@@ -82,12 +82,12 @@ module Utils::Cache
       Log.info &.emit("files smaller than this size limit will be stored into the cache: '#{(@max_allowed_filesize * 1000).humanize_bytes}'")
     end
 
-    private def notify_keyspace_events_expiration
+    private def notify_keyspace_events_expiration : Array(Redis::Value) | Int64 | String | Nil
       command = {"CONFIG", "SET", "notify-keyspace-events", "Ex"}
       @client.run(command)
     end
 
-    def set(filename : String, filedata : String, expire_time : UInt64?)
+    def set(filename : String, filedata : String, expire_time : UInt64?) : String?
       begin
         @client.set(filename, filedata, ex: expire_time)
       rescue ex
@@ -123,7 +123,7 @@ module Utils::Cache
       nil
     end
 
-    def expire_listener(&block : String ->)
+    def expire_listener(&block : String ->) : Redis::Subscription
       @client.subscribe "__keyevent@0__:expired" do |subscription, connection|
         subscription.on_message do |channel, message|
           # message is the filename that expired
@@ -133,7 +133,7 @@ module Utils::Cache
     end
   end
 
-  def init
+  def init : Fiber?
     return if !CONFIG.cache.enabled
 
     case CONFIG.cache.type
@@ -156,7 +156,7 @@ module Utils::Cache
 
   # This event listener will listen to expire events to delete expired files
   # from the @@files Hash.
-  private def expire_listener
+  private def expire_listener : Fiber?
     cache = @@cache
     return if cache.nil?
 
@@ -174,7 +174,7 @@ module Utils::Cache
     end
   end
 
-  private def is_too_big_for_cache?(filename : String, filesize : Int64, max_allowed_filesize : Int32)
+  private def is_too_big_for_cache?(filename : String, filesize : Int64, max_allowed_filesize : Int32) : Bool
     if filesize > max_allowed_filesize &* 1000
       Log.debug &.emit("not caching '#{filename}', size too big to be cached", size: filesize.humanize_bytes)
       true
@@ -237,7 +237,7 @@ module Utils::Cache
     end
   end
 
-  def files
+  def files : Hash(String, Int64)
     return @@files
   end
 end
