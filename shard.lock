@@ -18,7 +18,7 @@ shards:
 
   baked_file_handler:
     git: https://github.com/ralsina/baked_file_handler.git
-    version: 0.1.1
+    version: 0.1.5
 
   baked_file_system:
     git: https://github.com/fijxu/baked_file_system_no_gzip.git
@@ -38,11 +38,11 @@ shards:
 
   kemal:
     git: https://github.com/kemalcr/kemal.git
-    version: 1.9.0
+    version: 1.10.1
 
   lru:
     git: https://github.com/fijxu/crystal-lru.git
-    version: 1.0.3
+    version: 1.0.4
 
   markd:
     git: https://github.com/icyleaf/markd.git
@@ -70,7 +70,7 @@ shards:
 
   spectator:
     git: https://gitlab.com/arctic-fox/spectator.git
-    version: 0.12.2
+    version: 0.12.4
 
   sqlite3:
     git: https://github.com/crystal-lang/crystal-sqlite3.git
