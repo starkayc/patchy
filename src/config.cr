@@ -196,6 +196,9 @@ class Config
     property size_limit : Int16 = 512
     property enable_checksums : Bool = true
 
+    # Blocked extensions that are not allowed to be uploaded to the server
+    property blocked_extensions : Array(String) = [] of String
+
     property deletion : Deletion = Deletion.from_yaml("")
 
     struct Deletion
@@ -219,6 +222,7 @@ class Config
   property delete_files_after : Int32 = 168
   property delete_files_check : Int32 = 1800
   property delete_key_length : Int32 = 6
+  property blocked_extensions : Array(String) = [] of String
 
   property ip_block : IPBlocks = IPBlocks.from_yaml("")
 
@@ -267,9 +271,6 @@ class Config
 
   # Abuse email that is going to be displayed on the website of the uploader
   property abuse_email : String = ""
-
-  # Blocked extensions that are not allowed to be uploaded to the server
-  property blocked_extensions : Array(String) = [] of String
 
   # Since this program detects the Host header of the client it can be used
   # with multiple domains. You can display the domains in the frontend
@@ -328,6 +329,7 @@ class Config
     deprecated(config.delete_files_after, config.uploads.deletion.delete_files_after, found)
     deprecated(config.delete_files_check, config.uploads.deletion.delete_files_check, found)
     deprecated(config.delete_key_length, config.uploads.deletion.delete_key_length, found)
+    deprecated(config.blocked_extensions, config.uploads.blocked_extensions, found)
 
     if found > 0
       Log.warn &.emit("Config: #{found} deprecated config options were found, please update them to their new options. You can find an example in the config.example.yml file")

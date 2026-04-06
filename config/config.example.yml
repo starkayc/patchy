@@ -31,6 +31,9 @@ uploads:
   # Enable checksumming of files, it uses the SHA1 hashing algorithm
   # and the computed hash will be used for ETag headers.
   enable_checksums: false
+  # Blocked extensions that are not allowed to be uploaded to the server
+  blocked_extensions:
+    - "exe"
   # Deletion options
   deletion:
     # In hours (168 = 7 days)
@@ -151,7 +154,5 @@ views:
     autoplay_video: false
     autoplay_audio: false
 
-blocked_extensions:
-  - "exe"
 # alternative_domains:
 #   - "example.com"
