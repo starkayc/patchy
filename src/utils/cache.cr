@@ -20,7 +20,7 @@ module Utils::Cache
       @max_size = CONFIG.cache.max_size,
       @max_allowed_filesize = CONFIG.cache.max_allowed_filesize,
     )
-      @cache = LRUCache(Bytes).new(max_size: @max_size, clean_interval: 1.second)
+      @cache = LRUCache(Bytes).new(max_size: @max_size, clean_interval: CONFIG.cache.clean_interval.try &.seconds)
       Log.info &.emit("using in memory LRU for caching")
       Log.info &.emit("files smaller than this size limit will be stored into the cache: '#{(@max_allowed_filesize * 1000).humanize_bytes}'")
       Log.info &.emit("maximum amount of files the cache can hold: #{@max_size}")
