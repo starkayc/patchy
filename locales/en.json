@@ -25,7 +25,7 @@
   "user_settings_filename_length_max": "Max file name length",
   "user_settings_save_settings": "Save settings",
   "js_history_filename": "Filename",
-  "js_upload_text": "Click here, paste or drag and drop to upload a file",
+  "js_upload_text": "Click here, paste or drag and drop to upload some files",
   "js_upload_client_error": "Client error",
   "js_upload_server_error": "Server error",
   "js_upload_unknown_error": "Unknown error",
@@ -45,5 +45,8 @@
   "js_generic_link_copied_to_clipboard": "Link copied to clipboard",
   "js_generic_delete_key_does_not_exist": "The delete key to delete the file does not exist",
   "js_btn_delete": "Delete",
-  "js_btn_copy": "Copy"
+  "js_btn_copy": "Copy",
+  "js_btn_cancel_upload": "Cancel upload",
+  "js_status_uploading": "Uploading...",
+  "js_status_cancelled": "Upload cancelled"
 }

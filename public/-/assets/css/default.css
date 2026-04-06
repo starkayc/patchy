@@ -271,7 +271,7 @@ nav > ul {
 	border-radius: 2px;
 	flex-direction: row;
 	justify-content: space-between;
-	padding: 7px;
+	padding: 8px;
 }
 
 .link-container {
@@ -304,6 +304,15 @@ nav > ul {
 
 .delete-button:hover {
 	background-color: var(--yellow-dim);
+}
+
+.cancel-upload-button {
+	background-color: var(--green);
+	margin-left: 6px;
+}
+
+.cancel-upload-button:hover {
+	background-color: var(--green-dim);
 }
 
 .status {

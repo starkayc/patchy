@@ -24,7 +24,7 @@
   "user_settings_filename_length_min": "Largo minimo del nombre del archivo",
   "user_settings_filename_length_max": "Largo maximo del nombre del archivo",
   "user_settings_save_settings": "Guardar ajustes",
-  "js_upload_text": "Clickea aquí, pega o arrastra y suelta para subir un archivo",
+  "js_upload_text": "Clickea aquí, pega o arrastra y suelta para subir unos archivos",
   "js_upload_client_error": "Error del cliente",
   "js_upload_server_error": "Error del servidor",
   "js_upload_unknown_error": "Error desconocido",
@@ -45,5 +45,8 @@
   "js_generic_link_copied_to_clipboard": "Enlace copiado al portapapeles",
   "js_generic_delete_key_does_not_exist": "La llave para borrar el archivo no existe",
   "js_btn_delete": "Borrar",
-  "js_btn_copy": "Copiar"
+  "js_btn_copy": "Copiar",
+  "js_btn_cancel_upload": "Cancelar subida",
+  "js_status_uploading": "Subiendo...",
+  "js_status_cancelled": "Subida cancelada"
 }

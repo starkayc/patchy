@@ -18,10 +18,14 @@ window.addEventListener("DOMContentLoaded", () => {
   const translate_LinkCopied = translate("js_generic_link_copied_to_clipboard");
   const translate_buttonDelete = translate("js_btn_delete");
   const translate_buttonCopy = translate("js_btn_copy");
+  const translate_buttonCancelUpload = translate("js_btn_cancel_upload");
+  const translate_status_uploading = translate("js_status_uploading");
+  const translate_status_cancelled = translate("js_status_cancelled");
 
   const dropAreaText = document.createElement("p");
   dropAreaText.textContent = translate_uploadText;
   dropArea?.appendChild(dropAreaText);
+  fileInput?.setAttribute("multiple", "");
   dropArea?.addEventListener("click", () => fileInput?.click());
 
   fileInput?.addEventListener(
@@ -80,6 +84,7 @@ window.addEventListener("DOMContentLoaded", () => {
     const buttons = document.createElement("div");
     const copyButton = document.createElement("button");
     const deleteButton = document.createElement("button");
+    const cancelUploadButton = document.createElement("button");
 
     uploadContainer.className = "upload-status";
     uploadContainer.id = "upload-status";
@@ -87,6 +92,7 @@ window.addEventListener("DOMContentLoaded", () => {
     uploadContainer.appendChild(statusLink);
     buttons.appendChild(copyButton);
     buttons.appendChild(deleteButton);
+    buttons.appendChild(cancelUploadButton);
     uploadContainer.appendChild(buttons);
     uploadStatus?.appendChild(uploadContainer);
 
@@ -97,8 +103,25 @@ window.addEventListener("DOMContentLoaded", () => {
     copyButton.innerHTML = translate_buttonCopy;
     deleteButton.className = "button delete-button";
     deleteButton.innerHTML = translate_buttonDelete;
+    cancelUploadButton.className = "button cancel-upload-button";
+    cancelUploadButton.innerHTML = translate_buttonCancelUpload;
     copyButton.style.display = "none";
     deleteButton.style.display = "none";
+    cancelUploadButton.style.display = "none";
+
+    xhr.upload.addEventListener("loadstart", (_) => {
+      cancelUploadButton.style.display = "inline";
+      statusLink.innerHTML = `<a>${translate_status_uploading}</a>`;
+      cancelUploadButton.addEventListener(
+        "click",
+        () => {
+          xhr.abort();
+          statusLink.innerHTML = `<a>${translate_status_cancelled}</a>`;
+          uploadText.innerHTML = "-";
+        },
+        { once: true },
+      );
+    });
 
     xhr.upload.addEventListener("progress", (e) => {
       if (e.lengthComputable) {
@@ -114,6 +137,7 @@ window.addEventListener("DOMContentLoaded", () => {
 
     xhr.onload = () => {
       let deleteKey;
+      cancelUploadButton.style.display = "none";
       if (xhr.status === 200) {
         try {
           const response = xhr.responseText;
@@ -126,7 +150,7 @@ window.addEventListener("DOMContentLoaded", () => {
           deleteButton.style.display = "inline";
           copyButton.onclick = () => copyToClipboard(fileLink, copyButton);
           deleteButton.onclick = () =>
-            deleteFile(deleteLink, deleteKey, uploadContainer);
+            deleteFile(deleteLink, deleteKey, statusLink);
           history.add(response);
         } catch (_) {
           statusLink.textContent = translate_uploadUnknownError;
@@ -145,14 +169,9 @@ window.addEventListener("DOMContentLoaded", () => {
     xhr.send(formData);
   }
 
-  function deleteFile(deleteLink, deleteKey, uploadContainer) {
+  function deleteFile(deleteLink, deleteKey, statusLink) {
     const url = deleteLink;
     const xhr = new XMLHttpRequest();
-    const deleteText = document.createElement("a");
-    uploadContainer.innerHTML = "";
-    deleteText.className = "delete-text";
-    deleteText.textContent = translate_DeletingFile;
-    uploadContainer.appendChild(deleteText);
 
     xhr.onerror = () => {
       console.error(
@@ -161,12 +180,12 @@ window.addEventListener("DOMContentLoaded", () => {
         xhr.statusText,
         xhr.responseText,
       );
-      deleteText.textContent = translate_DeleteError;
+      statusLink.textContent = translate_DeleteError;
     };
 
     xhr.onload = () => {
       if (xhr.status === 200) {
-        deleteText.textContent = translate_DeleteSuccess;
+        statusLink.textContent = translate_DeleteSuccess;
         history.delete(deleteKey);
       }
     };
