@@ -24,6 +24,10 @@ shards:
     git: https://github.com/fijxu/baked_file_system_no_gzip.git
     version: 0.13.0+git.commit.b7d7b7ae0754417a256f68ff170290e2f2f0c6f2
 
+  base58:
+    git: https://github.com/crystal-china/base58.cr.git
+    version: 0.1.0+git.commit.0e2c44d16a8098b00d8bf0b74add8bb9ea2f1c5f
+
   db:
     git: https://github.com/crystal-lang/crystal-db.git
     version: 0.14.0

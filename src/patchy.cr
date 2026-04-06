@@ -10,6 +10,7 @@ require "log"
 require "redis"
 require "flib"
 require "lru"
+require "base58"
 
 # require "./ext/kemal_custom_exception_handler"
 
@@ -19,7 +20,6 @@ require "./jobs"
 require "./utils/*"
 require "./helpers/*"
 require "./handlers/*"
-require "./lib/*"
 require "./types/*"
 require "./database/*"
 
