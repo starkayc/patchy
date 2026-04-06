@@ -39,11 +39,11 @@ module Utils::Cache
       @cache.del(filename)
     end
 
-    def size
+    def size : Int64
       @cache.size
     end
 
-    def items
+    def items : Array(String)
       @cache.items
     end
 
@@ -118,9 +118,8 @@ module Utils::Cache
       @client.dbsize
     end
 
-    def items
-      # TODO: Not implemented
-      nil
+    def items : Array(String)
+      @client.keys
     end
 
     def expire_listener(&block : String ->) : Redis::Subscription
