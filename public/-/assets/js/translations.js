@@ -6,9 +6,9 @@ export function translate(elementId) {
     try {
       return JSON.parse(element.textContent).msg;
     } catch (_) {
-      return null;
+      return elementName;
     }
   } else {
-    return null;
+    return elementName;
   }
 }
