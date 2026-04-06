@@ -88,8 +88,8 @@ module Operations
       @ip.ip = @ip_addr.to_s
       @ip.date = @fileinfo.uploaded_at
 
-      if CONFIG.delete_key_length > 0
-        @fileinfo.delete_key = Random.base58(CONFIG.delete_key_length)
+      if CONFIG.uploads.deletion.delete_key_length > 0
+        @fileinfo.delete_key = Random.base58(CONFIG.uploads.deletion.delete_key_length)
       end
 
       begin

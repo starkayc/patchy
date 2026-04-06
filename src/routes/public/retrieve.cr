@@ -25,7 +25,7 @@ module Routes::Retrieve
       end
     end
 
-    cache_control_max_age = (fileinfo.uploaded_at + CONFIG.delete_files_after.to_i64 * 3600) - Time.utc.to_unix
+    cache_control_max_age = (fileinfo.uploaded_at + CONFIG.uploads.deletion.delete_files_after.to_i64 * 3600) - Time.utc.to_unix
 
     # Download the HTML file contents instead of rendering it on the browser
     if fileinfo.extension != ".html"

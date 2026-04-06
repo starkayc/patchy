@@ -195,13 +195,30 @@ class Config
     # In MiB
     property size_limit : Int16 = 512
     property enable_checksums : Bool = true
+
+    property deletion : Deletion = Deletion.from_yaml("")
+
+    struct Deletion
+      include YAML::Serializable
+
+      # Delete the files after how many hours?
+      property delete_files_after : Int32 = 168
+      # How often should the check of old files be performed? (in seconds)
+      property delete_files_check : Int32 = 1800
+      # The lenght of the delete key
+      property delete_key_length : Int32 = 6
+    end
   end
 
+  # Deprecated
   property filename_length : Int32 = 5
   property max_filename_length : Int32 = 16
   property min_filename_length : Int32 = 5
   property size_limit : Int16 = 512
   property enable_checksums : Bool = true
+  property delete_files_after : Int32 = 168
+  property delete_files_check : Int32 = 1800
+  property delete_key_length : Int32 = 6
 
   property ip_block : IPBlocks = IPBlocks.from_yaml("")
 
@@ -247,13 +264,6 @@ class Config
   # Deprecated
   property files_per_ip : Int32 = 32
   property rate_limit_period : Int32 = 600
-
-  # Delete the files after how many hours?
-  property delete_files_after : Int32 = 168
-  # How often should the check of old files be performed? (in seconds)
-  property delete_files_check : Int32 = 1800
-  # The lenght of the delete key
-  property delete_key_length : Int32 = 6
 
   # Abuse email that is going to be displayed on the website of the uploader
   property abuse_email : String = ""
@@ -315,6 +325,9 @@ class Config
     deprecated(config.min_filename_length, config.uploads.min_filename_length, found)
     deprecated(config.size_limit, config.uploads.size_limit, found)
     deprecated(config.enable_checksums, config.uploads.enable_checksums, found)
+    deprecated(config.delete_files_after, config.uploads.deletion.delete_files_after, found)
+    deprecated(config.delete_files_check, config.uploads.deletion.delete_files_check, found)
+    deprecated(config.delete_key_length, config.uploads.deletion.delete_key_length, found)
 
     if found > 0
       Log.warn &.emit("Config: #{found} deprecated config options were found, please update them to their new options. You can find an example in the config.example.yml file")
