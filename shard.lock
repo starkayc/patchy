@@ -46,7 +46,7 @@ shards:
 
   lru:
     git: https://github.com/fijxu/crystal-lru.git
-    version: 1.0.4
+    version: 1.0.5
 
   markd:
     git: https://github.com/icyleaf/markd.git
