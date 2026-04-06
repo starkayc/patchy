@@ -154,5 +154,10 @@ views:
     autoplay_video: false
     autoplay_audio: false
 
+# Will display an abuse email contact link
+# To disable, set it to empty (`""`)
+# abuse_email: ""
+abuse_email: "example@example.com"
+
 # alternative_domains:
 #   - "example.com"
