@@ -8,9 +8,6 @@ storage:
   thumbnails: "./data/thumbnails/"
   db: "./data/db/"
 
-size_limit: 512
-enable_checksums: false
-
 # Rate limit uploads per IP address
 rate_limits:
   # How many files can be uploaded in the `rate_limit_period` time span.
@@ -19,9 +16,21 @@ rate_limits:
   # that IP address will be able to upload files again.
   rate_limit_period: 600
 
-filename_length: 5
-max_filename_length: 16
-min_filename_length: 5
+# Upload related settings
+uploads:
+  # Length of the filename that is going to be generated
+  filename_length: 5
+  # Max length of the filename, this is going to be max value
+  # that can be set in the user settings ("/-/settings")
+  max_filename_length: 16
+  # Min length of the filename, this is going to be max value
+  # that can be set in the user settings ("/-/settings")
+  min_filename_length: 5
+  # File size limit in MiB
+  size_limit: 512
+  # Enable checksumming of files, it uses the SHA1 hashing algorithm
+  # and the computed hash will be used for ETag headers.
+  enable_checksums: false
 
 # In hours (168 = 7 days)
 delete_files_after: 168

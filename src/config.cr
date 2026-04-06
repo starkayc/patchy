@@ -181,13 +181,25 @@ class Config
     property api_key : String? = nil
   end
 
-  # Filename length
+  property uploads : Uploads = Uploads.from_yaml("")
+
+  struct Uploads
+    include YAML::Serializable
+
+    # Filename length
+    property filename_length : Int32 = 5
+    # Used for user settings
+    property max_filename_length : Int32 = 16
+    # Used for user settings
+    property min_filename_length : Int32 = 5
+    # In MiB
+    property size_limit : Int16 = 512
+    property enable_checksums : Bool = true
+  end
+
   property filename_length : Int32 = 5
-  # Used for user settings
   property max_filename_length : Int32 = 16
-  # Used for user settings
   property min_filename_length : Int32 = 5
-  # In MiB
   property size_limit : Int16 = 512
   property enable_checksums : Bool = true
 
@@ -298,6 +310,11 @@ class Config
     deprecated(config.files, config.storage.files, found)
     deprecated(config.db, config.storage.db, found)
     deprecated(config.thumbnails, config.storage.thumbnails, found)
+    deprecated(config.filename_length, config.uploads.filename_length, found)
+    deprecated(config.max_filename_length, config.uploads.max_filename_length, found)
+    deprecated(config.min_filename_length, config.uploads.min_filename_length, found)
+    deprecated(config.size_limit, config.uploads.size_limit, found)
+    deprecated(config.enable_checksums, config.uploads.enable_checksums, found)
 
     if found > 0
       Log.warn &.emit("Config: #{found} deprecated config options were found, please update them to their new options. You can find an example in the config.example.yml file")
