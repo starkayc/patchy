@@ -38,7 +38,7 @@ jobs:
 
     - name: Docker meta
       id: meta
-      uses: https://code.forgejo.org/docker/metadata-action@v5
+      uses: https://code.forgejo.org/docker/metadata-action@v6
       with:
         images: git.nadeko.net/fijxu/patchy
         tags: |
