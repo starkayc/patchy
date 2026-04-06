@@ -38,6 +38,8 @@
           nativeBuildInputs = deps;
           packages = with pkgs; [
             crystal_1_19
+            libllvm
+            libffi
             crystal2nix
             nix-prefetch-git
             nix
