@@ -64,7 +64,7 @@ module Jobs
 
     if !CONFIG.server.unix_socket.nil?
       loop do
-        sleep 1
+        sleep 1.seconds
         if Kemal.config.running
           Log.info &.emit("changing socket permissions to 777")
           begin
