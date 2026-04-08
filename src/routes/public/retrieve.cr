@@ -43,7 +43,7 @@ module Routes::Retrieve
 
     # TODO: send_file_raw and some functions
     if cached_file = Utils::Cache.select(fileinfo)
-      env.response.headers["X-Patchy-Cache"] = "HIT"
+      env.response.headers["X-Patchy-Cache"] = "HIT" if CONFIG.cache.enabled
       send_file_raw env, fileinfo.extension, cached_file
     else
       if CONFIG.s3.enabled
@@ -54,7 +54,7 @@ module Routes::Retrieve
       else
         file_path = "#{CONFIG.storage.files}/#{fileinfo.filename}#{fileinfo.extension}"
         Utils::Cache.insert(fileinfo, file_path, CONFIG.cache.expire_time)
-        env.response.headers["X-Patchy-Cache"] = "MISS"
+        env.response.headers["X-Patchy-Cache"] = "MISS" if CONFIG.cache.enabled
         send_file env, file_path
       end
     end
