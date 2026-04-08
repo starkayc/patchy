@@ -45,6 +45,8 @@
             nix
             nixfmt
             nixd
+            # for libmagic!
+            file
           ];
           # sqlite library needs to be in the LD_LIBRARY_PATH environment variable
           # so crystal can detect it in the linking stage.

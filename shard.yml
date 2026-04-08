@@ -40,3 +40,8 @@ development_dependencies:
 crystal: '>= 1.12.2'
 
 license: AGPL-3.0-only
+
+libraries:
+  # For MIME Types and Encodings
+  # Requires `file` package, available on most OSes
+  libmagic: '*'
