@@ -338,8 +338,10 @@ class Config
     config
   end
 
-  private macro deprecated(old_option, new_option, found)
-    {{new_option}} = {{old_option}}
+  private macro deprecated(old_option, new_option, found, replace = true)
+    if {{replace}}
+      {{new_option}} = {{old_option}}
+    end
     {{found}} += 1
     s = %q(Config: Deprecated config option {{ old_option.id.split(".")[1..].join(".") }}, use {{ new_option.id.split(".")[1..].join(".") }} instead)
     Log.warn &.emit(s)
