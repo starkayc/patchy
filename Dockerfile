@@ -40,7 +40,8 @@ RUN apk add --no-cache \
 	libwebpmux \
 	libjxl \
 	libpng \
-	libjpeg
+	libjpeg \
+	file
 
 RUN rm -rf /var/cache/apk/* /tmp/*
 
