@@ -5,10 +5,12 @@
 # since I will just do single operations
 #
 # TODO: Minify the bullshit functions
-struct Mime
-  def initialize(
-    @magic_file : String? = nil,
-  ); end
+# TODO: Store the
+module Mime
+  extend self
+
+  # To store and reuse the magic cookies :3
+  @@magic_cookies : Hash(LibMagic::Flags, LibMagic::MagicT) = {} of LibMagic::Flags => LibMagic::MagicT
 
   @[Link("magic", pkg_config: "libmagic")]
   lib LibMagic
@@ -48,55 +50,35 @@ struct Mime
     ) : LibC::Char*
   end
 
+  private def magic(flags, &)
+    unless @@magic_cookies[flags] = LibMagic.magic_open flags
+      raise Exception.new "Failed to open libmagic."
+    end
+
+    begin
+      unless LibMagic.magic_load(@@magic_cookies[flags], nil).zero?
+        raise Exception.new String.new LibMagic.magic_error @@magic_cookies[flags]
+      end
+
+      yield @@magic_cookies[flags]
+    end
+  end
+
   def mime_type(path : String | Path) : String?
     if !File.file?(path) || !File::Info.readable?(path)
       raise Exception.new "The file '#{path}' does not exist or is not readable."
     end
 
-    unless magic = LibMagic.magic_open LibMagic::Flags::MIME_TYPE
-      raise Exception.new "Failed to open libmagic."
-    end
-
-    begin
-      magic_load = if magic_file = @magic_file
-                     LibMagic.magic_load magic, magic_file
-                   else
-                     LibMagic.magic_load magic, nil
-                   end
-
-      unless magic_load.zero?
-        raise Exception.new String.new LibMagic.magic_error magic
-      end
-
-      unless mime_type = LibMagic.magic_file magic, path.to_s
-        raise Exception.new String.new LibMagic.magic_error magic
-      end
-
-      String.new mime_type
-    ensure
-      LibMagic.magic_close magic
+    magic(flags: LibMagic::Flags::MIME_TYPE) do |magic|
+      mime = LibMagic.magic_file(magic, path.to_s) || raise Exception.new String.new LibMagic.magic_error magic
+      String.new mime
     end
   end
 
   def mime_type(data : Bytes) : String?
-    unless magic = LibMagic.magic_open LibMagic::Flags::MIME_TYPE
-      raise Exception.new "Failed to open libmagic."
-    end
-
-    begin
-      magic_load = LibMagic.magic_load magic, nil
-
-      unless magic_load.zero?
-        raise Exception.new String.new LibMagic.magic_error magic
-      end
-
-      unless mime_type = LibMagic.magic_buffer magic, data, data.bytesize
-        raise Exception.new String.new LibMagic.magic_error magic
-      end
-
-      String.new mime_type
-    ensure
-      LibMagic.magic_close magic
+    magic(flags: LibMagic::Flags::MIME_TYPE) do |magic|
+      mime = LibMagic.magic_buffer(magic, data, data.bytesize) || raise Exception.new String.new LibMagic.magic_error magic
+      String.new mime
     end
   end
 
@@ -105,50 +87,16 @@ struct Mime
       raise Exception.new "The file '#{path}' does not exist or is not readable."
     end
 
-    unless magic = LibMagic.magic_open LibMagic::Flags::MIME_ENCODING
-      raise Exception.new "Failed to open libmagic."
-    end
-
-    begin
-      magic_load = if magic_file = @magic_file
-                     LibMagic.magic_load magic, magic_file
-                   else
-                     LibMagic.magic_load magic, nil
-                   end
-
-      unless magic_load.zero?
-        raise Exception.new String.new LibMagic.magic_error magic
-      end
-
-      unless mime_encoding = LibMagic.magic_file magic, path.to_s
-        raise Exception.new String.new LibMagic.magic_error magic
-      end
-
-      String.new mime_encoding
-    ensure
-      LibMagic.magic_close magic
+    magic(flags: LibMagic::Flags::MIME_ENCODING) do |magic|
+      mime = LibMagic.magic_file(magic, path.to_s) || raise Exception.new String.new LibMagic.magic_error magic
+      String.new mime
     end
   end
 
   def mime_encoding(data : Bytes) : String?
-    unless magic = LibMagic.magic_open LibMagic::Flags::MIME_ENCODING
-      raise Exception.new "Failed to open libmagic."
-    end
-
-    begin
-      magic_load = LibMagic.magic_load magic, nil
-
-      unless magic_load.zero?
-        raise Exception.new String.new LibMagic.magic_error magic
-      end
-
-      unless mime_encoding = LibMagic.magic_buffer magic, data, data.bytesize
-        raise Exception.new String.new LibMagic.magic_error magic
-      end
-
-      String.new mime_encoding
-    ensure
-      LibMagic.magic_close magic
+    magic(flags: LibMagic::Flags::MIME_ENCODING) do |magic|
+      mime = LibMagic.magic_buffer(magic, data, data.bytesize) || raise Exception.new String.new LibMagic.magic_error magic
+      String.new mime
     end
   end
 end

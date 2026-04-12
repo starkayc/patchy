@@ -3,8 +3,7 @@ module Utils::MagicBytes
   Log = ::Log.for(self)
 
   def detect(bytes : Bytes) : String?
-    mime = Mime.new
-    if mime_type = mime.mime_type(bytes)
+    if mime_type = Mime.mime_type(bytes)
       Log.debug &.emit("mime type '#{mime_type}' detected")
       if extension = EXTENSION_MAP[mime_type]?
         ext = extension.first

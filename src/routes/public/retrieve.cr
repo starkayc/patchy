@@ -43,21 +43,19 @@ module Routes::Retrieve
 
     # TODO, store the mime values in the database when the uploaded file is being processed
     # to prevent having to calculate it again and again!
-    mime_type_processor = Mime.new
-
     # TODO: send_file_raw and some functions
     if cached_file = Utils::Cache.select(fileinfo)
       env.response.headers["X-Patchy-Cache"] = "HIT" if CONFIG.cache.enabled
-      mime_type = mime_type_processor.mime_type(cached_file)
-      mime_encoding = mime_type_processor.mime_encoding(cached_file)
+      mime_type = Mime.mime_type(cached_file)
+      mime_encoding = Mime.mime_encoding(cached_file)
       content_type = "#{mime_type}#{"; charset=" + mime_encoding if mime_encoding}"
       send_file_raw env, fileinfo.extension, cached_file, content_type
     else
       if CONFIG.s3.enabled
         full_filename = fileinfo.filename + fileinfo.extension
         if file = Utils::S3::Client.as(Utils::S3::S3).retrieve(full_filename)
-          mime_type = mime_type_processor.mime_type(file)
-          mime_encoding = mime_type_processor.mime_encoding(file)
+          mime_type = Mime.mime_type(file)
+          mime_encoding = Mime.mime_encoding(file)
           content_type = "#{mime_type}#{"; charset=" + mime_encoding if mime_encoding}"
           send_file_raw env, fileinfo.extension, file, content_type
         end
@@ -65,8 +63,8 @@ module Routes::Retrieve
         file_path = "#{CONFIG.storage.files}/#{fileinfo.filename}#{fileinfo.extension}"
         Utils::Cache.insert(fileinfo, file_path, CONFIG.cache.expire_time)
         env.response.headers["X-Patchy-Cache"] = "MISS" if CONFIG.cache.enabled
-        mime_type = mime_type_processor.mime_type(file_path)
-        mime_encoding = mime_type_processor.mime_encoding(file_path)
+        mime_type = Mime.mime_type(file_path)
+        mime_encoding = Mime.mime_encoding(file_path)
         content_type = "#{mime_type}#{"; charset=" + mime_encoding if mime_encoding}"
         send_file env, file_path, mime_type: content_type
       end
