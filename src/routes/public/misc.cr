@@ -48,9 +48,9 @@ module Routes::Misc
         "RequestURL": "#{scheme}://#{host}/-/upload",
         "Body": "MultipartFormData",
         "FileFormName": "file",
-        "URL": "{json:link}",
-        "DeletionURL": "{json:deleteLink}",
-        "ErrorMessage": "{json:error}"
+        "URL": "$json:link$",
+        "DeletionURL": "$json:deleteLink$",
+        "ErrorMessage": "$json:error$"
       }
       JSON
 
