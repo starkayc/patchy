@@ -1,5 +1,5 @@
 <%
-  title = translate(locale, "uploader_configs")
+  title = I18n.translate(locale, "uploader_configs")
 %>
 
 <% content_for "head" do %>
@@ -7,12 +7,12 @@
 <% end %>
 
 <div class="container">
-  <a href='/'><%= translate(locale, "go_back") %></a>
+  <a href='/'><%= I18n.translate(locale, "go_back") %></a>
   <hr>
   <h2><%= title %>
   <h3>Chatterino</h3>
     <p>
-      <%= translate(locale, "uploader_configs_chatterino_text") %>
+      <%= I18n.translate(locale, "uploader_configs_chatterino_text") %>
       <p>Request URL: <b><a><%= scheme %>://<%= host %>/-/upload</a></b></p>
       <p>Form field: <b><a>data</a></b></p>
       <p>Image link: <b><a>{link}</a></b></p>
@@ -20,6 +20,6 @@
     </p>
   <h3>ShareX</h3>
     <p>
-      <%= translate(locale, "uploader_configs_sharex_text") %> <a href='./sharex.sxcu'><%= host || "sharex" %>.sxcu</a>
+      <%= I18n.translate(locale, "uploader_configs_sharex_text") %> <a href='./sharex.sxcu'><%= host || "sharex" %>.sxcu</a>
     </p>
 </div>

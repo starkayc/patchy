@@ -43,16 +43,16 @@
 
 <div class="media-container">
   <div class="navbar">
-    <a href='/'><%= translate(locale, "go_back") %></a>
-    <a href='/-/file/<%= filename_ %>' download=''><%= translate(locale, "download_file") %> (<%= original_filename_ %>)</a>
+    <a href='/'><%= I18n.translate(locale, "go_back") %></a>
+    <a href='/-/file/<%= filename_ %>' download=''><%= I18n.translate(locale, "download_file") %> (<%= original_filename_ %>)</a>
     <%
       # Disable view button for .html
       if fileinfo.extension != ".html"
     %>
-    <a href='/-/file/<%= filename_ %><%= extension_ %>'><%= translate(locale, "view_file") %></a>
+    <a href='/-/file/<%= filename_ %><%= extension_ %>'><%= I18n.translate(locale, "view_file") %></a>
     <% end %>
     <span class="end-of-flex"></span>
-    <a href='/-/reportabuse?file=<%= filename_ %>'><%= translate(locale, "report_abuse") %></a>
+    <a href='/-/reportabuse?file=<%= filename_ %>'><%= I18n.translate(locale, "report_abuse") %></a>
   </div>
   <hr>
   <div class="media">
@@ -70,8 +70,8 @@
       </audio>
     <% else %>
       <div class="file-no-display">
-        <p><%= translate(locale, "file_cannot_be_displayed") %></p>
-        <a href='/-/file/<%= filename_ %>' download=''><%= translate(locale, "download_file") %> (<%= original_filename_ %>)</a>
+        <p><%= I18n.translate(locale, "file_cannot_be_displayed") %></p>
+        <a href='/-/file/<%= filename_ %>' download=''><%= I18n.translate(locale, "download_file") %> (<%= original_filename_ %>)</a>
       </div>
     <% end %>
   </div>
