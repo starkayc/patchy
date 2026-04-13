@@ -19,8 +19,7 @@ module Operations
     end
 
     private def writefile : Nil
-      buffer = Bytes.new(16, 0)
-      slice = buffer.to_slice
+      slice = Bytes.new(CONFIG.uploads.magic_bytes.buffer_size, 0)
       bytes_read = @uploaded_file.body.read(slice)
       slice_for_magic_bytes = slice[0, bytes_read]
 

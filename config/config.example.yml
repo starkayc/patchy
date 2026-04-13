@@ -41,6 +41,14 @@ uploads:
     # In seconds
     delete_files_check: 1800
     delete_key_length: 4
+  magic_bytes:
+    # How many bytes of the uploaded file should be thrown into the buffer
+    # so libmagic can detect it's MIME type and extension.
+    # 1024 bytes is the recommended value. Lowering this value may
+    # reduce the precision of the guessed MIME type and extension.
+    #
+    # You shouldn't change this value, unless you know what you are doing!
+    buffer_size: 1024
 
 # http server
 server:

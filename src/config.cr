@@ -211,6 +211,18 @@ class Config
       # The lenght of the delete key
       property delete_key_length : Int32 = 6
     end
+
+    property magic_bytes : MagicBytes = MagicBytes.from_yaml("")
+
+    struct MagicBytes
+      include YAML::Serializable
+
+      # How many bytes of the uploaded file should be thrown into the buffer
+      # so libmagic can detect it's MIME type.
+      # 1024 bytes is the recommended value. Lowering this value may
+      # reduce the precision of the guessed MIME type.
+      property buffer_size : Int32 = 1024
+    end
   end
 
   # Deprecated
