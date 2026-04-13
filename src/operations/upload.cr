@@ -19,11 +19,12 @@ module Operations
     end
 
     private def writefile : Nil
-      buffer = uninitialized UInt8[16]
+      buffer = Bytes.new(16, 0)
       slice = buffer.to_slice
-      @uploaded_file.body.read_fully(slice)
+      bytes_read = @uploaded_file.body.read(slice)
+      slice_for_magic_bytes = slice[0, bytes_read]
 
-      self.detect_extension(slice)
+      self.detect_extension(slice_for_magic_bytes)
 
       full_filename = @fileinfo.filename + @fileinfo.extension
       file_path = "#{CONFIG.storage.files}/#{full_filename}"
@@ -38,7 +39,7 @@ module Operations
         Utils::S3::Client.as(Utils::S3::S3).upload(full_filename, body)
       else
         File.open(file_path, "wb") do |output|
-          output.write(slice)
+          output.write(slice_for_magic_bytes)
           IO.copy(@uploaded_file.body, output)
         end
         self.generate_checksum(file_path)
