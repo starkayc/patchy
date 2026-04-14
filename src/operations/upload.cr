@@ -20,7 +20,13 @@ module Operations
 
     private def writefile : Nil
       slice = Bytes.new(CONFIG.uploads.magic_bytes.buffer_size, 0)
-      bytes_read = @uploaded_file.body.read(slice)
+      bytes_read = 0
+      bytes_to_read = slice.size
+      @uploaded_file.body.each_byte do |byte|
+        slice[bytes_read] = byte
+        bytes_read += 1
+        break if bytes_read == bytes_to_read
+      end
       slice_for_magic_bytes = slice[0, bytes_read]
 
       self.detect_extension(slice_for_magic_bytes)
