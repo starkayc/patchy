@@ -55,8 +55,8 @@ module Routes::Upload
     # This is generally a good way to check the filesize but there is a better way to do it
     # which is inspecting the file directly (If I'm not wrong).
     if CONFIG.size_limit > 0
-      if !env.request.headers["Content-Length"]?.try &.to_i == nil
-        if env.request.headers["Content-Length"].to_i > 1048576*CONFIG.size_limit
+      if content_length = env.request.headers["Content-Length"]?.try &.to_u64
+        if content_length > 1048576_u64*CONFIG.size_limit
           ee 413, "File is too big. The maximum size allowed is #{CONFIG.size_limit}MiB"
         end
       end
