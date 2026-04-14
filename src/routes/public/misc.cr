@@ -19,9 +19,9 @@ module Routes::Misc
 
     def initialize
       @files_hosted = Database::Files.file_count
-      @max_upload_size = CONFIG.size_limit.to_s
+      @max_upload_size = CONFIG.uploads.size_limit.to_s
       @thumbnail_generation = CONFIG.thumbnail_generation.enabled
-      @filename_length = CONFIG.filename_length
+      @filename_length = CONFIG.uploads.filename_length
       @alternative_domains = CONFIG.alternative_domains
     end
   end

@@ -54,10 +54,10 @@ module Routes::Upload
     # You can modify this if you want to allow files smaller than 1MiB.
     # This is generally a good way to check the filesize but there is a better way to do it
     # which is inspecting the file directly (If I'm not wrong).
-    if CONFIG.size_limit > 0
+    if CONFIG.uploads.size_limit > 0
       if content_length = env.request.headers["Content-Length"]?.try &.to_u64
-        if content_length > 1048576_u64*CONFIG.size_limit
-          ee 413, "File is too big. The maximum size allowed is #{CONFIG.size_limit}MiB"
+        if content_length > 1048576_u64*CONFIG.uploads.size_limit
+          ee 413, "File is too big. The maximum size allowed is #{CONFIG.uploads.size_limit}MiB"
         end
       end
     end

@@ -62,7 +62,7 @@ module Utils
   end
 
   # TODO: Check if there are no other possibilities to get a random filename and exit
-  def generate_filename(filename_length : Int32 = CONFIG.filename_length) : String
+  def generate_filename(filename_length : Int32 = CONFIG.uploads.filename_length) : String
     filename = Random.base58(filename_length)
 
     loop do
@@ -71,7 +71,7 @@ module Utils
         return filename
       else
         Log.trace &.emit("filename collision! Generating a new filename")
-        filename = Random.base58(CONFIG.filename_length)
+        filename = Random.base58(CONFIG.uploads.filename_length)
       end
     end
   end

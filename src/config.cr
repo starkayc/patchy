@@ -290,7 +290,7 @@ class Config
   property alternative_domains : Array(String) = [] of String
 
   def self.check_config(config : Config) : Nil
-    if config.filename_length <= 0
+    if config.uploads.filename_length <= 0
       Log.fatal &.emit("Config: filename_length cannot be less or equal to 0")
       exit(1)
     end

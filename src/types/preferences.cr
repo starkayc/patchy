@@ -4,5 +4,5 @@ struct UserSettings
   include JSON::Serializable
   include URI::Params::Serializable
 
-  property filename_length : Int32 = CONFIG.filename_length
+  property filename_length : Int32 = CONFIG.uploads.filename_length
 end

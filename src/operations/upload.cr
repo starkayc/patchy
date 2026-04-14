@@ -13,7 +13,7 @@ module Operations
     end
 
     private def generate_checksum(file_path : String) : Nil
-      if CONFIG.enable_checksums
+      if CONFIG.uploads.enable_checksums
         @fileinfo.checksum = Utils::Hashing.hash_file(file_path)
       end
     end
