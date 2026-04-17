@@ -58,7 +58,7 @@ RUN adduser -u 10000 -S patchy
 
 RUN mkdir -p /data && chown -R 10000:10000 /data
 
-COPY --from=builder --chown=patchy:patchy /patchy/patchy /patchy
+COPY --from=builder --chown=10000:10000 /patchy/patchy /patchy
 
 EXPOSE 8080
 
