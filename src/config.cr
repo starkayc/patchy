@@ -289,6 +289,22 @@ class Config
   # and in `/api/stats`
   property alternative_domains : Array(String) = [] of String
 
+  property advanced : Advanced = Advanced.from_yaml("")
+
+  struct Advanced
+    include YAML::Serializable
+
+    property gc : GC = GC.from_yaml("")
+
+    struct GC
+      include YAML::Serializable
+
+      property enabled : Bool = true
+      # In seconds
+      property interval : Int32 = 10
+    end
+  end
+
   def self.check_config(config : Config) : Nil
     if config.uploads.filename_length <= 0
       Log.fatal &.emit("Config: filename_length cannot be less or equal to 0")

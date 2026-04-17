@@ -169,3 +169,13 @@ abuse_email: "example@example.com"
 
 # alternative_domains:
 #   - "example.com"
+
+# Advanced options that you shouldn't touch
+# but you can touch them if you really need it.
+advanced:
+  # Calls the GC.collect method, frees memory every <interval> seconds
+  # as Crystal by default frees memory when there is activity
+  # https://crystal-lang.org/api/1.19.1/GC.html#collect-class-method
+  gc:
+    enabled: true
+    interval: 10

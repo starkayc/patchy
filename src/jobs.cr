@@ -79,16 +79,22 @@ module Jobs
     end
   end
 
-  def gc : Fiber
+  def gc : Fiber?
+    if !CONFIG.advanced.gc.enabled
+      Log.trace &.emit("gc enabled")
+    end
+    interval = CONFIG.advanced.gc.interval
+    Log.trace &.emit("gc enabled", gc_call_interval: interval)
+
     spawn do
       loop do
         GC.collect
-        sleep 10.seconds
+        sleep interval.seconds
       end
     end
   end
 
-  def run : Fiber
+  def run : Nil
     check_old_files
     retrieve_tor_exit_nodes
     retrieve_vpn_addresses
