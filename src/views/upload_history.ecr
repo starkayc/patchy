@@ -4,7 +4,7 @@
 
 <% content_for "head" do %>
 <title> <%= host %> - <%= title %></title>
-<script type="module" src="/-/assets/js/uploadHistory.js?v=<%= ASSET_COMMIT %>"></script>
+<script type="module" src="/-/assets/<%= JS_PATH %>/uploadHistory.js?v=<%= ASSET_COMMIT %>"></script>
 <script id="patchy-config" type="application/json">
 <%=
 {

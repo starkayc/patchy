@@ -1,7 +1,7 @@
 # Based on https://github.com/iv-org/invidious/blob/master/docker/Dockerfile
 FROM crystallang/crystal:1.19.1-alpine AS builder
 
-RUN apk add --no-cache sqlite-static yaml-static libmagic-static
+RUN apk add --no-cache sqlite-static yaml-static libmagic-static esbuild
 
 WORKDIR /patchy
 
@@ -18,10 +18,12 @@ COPY ./.git/ ./.git/
 COPY ./public/ ./public/
 COPY ./locales/ ./locales/
 
+RUN esbuild "./public/-/assets/js/*" --color=false --sourcemap --minify --outdir="./public/-/assets/js-m"
+
 RUN --mount=type=cache,target=/root/.cache/crystal \
 	crystal build ./src/patchy.cr \
 	--release \
-	--static --warnings all -s -p -t
+	--static --warnings all -s -p -t -Dpatchy_minified_js
 
 FROM git.nadeko.net/fijxu/alpine-stripped-ffmpeg:3.23-ffmpeg-6.1.2
 # shared-mime-info is required so Crystal is able to guess the mime types

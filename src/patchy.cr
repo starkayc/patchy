@@ -26,6 +26,12 @@ require "./database/*"
 module Patchy
 end
 
+{% if flag?(:patchy_minified_js) %}
+  JS_PATH = "js-m"
+{% else %}
+  JS_PATH = "js"
+{% end %}
+
 # https://github.com/iv-org/invidious/blob/90e94d4e6cc126a8b7a091d12d7a5556bfe369d5/src/invidious.cr#L78
 CURRENT_BRANCH  = {{ "#{`git branch | sed -n '/* /s///p'`.strip}" }}
 CURRENT_COMMIT  = {{ "#{`git rev-list HEAD --max-count=1 --abbrev-commit`.strip}" }}

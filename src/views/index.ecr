@@ -1,6 +1,6 @@
 <% content_for "head" do %>
 <title> <%= host %> - <%= I18n.translate(locale, "main_title") %></title>
-<script type="module" src="/-/assets/js/script.js?v=<%= ASSET_COMMIT %>"></script>
+<script type="module" src="/-/assets/<%= JS_PATH %>/script.js?v=<%= ASSET_COMMIT %>"></script>
 <%= I18n.translate_js(locale, "js_upload_text") %>
 <%= I18n.translate_js(locale, "js_upload_client_error") %>
 <%= I18n.translate_js(locale, "js_upload_server_error") %>

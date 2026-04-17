@@ -12,3 +12,6 @@ patchy
 
 # The history of GDB commands for debugging purposes
 .gdb_history
+
+# Minified JS files generated with esbuild at build time using `make build`
+public/-/assets/js-m
