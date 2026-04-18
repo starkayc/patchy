@@ -6,14 +6,14 @@ module Jobs
   Log = ::Log.for(self)
 
   def check_old_files : Fiber?
-    if CONFIG.delete_files_check <= 0
+    if CONFIG.uploads.deletion.delete_files_check <= 0
       Log.info &.emit("file deletion is disabled")
       return
     end
     spawn do
       loop do
         Utils.check_old_files
-        sleep CONFIG.delete_files_check.seconds
+        sleep CONFIG.uploads.deletion.delete_files_check.seconds
       end
     end
   end

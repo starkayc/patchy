@@ -34,7 +34,7 @@ module Routes::Retrieve
       env.response.headers["Content-Disposition"] = "attachment; filename*=UTF-8''#{fileinfo.original_filename}"
     end
     env.response.headers["ETag"] = "#{fileinfo.checksum}" if fileinfo.checksum
-    if !(CONFIG.delete_files_check <= 0)
+    if !(CONFIG.uploads.deletion.delete_files_check <= 0)
       env.response.headers["Cache-Control"] = "public, max-age=#{cache_control_max_age}"
     else
       # Default max-age of 7 days if Patchy is configured to not delete files.

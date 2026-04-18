@@ -35,9 +35,9 @@ class Config
   end
 
   # Deprecated
-  property files : String = "./data/files"
-  property thumbnails : String = "./data/thumbnails"
-  property db : String = "./data/db"
+  property files : String? = nil
+  property thumbnails : String? = nil
+  property db : String? = nil
 
   property cors : Cors = Cors.from_yaml("")
 
@@ -226,15 +226,15 @@ class Config
   end
 
   # Deprecated
-  property filename_length : Int32 = 5
-  property max_filename_length : Int32 = 16
-  property min_filename_length : Int32 = 5
-  property size_limit : Int16 = 512
-  property enable_checksums : Bool = true
-  property delete_files_after : Int32 = 168
-  property delete_files_check : Int32 = 1800
-  property delete_key_length : Int32 = 6
-  property blocked_extensions : Array(String) = [] of String
+  property filename_length : Int32? = nil
+  property max_filename_length : Int32? = nil
+  property min_filename_length : Int32? = nil
+  property size_limit : Int16? = nil
+  property enable_checksums : Bool? = nil
+  property delete_files_after : Int32? = nil
+  property delete_files_check : Int32? = nil
+  property delete_key_length : Int32? = nil
+  property blocked_extensions : Array(String)? = nil
 
   property ip_block : IPBlocks = IPBlocks.from_yaml("")
 
@@ -278,8 +278,8 @@ class Config
   end
 
   # Deprecated
-  property files_per_ip : Int32 = 32
-  property rate_limit_period : Int32 = 600
+  property files_per_ip : Int32? = nil
+  property rate_limit_period : Int32? = nil
 
   # Abuse email that is going to be displayed on the website of the uploader
   property abuse_email : String = ""
@@ -311,8 +311,8 @@ class Config
       exit(1)
     end
 
-    if config.min_filename_length > config.max_filename_length
-      Log.fatal &.emit("Config: min_filename_length can't be greater than max_filename_length", min_filename_length: config.min_filename_length, max_filename_length: config.max_filename_length)
+    if config.uploads.min_filename_length > config.uploads.max_filename_length
+      Log.fatal &.emit("Config: min_filename_length can't be greater than max_filename_length", min_filename_length: config.uploads.min_filename_length, max_filename_length: config.uploads.max_filename_length)
       exit(1)
     end
 
@@ -367,12 +367,12 @@ class Config
   end
 
   private macro deprecated(old_option, new_option, found, replace = true)
-    if {{replace}}
-      {{new_option}} = {{old_option}}
+    if {{replace}} && {{old_option}}
+      {{new_option}} = {{old_option}}.not_nil!
+      {{found}} += 1
+      s = %q(Config: Deprecated config option {{ old_option.id.split(".")[1..].join(".") }}, use {{ new_option.id.split(".")[1..].join(".") }} instead)
+      Log.warn &.emit(s)
     end
-    {{found}} += 1
-    s = %q(Config: Deprecated config option {{ old_option.id.split(".")[1..].join(".") }}, use {{ new_option.id.split(".")[1..].join(".") }} instead)
-    Log.warn &.emit(s)
   end
 
   def self.load(config_file : String = "config/config.yml") : Config

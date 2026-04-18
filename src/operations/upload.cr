@@ -52,7 +52,7 @@ module Operations
     end
 
     private def valid_extension?(extension : String) : Nil
-      if CONFIG.blocked_extensions.includes?(extension.split(".")[1]?)
+      if CONFIG.uploads.blocked_extensions.includes?(extension.split(".")[1]?)
         raise ExtensionNotAllowed.new(extension)
       end
     end
