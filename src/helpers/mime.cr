@@ -1,16 +1,8 @@
 # Stripped down version of:
 # https://github.com/athena-framework/mime/blob/f11a7f991a00b4f95a5e274bc05d10e686569570/src/magic_types_guesser.cr
 
-# TODO: Convert this to a module, I don't really need a struct and @magic_file
-# since I will just do single operations
-#
-# TODO: Minify the bullshit functions
-# TODO: Store the
 module Mime
   extend self
-
-  # To store and reuse the magic cookies :3
-  @@magic_cookies : Hash(LibMagic::Flags, LibMagic::MagicT) = {} of LibMagic::Flags => LibMagic::MagicT
 
   @[Link("magic", pkg_config: "libmagic")]
   lib LibMagic
@@ -51,16 +43,18 @@ module Mime
   end
 
   private def magic(flags, &)
-    unless @@magic_cookies[flags] = LibMagic.magic_open flags
+    unless magic = LibMagic.magic_open flags
       raise Exception.new "Failed to open libmagic."
     end
 
     begin
-      unless LibMagic.magic_load(@@magic_cookies[flags], nil).zero?
-        raise Exception.new String.new LibMagic.magic_error @@magic_cookies[flags]
+      unless LibMagic.magic_load(magic, nil).zero?
+        raise Exception.new String.new LibMagic.magic_error magic
       end
 
-      yield @@magic_cookies[flags]
+      yield magic
+    ensure
+      LibMagic.magic_close magic
     end
   end
 
