@@ -270,8 +270,9 @@ class Config
   struct RateLimits
     include YAML::Serializable
 
-    # How many files an IP address can upload to the server. Setting this to 0
-    # disables rate limits in the rate limit period
+    # Enable rate limiting per IP address.
+    property enabled : Bool = false
+    # How many files an IP address can upload to the server.
     property files_per_ip : Int32 = 32
     # How often is the file limit per IP reset? (in seconds)
     property rate_limit_period : Int32 = 600

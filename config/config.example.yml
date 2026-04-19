@@ -10,7 +10,10 @@ storage:
 
 # Rate limit uploads per IP address
 rate_limits:
+  enabled: false
   # How many files can be uploaded in the `rate_limit_period` time span.
+  # Setting this to 0 disables rate limits, regardless if rate limits
+  # are enabled.
   files_per_ip: 32
   # After 600 seconds, the limits for a specific IP will be lifted and
   # that IP address will be able to upload files again.

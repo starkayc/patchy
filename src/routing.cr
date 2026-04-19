@@ -85,7 +85,7 @@ module Routing
     ip_info = Database::IPS.select(ip)
     return if ip_info.nil?
 
-    if CONFIG.rate_limits.files_per_ip > 0
+    if CONFIG.rate_limits.enabled && CONFIG.rate_limits.files_per_ip > 0
       time_since_first_upload = Time.utc.to_unix - ip_info.date
       time_until_unban = ip_info.date - Time.utc.to_unix + CONFIG.rate_limits.rate_limit_period
 
