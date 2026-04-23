@@ -387,3 +387,16 @@ input[type="number"] {
 	border: 1px solid var(--bg2);
 	border-radius: 2px;
 }
+
+.infobox {
+	text-align: center;
+	position: relative;
+	width: fit-content;
+	margin: 8px auto;
+	display: block;
+	background: var(--bg1);
+	border: 1px solid var(--bg2);
+	border-radius: 2px;
+	cursor: pointer;
+	padding: 8px;
+}

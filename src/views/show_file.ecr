@@ -6,7 +6,7 @@
   filetype = Filetype::File
   if [".png", ".jpg", ".gif", ".webp", ".jpeg", ".bmp", ".tiff", ".jfif", ".avif", ".jxl"].any? { |ex| fileinfo.extension == ex }
     filetype = Filetype::Image
-  elsif [".mp4", ".webm", ".avi", ".mov", ".ogv"].any? { |ex| fileinfo.extension == ex }
+  elsif [".mp4", ".webm", ".avi", ".mov", ".ogv", ".mkv"].any? { |ex| fileinfo.extension == ex }
     filetype = Filetype::Video
   elsif [".flac", ".wav", ".mp3", ".acc", ".ogg", ".opus"].any? { |ex| fileinfo.extension == ex }
     filetype = Filetype::Audio
@@ -54,6 +54,23 @@
     <span class="end-of-flex"></span>
     <a href='/-/reportabuse?file=<%= filename_ %>'><%= I18n.translate(locale, "report_abuse") %></a>
   </div>
+  <% if fileinfo.extension == ".mkv" %>
+    <div class="infobox">
+        <a><%= I18n.translate(locale, "info_mkv_may_not_play") %></a>
+    </div>
+  <% elsif fileinfo.extension == ".mov" %>
+    <div class="infobox">
+        <a><%= I18n.translate(locale, "info_mov_may_not_play") %></a>
+    </div>
+  <% elsif fileinfo.extension == ".ogv" %>
+    <div class="infobox">
+        <a><%= I18n.translate(locale, "info_ogv_may_not_play") %></a>
+    </div>
+  <% elsif fileinfo.extension == ".avi" %>
+    <div class="infobox">
+        <a><%= I18n.translate(locale, "info_avi_may_not_play") %></a>
+    </div>
+  <% end %>
   <hr>
   <div class="media">
     <% if filetype == Filetype::Image %>
