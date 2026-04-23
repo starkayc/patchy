@@ -41,9 +41,9 @@ module Utils
       rescue File::NotFoundError
         Log.error &.emit("file '#{full_filename}' doesn't exist on the '#{CONFIG.storage.files}', folder, deleting it from the database")
       rescue ex : File::AccessDeniedError
-        Log.error &.emit("file '#{full_filename}' failed to be deleted due to bad permissions, deleting it from the database, error", error: ex.message)
+        Log.error &.emit("file '#{full_filename}' failed to be deleted due to bad permissions, deleting it from the database", error: ex.message)
       rescue ex
-        Log.error &.emit("file '#{full_filename}' failed to be deleted, deleting it from the database, error", error: ex.message)
+        Log.error &.emit("file '#{full_filename}' failed to be deleted, deleting it from the database", error: ex.message)
       ensure
         Database::Files.delete(f.filename)
       end
