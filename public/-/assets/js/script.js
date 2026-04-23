@@ -133,6 +133,7 @@ window.addEventListener("DOMContentLoaded", () => {
     xhr.onerror = () => {
       console.error("Error:", xhr.status, xhr.statusText, xhr.responseText);
       statusLink.textContent = translate_uploadUnknownError;
+      cancelUploadButton.style.display = "none";
     };
 
     xhr.onload = () => {
@@ -154,11 +155,14 @@ window.addEventListener("DOMContentLoaded", () => {
           history.add(response);
         } catch (_) {
           statusLink.textContent = translate_uploadUnknownError;
+          cancelUploadButton.style.display = "none";
         }
       } else if (xhr.status >= 400 && xhr.status < 500) {
         statusLink.textContent = translate_uploadClientError;
+        cancelUploadButton.style.display = "none";
       } else {
         statusLink.textContent = translate_uploadServerError;
+        cancelUploadButton.style.display = "none";
       }
     };
 
