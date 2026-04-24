@@ -20,7 +20,6 @@ module Routes::UserSettings
 
     begin
       new_user_settings = ::UserSettings.from_www_form(env.params.body.to_s)
-      new_user_settings = self.parse_settings(new_user_settings)
       env.response.cookies["PREFS"] = self.set_cookie("PREFS", host, new_user_settings)
     rescue ex
       # TODO: Show error page if settings were unable to be parsed
@@ -28,10 +27,5 @@ module Routes::UserSettings
     end
 
     return env.redirect "/-/settings"
-  end
-
-  def parse_settings(new_user_settings : ::UserSettings) : ::UserSettings
-    new_user_settings.filename_length = new_user_settings.filename_length.clamp(CONFIG.min_filename_length, CONFIG.max_filename_length)
-    return new_user_settings
   end
 end
