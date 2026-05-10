@@ -48,9 +48,6 @@ module Routes::Upload
     scheme = Headers.scheme
     ip_addr = Headers.ip_addr
     user_settings = Headers.user_settings
-    if query = env.params.query
-      user_settings = ::UserSettings.from_www_form(query.to_s)
-    end
     no_js = env.params.query.has_key?("nojs")
     env.response.content_type = "application/json"
 
