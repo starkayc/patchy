@@ -8,7 +8,7 @@
     filetype = Filetype::Image
   elsif [".mp4", ".webm", ".avi", ".mov", ".ogv", ".mkv"].any? { |ex| fileinfo.extension == ex }
     filetype = Filetype::Video
-  elsif [".flac", ".wav", ".mp3", ".acc", ".ogg", ".opus"].any? { |ex| fileinfo.extension == ex }
+  elsif [".flac", ".wav", ".mp3", ".acc", ".ogg", ".opus", ".m4a"].any? { |ex| fileinfo.extension == ex }
     filetype = Filetype::Audio
   end
 %>
