@@ -222,7 +222,7 @@ class Config
       # so libmagic can detect it's MIME type.
       # 1024 bytes is the recommended value. Lowering this value may
       # reduce the precision of the guessed MIME type.
-      property buffer_size : Int32 = 1024
+      property buffer_size : Int32 = 131072
     end
   end
 

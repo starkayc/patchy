@@ -51,7 +51,7 @@ uploads:
     # reduce the precision of the guessed MIME type and extension.
     #
     # You shouldn't change this value, unless you know what you are doing!
-    buffer_size: 1024
+    buffer_size: 131072
 
 # http server
 server:
