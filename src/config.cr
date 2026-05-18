@@ -71,6 +71,7 @@ class Config
     include YAML::Serializable
 
     property enabled : Bool = false
+    property background_generation : Bool = false
     property resolution : Resolution = Resolution.from_yaml("")
     property fallback_thumbnail : CustomThumbnail = CustomThumbnail.from_yaml("")
 

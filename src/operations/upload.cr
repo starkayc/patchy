@@ -98,10 +98,12 @@ module Operations
         @fileinfo.delete_key = Random.base58(CONFIG.uploads.deletion.delete_key_length)
       end
 
-      begin
-        @fileinfo.thumbnail = Utils::Thumbnails.generate_thumbnail(@fileinfo.filename, @fileinfo.extension)
-      rescue ex
-        Log.error &.emit("an error ocurred when trying to generate a thumbnail", error: ex.message)
+      if !CONFIG.thumbnail_generation.background_generation
+        begin
+          @fileinfo.thumbnail = Utils::Thumbnails.generate_thumbnail(@fileinfo.filename, @fileinfo.extension, false)
+        rescue ex
+          Log.error &.emit("an error ocurred when trying to generate a thumbnail", error: ex.message)
+        end
       end
 
       begin

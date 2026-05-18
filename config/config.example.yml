@@ -88,6 +88,13 @@ cors:
 # https://codeberg.org/Fijxu/patchy/src/branch/master/docs/security/ffmpeg.md
 thumbnail_generation:
   enabled: false
+  # Generate thumbnails in the background instead of processing them when the
+  # file is being processed for upload. This saves time when uploading files
+  # as it takes some time (around ~100ms more, depends of the file)
+  # to process the thumbnail.
+  # When having background generation enabled, the thumbnail will generate
+  # right after the file has been uploaded.
+  background_generation: false
   # When a file has no thumbnail, it will show a fallback thumbnail located in
   # ./public/-/assets/img/nothumbnail.jpg, it can be easily replaced by adding
   # an image file to ./public/-/assets/img/
