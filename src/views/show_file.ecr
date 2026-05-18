@@ -2,15 +2,6 @@
   original_filename_ = HTML.escape(fileinfo.original_filename)
   filename_ = HTML.escape(fileinfo.filename)
   extension_ = HTML.escape(fileinfo.extension)
-
-  filetype = Filetype::File
-  if [".png", ".jpg", ".gif", ".webp", ".jpeg", ".bmp", ".tiff", ".jfif", ".avif", ".jxl"].any? { |ex| fileinfo.extension == ex }
-    filetype = Filetype::Image
-  elsif [".mp4", ".webm", ".avi", ".mov", ".ogv", ".mkv"].any? { |ex| fileinfo.extension == ex }
-    filetype = Filetype::Video
-  elsif [".flac", ".wav", ".mp3", ".acc", ".ogg", ".opus", ".m4a"].any? { |ex| fileinfo.extension == ex }
-    filetype = Filetype::Audio
-  end
 %>
 
 <% content_for "head" do %>
@@ -81,6 +72,9 @@
         Your browser does not support the video tag.
       </video>
     <% elsif filetype == Filetype::Audio %>
+      <% if thumbnail = fileinfo.thumbnail %>
+        <img class="media-audio-img" src="/-/thumbnail/<%= thumbnail %>">
+      <% end %>
       <audio class="content" controls <%= CONFIG.views.show_file.autoplay_audio ? "autoplay" : "" %>>
         <source src="/-/file/<%= filename_ %>" type="<%= mime_type %>">
         Your browser does not support the audio tag.

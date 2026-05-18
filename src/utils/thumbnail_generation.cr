@@ -3,8 +3,10 @@ module Utils::Thumbnails
   Log = ::Log.for(self)
 
   private ALLOWED_EXTENSIONS =
-    {".jpg", ".jpeg", ".png", ".gif", ".bmp", ".tiff", ".webp", ".heic", ".jxl", ".avif", ".crw", ".dng",
-     ".mp4", ".mkv", ".webm", ".avi", ".wmv", ".flv", "m4v", ".mov", ".amv", ".3gp", ".mpg", ".mpeg", ".yuv"}
+    Routes::Views::IMAGE_EXTENSIONS +
+      Routes::Views::VIDEO_EXTENSIONS +
+      Routes::Views::AUDIO_EXTENSIONS +
+      Set{".heic", ".crw", ".dng", ".wmv", ".flv", ".amv", ".3gp", ".mpg", ".mpeg", ".yuv", ".ogv"}
 
   def generate_thumbnail(filename : String, extension : String, background_generation : Bool) : String?
     return unless CONFIG.thumbnail_generation.enabled &&
@@ -13,7 +15,7 @@ module Utils::Thumbnails
 
     process = generate(filename, extension, CONFIG.thumbnail_generation.resolution)
 
-    if process.exit_reason == Process::ExitReason::Normal
+    if process.success?
       Log.debug &.emit("thumbnail for '#{filename + extension}' generated successfully")
       return "#{filename}.jpg"
     else
