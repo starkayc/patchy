@@ -11,6 +11,9 @@
   <link rel="stylesheet" href="/-/assets/css/default.css?v=<%= ASSET_COMMIT %>">
   <link rel="icon" type="image/x-icon" href="/-/assets/favicon.ico?v=<%= ASSET_COMMIT %>" />
   <link rel="icon" type="image/png" href="/-/assets/favicon.png?v=<%= ASSET_COMMIT %>" />
+  <% if CONFIG.server.no_robots %>
+    <meta name="robots" content="none" />
+  <% end %>
   <%= yield_content "head" %>
 </head>
 

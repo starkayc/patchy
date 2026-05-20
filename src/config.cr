@@ -20,6 +20,7 @@ class Config
     # A file path where do you want to place a unix socket (THIS WILL DISABLE ACCESS
     # BY IP ADDRESS)
     property unix_socket : String?
+    property no_robots : Bool = false
   end
 
   property storage : Storage = Storage.from_yaml("")

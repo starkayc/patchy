@@ -59,6 +59,10 @@ module Routing
         halt env, status_code: 401, response: res
       end
     end
+
+    if CONFIG.server.no_robots
+      env.response.headers["X-Robots-Tag"] = "none"
+    end
   end
 
   private def before_upload(env : HTTP::Server::Context) : Nil
