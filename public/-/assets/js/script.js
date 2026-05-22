@@ -81,19 +81,23 @@ window.addEventListener("DOMContentLoaded", () => {
     const uploadContainer = document.createElement("div");
     const statusLink = document.createElement("div");
     const uploadText = document.createElement("a");
-    const buttons = document.createElement("div");
+    const rightButtons = document.createElement("div");
+    const leftButtons = document.createElement("div");
     const copyButton = document.createElement("button");
     const deleteButton = document.createElement("button");
     const cancelUploadButton = document.createElement("button");
 
     uploadContainer.className = "upload-status";
     uploadContainer.id = "upload-status";
+    rightButtons.className = "buttons-container right-buttons";
+    leftButtons.className = "buttons-container left-buttons";
+    rightButtons.appendChild(copyButton);
+    rightButtons.appendChild(cancelUploadButton);
+    leftButtons.appendChild(deleteButton);
+    uploadContainer.appendChild(leftButtons);
     uploadContainer.appendChild(uploadText);
     uploadContainer.appendChild(statusLink);
-    buttons.appendChild(copyButton);
-    buttons.appendChild(deleteButton);
-    buttons.appendChild(cancelUploadButton);
-    uploadContainer.appendChild(buttons);
+    uploadContainer.appendChild(rightButtons);
     uploadStatus?.appendChild(uploadContainer);
 
     uploadText.innerHTML = "0%";
@@ -108,6 +112,7 @@ window.addEventListener("DOMContentLoaded", () => {
     copyButton.style.display = "none";
     deleteButton.style.display = "none";
     cancelUploadButton.style.display = "none";
+    leftButtons.style.display = "none";
 
     xhr.upload.addEventListener("loadstart", (_) => {
       cancelUploadButton.style.display = "inline";
@@ -134,6 +139,7 @@ window.addEventListener("DOMContentLoaded", () => {
       console.error("Error:", xhr.status, xhr.statusText, xhr.responseText);
       statusLink.textContent = translate_uploadUnknownError;
       cancelUploadButton.style.display = "none";
+      uploadText.innerHTML = "-";
     };
 
     xhr.onload = () => {
@@ -147,8 +153,10 @@ window.addEventListener("DOMContentLoaded", () => {
           const deleteLink = parsedResponse.deleteLink;
           deleteKey = parsedResponse.deleteKey;
           statusLink.innerHTML = `<a href="${fileLink}" target="_blank">${fileLink}</a>`;
-          copyButton.style.display = "inline";
-          deleteButton.style.display = "inline";
+          copyButton.style.display = "";
+          deleteButton.style.display = "";
+          leftButtons.style.display = "";
+          uploadText.style.display = "none";
           copyButton.onclick = () => copyToClipboard(fileLink, copyButton);
           deleteButton.onclick = () =>
             deleteFile(deleteLink, deleteKey, statusLink);
@@ -156,6 +164,7 @@ window.addEventListener("DOMContentLoaded", () => {
         } catch (_) {
           statusLink.textContent = translate_uploadUnknownError;
           cancelUploadButton.style.display = "none";
+          uploadText.innerHTML = "-";
         }
       } else if (xhr.status >= 400 && xhr.status < 500) {
         statusLink.textContent = translate_uploadClientError;

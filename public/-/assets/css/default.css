@@ -265,7 +265,7 @@ nav > ul {
 }
 
 .upload-status-container {
-	margin: 10px;
+	margin: 10px 0px 10px;
 	display: flex;
 	flex-direction: column;
 	gap: 10px;
@@ -279,6 +279,11 @@ nav > ul {
 	flex-direction: row;
 	justify-content: space-between;
 	padding: 8px;
+	gap: 6px;
+}
+
+.upload-status .buttons-container {
+	display: flex;
 }
 
 .link-container {
@@ -306,7 +311,6 @@ nav > ul {
 
 .delete-button {
 	background-color: var(--yellow);
-	margin-left: 6px;
 }
 
 .delete-button:hover {
@@ -315,7 +319,6 @@ nav > ul {
 
 .cancel-upload-button {
 	background-color: var(--green);
-	margin-left: 6px;
 }
 
 .cancel-upload-button:hover {
@@ -325,6 +328,7 @@ nav > ul {
 .status {
 	color: rgb(255, 132, 0);
 	align-content: center;
+	text-align: center;
 }
 
 .file-history {
