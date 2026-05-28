@@ -20,10 +20,15 @@ COPY ./locales/ ./locales/
 
 RUN esbuild "./public/-/assets/js/*" --color=false --sourcemap --minify --outdir="./public/-/assets/js-m"
 
-RUN --mount=type=cache,target=/root/.cache/crystal \
-	crystal build ./src/patchy.cr \
-	--release \
-	--static --warnings all -s -p -t -Dpatchy_minified_js
+ARG RELEASE
+RUN --mount=type=cache,target=/root/.cache/crystal if [[ "${RELEASE}" == 1 ]] ; then \
+		crystal build ./src/patchy.cr \
+		--release \
+		--static --warnings all -s -p -t -Dpatchy_minified_js; \
+	else \
+		crystal build ./src/patchy.cr \
+		--static --warnings all -s -p -t -Dpatchy_minified_js; \
+	fi
 
 FROM git.nadeko.net/fijxu/alpine-stripped-ffmpeg:3.23-ffmpeg-6.1.2
 # shared-mime-info is required so Crystal is able to guess the mime types
