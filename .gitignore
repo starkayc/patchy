@@ -15,3 +15,6 @@ patchy
 
 # Minified JS files generated with esbuild at build time using `make build`
 public/-/assets/js-m
+
+# direnv for nix flakes
+.direnv
