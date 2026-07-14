@@ -8,6 +8,7 @@ module I18n
   private LOCALES_LIST = {
     "en" => "English", # English
     "es" => "Español", # Spanish
+    "ru" => "Russian", # Russian
   }
 
   private LOCALES = load_all_locales()
