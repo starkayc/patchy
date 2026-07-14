@@ -49,7 +49,7 @@ jobs:
       name: Build images
       with:
         context: .
-        file: Dockerfile
+        file: dist/docker/Dockerfile
         tags: ${{ steps.meta.outputs.tags }}
         platforms: linux/amd64
         push: true
