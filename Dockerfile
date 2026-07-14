@@ -1,5 +1,5 @@
 # Based on https://github.com/iv-org/invidious/blob/master/docker/Dockerfile
-FROM crystallang/crystal:1.20.2-alpine AS builder
+FROM crystallang/crystal:1.20.3-alpine AS builder
 
 RUN apk add --no-cache sqlite-static yaml-static libmagic-static esbuild
 
@@ -30,7 +30,7 @@ RUN --mount=type=cache,target=/root/.cache/crystal if [[ "${RELEASE}" == 1 ]] ; 
 		--static --warnings all -s -p -t -Dpatchy_minified_js; \
 	fi
 
-FROM git.nadeko.net/fijxu/alpine-stripped-ffmpeg:3.23-ffmpeg-6.1.2
+FROM git.nadeko.net/fijxu/alpine-stripped-ffmpeg:3.23-ffmpeg-8.1.2
 # shared-mime-info is required so Crystal is able to guess the mime types
 # of uploaded/retrieved files using the file `/etc/mime.types` provided
 # by that package.
