@@ -1,5 +1,5 @@
 # Based on https://github.com/iv-org/invidious/blob/master/docker/Dockerfile
-FROM crystallang/crystal:1.20.3-alpine AS builder
+FROM crystallang/crystal:v1.21.0-alpine AS builder
 
 RUN apk add --no-cache sqlite-static yaml-static libmagic-static esbuild
 
