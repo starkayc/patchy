@@ -1,7 +1,12 @@
 require "mime"
 
+<<<<<<< HEAD
 def send_file_raw(env : HTTP::Server::Context, extension : String, file : Bytes) : Nil
   mime_type = MIME.from_extension(extension, "application/octet-stream")
+=======
+def send_file_raw(env : HTTP::Server::Context, extension : String, file : Bytes, mime_type : String? = nil) : Nil
+  mime_type ||= MIME.from_extension(extension, "application/octet-stream")
+>>>>>>> upstream/master
   env.response.content_type = mime_type
   env.response.headers["Accept-Ranges"] = "bytes"
   env.response.headers["X-Content-Type-Options"] = "nosniff"

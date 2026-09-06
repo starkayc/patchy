@@ -19,9 +19,15 @@ module Routes::Misc
 
     def initialize
       @files_hosted = Database::Files.file_count
+<<<<<<< HEAD
       @max_upload_size = CONFIG.size_limit.to_s
       @thumbnail_generation = CONFIG.thumbnail_generation.enabled
       @filename_length = CONFIG.filename_length
+=======
+      @max_upload_size = CONFIG.uploads.size_limit.to_s
+      @thumbnail_generation = CONFIG.thumbnail_generation.enabled
+      @filename_length = CONFIG.uploads.filename_length
+>>>>>>> upstream/master
       @alternative_domains = CONFIG.alternative_domains
     end
   end
@@ -39,6 +45,7 @@ module Routes::Misc
     # So it's able to download the file instead of displaying it
     env.response.headers["Content-Disposition"] = "attachment; filename=\"#{host}.sxcu\""
 
+<<<<<<< HEAD
     return %({
 "Version": "14.0.1",
 "DestinationType": "ImageUploader, FileUploader",
@@ -50,5 +57,23 @@ module Routes::Misc
 "DeletionURL": "{json:deleteLink}",
 "ErrorMessage": "{json:error}"
 })
+=======
+    config =
+      <<-JSON
+      {
+        "Version": "14.0.1",
+        "DestinationType": "ImageUploader, FileUploader",
+        "RequestMethod": "POST",
+        "RequestURL": "#{scheme}://#{host}/-/upload",
+        "Body": "MultipartFormData",
+        "FileFormName": "file",
+        "URL": "$json:link$",
+        "DeletionURL": "$json:deleteLink$",
+        "ErrorMessage": "$json:error$"
+      }
+      JSON
+
+    return config
+>>>>>>> upstream/master
   end
 end

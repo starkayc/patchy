@@ -6,9 +6,16 @@ export function translate(elementId) {
     try {
       return JSON.parse(element.textContent).msg;
     } catch (_) {
+<<<<<<< HEAD
       return null;
     }
   } else {
     return null;
+=======
+      return elementName;
+    }
+  } else {
+    return elementName;
+>>>>>>> upstream/master
   }
 }

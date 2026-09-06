@@ -8,6 +8,13 @@ module Routes::Views
     Audio = 3
   end
 
+<<<<<<< HEAD
+=======
+  IMAGE_EXTENSIONS = Set{".png", ".jpg", ".gif", ".webp", ".jpeg", ".bmp", ".tiff", ".jfif", ".avif", ".jxl"}
+  VIDEO_EXTENSIONS = Set{".mp4", ".m4v", ".webm", ".avi", ".mov", ".ogv", ".mkv"}
+  AUDIO_EXTENSIONS = Set{".flac", ".wav", ".mp3", ".acc", ".ogg", ".opus", ".m4a"}
+
+>>>>>>> upstream/master
   def index(env : HTTP::Server::Context) : String
     locale = Headers.locale
     host = Headers.host
@@ -40,6 +47,19 @@ module Routes::Views
 
     mime_type = MIME.from_extension(fileinfo.extension, "application/octet-stream")
 
+<<<<<<< HEAD
+=======
+    filetype = if IMAGE_EXTENSIONS.includes?(fileinfo.extension)
+                 Filetype::Image
+               elsif VIDEO_EXTENSIONS.includes?(fileinfo.extension)
+                 Filetype::Video
+               elsif AUDIO_EXTENSIONS.includes?(fileinfo.extension)
+                 Filetype::Audio
+               else
+                 Filetype::File
+               end
+
+>>>>>>> upstream/master
     templated "show_file"
   end
 
@@ -87,6 +107,10 @@ module Routes::Views
     locale = Headers.locale
     host = Headers.host
     scheme = Headers.scheme
+<<<<<<< HEAD
+=======
+    user_settings = Headers.user_settings
+>>>>>>> upstream/master
 
     templated "settings"
   end

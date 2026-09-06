@@ -6,14 +6,22 @@ module Jobs
   Log = ::Log.for(self)
 
   def check_old_files : Fiber?
+<<<<<<< HEAD
     if CONFIG.delete_files_check <= 0
+=======
+    if CONFIG.uploads.deletion.delete_files_check <= 0
+>>>>>>> upstream/master
       Log.info &.emit("file deletion is disabled")
       return
     end
     spawn do
       loop do
         Utils.check_old_files
+<<<<<<< HEAD
         sleep CONFIG.delete_files_check.seconds
+=======
+        sleep CONFIG.uploads.deletion.delete_files_check.seconds
+>>>>>>> upstream/master
       end
     end
   end
@@ -42,6 +50,7 @@ module Jobs
     end
   end
 
+<<<<<<< HEAD
   def kemal : Fiber
     Kemal.config.add_handler BakedFileHandler::BakedFileHandler.new(PublicAssets)
     if CONFIG.cors.enabled
@@ -64,21 +73,73 @@ module Jobs
         rescue ex
           Log.fatal &.emit("patchy http server failed to start, exiting!", error: ex.message)
           exit(1)
+=======
+  def kemal : Fiber?
+    Kemal.config.add_handler BakedFileHandler::BakedFileHandler.new(BakedFiles::PublicAssets)
+    if CONFIG.cors.enabled
+      Kemal.config.add_handler Handlers::Options::CORSHeaders.new
+    end
+
+    spawn do
+      begin
+        Kemal.run(args: nil) do |kemal_config|
+          if !CONFIG.server.unix_socket.nil?
+            Utils.delete_socket
+            kemal_config.server.not_nil!.bind_unix "#{CONFIG.server.unix_socket}"
+          end
+        end
+      rescue ex
+        Log.fatal &.emit("patchy http server failed to start, exiting!", error: ex.message)
+        exit(1)
+      end
+    end
+
+    if !CONFIG.server.unix_socket.nil?
+      loop do
+        sleep 1.seconds
+        if Kemal.config.running
+          Log.info &.emit("changing socket permissions to 777")
+          begin
+            File.chmod("#{CONFIG.server.unix_socket}", File::Permissions::All)
+            break
+          rescue ex
+            Log.fatal &.emit("failed to set unix socket permissions to 777", error: ex.message)
+            exit(1)
+          end
+>>>>>>> upstream/master
         end
       end
     end
   end
 
+<<<<<<< HEAD
   def gc : Fiber
     spawn do
       loop do
         GC.collect
         sleep 10.seconds
+=======
+  def gc : Fiber?
+    if !CONFIG.advanced.gc.enabled
+      Log.trace &.emit("gc enabled")
+    end
+    interval = CONFIG.advanced.gc.interval
+    Log.trace &.emit("gc enabled", gc_call_interval: interval)
+
+    spawn do
+      loop do
+        GC.collect
+        sleep interval.seconds
+>>>>>>> upstream/master
       end
     end
   end
 
+<<<<<<< HEAD
   def run : Fiber
+=======
+  def run : Nil
+>>>>>>> upstream/master
     check_old_files
     retrieve_tor_exit_nodes
     retrieve_vpn_addresses

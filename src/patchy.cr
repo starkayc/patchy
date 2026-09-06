@@ -10,6 +10,10 @@ require "log"
 require "redis"
 require "flib"
 require "lru"
+<<<<<<< HEAD
+=======
+require "base58"
+>>>>>>> upstream/master
 
 # require "./ext/kemal_custom_exception_handler"
 
@@ -19,17 +23,31 @@ require "./jobs"
 require "./utils/*"
 require "./helpers/*"
 require "./handlers/*"
+<<<<<<< HEAD
 require "./lib/*"
+=======
+>>>>>>> upstream/master
 require "./types/*"
 require "./database/*"
 
 module Patchy
 end
 
+<<<<<<< HEAD
 # https://github.com/iv-org/invidious/blob/90e94d4e6cc126a8b7a091d12d7a5556bfe369d5/src/invidious.cr#L78
 # CURRENT_BRANCH prefers the build arg (passed via Docker --build-arg) so that
 # GitHub Actions detached-HEAD checkouts don't produce a garbage branch name.
 CURRENT_BRANCH  = {{ env("CURRENT_BRANCH") || "#{`git branch | sed -n '/* /s///p'`.strip}" }}
+=======
+{% if flag?(:patchy_minified_js) %}
+  JS_PATH = "js-m"
+{% else %}
+  JS_PATH = "js"
+{% end %}
+
+# https://github.com/iv-org/invidious/blob/90e94d4e6cc126a8b7a091d12d7a5556bfe369d5/src/invidious.cr#L78
+CURRENT_BRANCH  = {{ "#{`git branch | sed -n '/* /s///p'`.strip}" }}
+>>>>>>> upstream/master
 CURRENT_COMMIT  = {{ "#{`git rev-list HEAD --max-count=1 --abbrev-commit`.strip}" }}
 CURRENT_VERSION = {{ "#{`git log -1 --format=%ci | awk '{print $1}' | sed s/-/./g`.strip}" }}
 
@@ -57,10 +75,17 @@ Kemal.config.host_binding = CONFIG.server.host
 Kemal.config.shutdown_message = false
 Kemal.config.app_name = "Patchy"
 Kemal.config.powered_by_header = false
+<<<<<<< HEAD
+=======
+Kemal.config.public_folder = "./public"
+# Kemal DSL: https://crystaldoc.info/github/kemalcr/kemal/v1.9.0/toplevel.html#add_context_storage_type(type)-macro
+add_context_storage_type(::UserSettings)
+>>>>>>> upstream/master
 
 # Show current configuration
 Log.trace &.emit("current configuration: \n#{CONFIG.to_yaml}")
 
+<<<<<<< HEAD
 Utils.create_dir(CONFIG.db, "for database")
 SQL = DB.open("sqlite3://#{CONFIG.db}/db.sqlite3")
 
@@ -68,6 +93,15 @@ Utils.check_dependencies
 Utils::DB.create_tables
 Utils.create_dir(CONFIG.files, "for files")
 Utils.create_dir(CONFIG.thumbnails, "for thumbnails")
+=======
+Utils.create_dir(CONFIG.storage.db, "for database")
+SQL = DB.open("sqlite3://#{CONFIG.storage.db}/db.sqlite3")
+
+Utils.check_dependencies
+Utils::DB.create_tables
+Utils.create_dir(CONFIG.storage.files, "for files")
+Utils.create_dir(CONFIG.storage.thumbnails, "for thumbnails")
+>>>>>>> upstream/master
 Routing.register_all
 Utils::Cache.init
 

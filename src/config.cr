@@ -20,6 +20,7 @@ class Config
     # A file path where do you want to place a unix socket (THIS WILL DISABLE ACCESS
     # BY IP ADDRESS)
     property unix_socket : String?
+<<<<<<< HEAD
   end
 
   # Where the uploaded files will be located
@@ -28,6 +29,27 @@ class Config
   property thumbnails : String = "./data/thumbnails"
   # Where the SQLITE3 database will be located
   property db : String = "./data/db"
+=======
+    property no_robots : Bool = false
+  end
+
+  property storage : Storage = Storage.from_yaml("")
+
+  struct Storage
+    include YAML::Serializable
+    # Where the uploaded files will be located
+    property files : String = "./data/files"
+    # Where the thumbnails will be located when they are successfully generated
+    property thumbnails : String = "./data/thumbnails"
+    # Where the SQLITE3 database will be located
+    property db : String = "./data/db"
+  end
+
+  # Deprecated
+  property files : String? = nil
+  property thumbnails : String? = nil
+  property db : String? = nil
+>>>>>>> upstream/master
 
   property cors : Cors = Cors.from_yaml("")
 
@@ -61,6 +83,10 @@ class Config
     include YAML::Serializable
 
     property enabled : Bool = false
+<<<<<<< HEAD
+=======
+    property background_generation : Bool = false
+>>>>>>> upstream/master
     property resolution : Resolution = Resolution.from_yaml("")
     property fallback_thumbnail : CustomThumbnail = CustomThumbnail.from_yaml("")
 
@@ -171,11 +197,68 @@ class Config
     property api_key : String? = nil
   end
 
+<<<<<<< HEAD
   # Filename length
   property filename_length : Int32 = 5
   # In MiB
   property size_limit : Int16 = 512
   property enable_checksums : Bool = true
+=======
+  property uploads : Uploads = Uploads.from_yaml("")
+
+  struct Uploads
+    include YAML::Serializable
+
+    # Filename length
+    property filename_length : Int32 = 5
+    # Used for user settings
+    property max_filename_length : Int32 = 16
+    # Used for user settings
+    property min_filename_length : Int32 = 5
+    # In MiB
+    property size_limit : Int16 = 512
+    property enable_checksums : Bool = true
+
+    # Blocked extensions that are not allowed to be uploaded to the server
+    property blocked_extensions : Array(String) = [] of String
+
+    property deletion : Deletion = Deletion.from_yaml("")
+
+    struct Deletion
+      include YAML::Serializable
+
+      # Delete the files after how many hours?
+      property delete_files_after : Int32 = 168
+      # How often should the check of old files be performed? (in seconds)
+      property delete_files_check : Int32 = 1800
+      # The lenght of the delete key
+      property delete_key_length : Int32 = 6
+    end
+
+    property magic_bytes : MagicBytes = MagicBytes.from_yaml("")
+
+    struct MagicBytes
+      include YAML::Serializable
+
+      # How many bytes of the uploaded file should be thrown into the buffer
+      # so libmagic can detect it's MIME type.
+      # 1024 bytes is the recommended value. Lowering this value may
+      # reduce the precision of the guessed MIME type.
+      property buffer_size : Int32 = 131072
+    end
+  end
+
+  # Deprecated
+  property filename_length : Int32? = nil
+  property max_filename_length : Int32? = nil
+  property min_filename_length : Int32? = nil
+  property size_limit : Int16? = nil
+  property enable_checksums : Bool? = nil
+  property delete_files_after : Int32? = nil
+  property delete_files_check : Int32? = nil
+  property delete_key_length : Int32? = nil
+  property blocked_extensions : Array(String)? = nil
+>>>>>>> upstream/master
 
   property ip_block : IPBlocks = IPBlocks.from_yaml("")
 
@@ -206,6 +289,7 @@ class Config
     property vpn : VPN = VPN.from_yaml("")
   end
 
+<<<<<<< HEAD
   # How many files an IP address can upload to the server. Setting this to 0
   # disables rate limits in the rate limit period
   property files_per_ip : Int32 = 32
@@ -247,17 +331,68 @@ class Config
   # Blocked extensions that are not allowed to be uploaded to the server
   property blocked_extensions : Array(String) = [] of String
 
+=======
+  property rate_limits : RateLimits = RateLimits.from_yaml("")
+
+  struct RateLimits
+    include YAML::Serializable
+
+    # Enable rate limiting per IP address.
+    property enabled : Bool = false
+    # How many files an IP address can upload to the server.
+    property files_per_ip : Int32 = 32
+    # How often is the file limit per IP reset? (in seconds)
+    property rate_limit_period : Int32 = 600
+  end
+
+  # Deprecated
+  property files_per_ip : Int32? = nil
+  property rate_limit_period : Int32? = nil
+
+  # Abuse email that is going to be displayed on the website of the uploader
+  property abuse_email : String = ""
+
+>>>>>>> upstream/master
   # Since this program detects the Host header of the client it can be used
   # with multiple domains. You can display the domains in the frontend
   # and in `/api/stats`
   property alternative_domains : Array(String) = [] of String
 
+<<<<<<< HEAD
   def self.check_config(config : Config) : String?
     if config.filename_length <= 0
+=======
+  property advanced : Advanced = Advanced.from_yaml("")
+
+  struct Advanced
+    include YAML::Serializable
+
+    property gc : GC = GC.from_yaml("")
+
+    struct GC
+      include YAML::Serializable
+
+      property enabled : Bool = true
+      # In seconds
+      property interval : Int32 = 10
+    end
+  end
+
+  def self.check_config(config : Config) : Nil
+    if config.uploads.filename_length <= 0
+>>>>>>> upstream/master
       Log.fatal &.emit("Config: filename_length cannot be less or equal to 0")
       exit(1)
     end
 
+<<<<<<< HEAD
+=======
+    if config.uploads.min_filename_length > config.uploads.max_filename_length
+      Log.fatal &.emit("Config: min_filename_length can't be greater than max_filename_length", min_filename_length: config.uploads.min_filename_length, max_filename_length: config.uploads.max_filename_length)
+      exit(1)
+    end
+
+>>>>>>> upstream/master
     if config.s3.enabled
       # if CONFIG.generate_thumbnails
       #   puts "Config [WARNING]: Thumbnail generation disabled when using S3! This is going to be fixed on a next release!"
@@ -276,11 +411,52 @@ class Config
       end
     end
 
+<<<<<<< HEAD
     if config.files.ends_with?('/')
       config.files = config.files.chomp('/')
     end
     if config.thumbnails.ends_with?('/')
       config.thumbnails = config.thumbnails.chomp('/')
+=======
+    if config.storage.files.ends_with?('/')
+      config.storage.files = config.storage.files.chomp('/')
+    end
+    if config.storage.thumbnails.ends_with?('/')
+      config.storage.thumbnails = config.storage.thumbnails.chomp('/')
+    end
+  end
+
+  private def self.check_deprecated_options(config : Config) : Config
+    found = 0
+    deprecated(config.files_per_ip, config.rate_limits.files_per_ip, found)
+    deprecated(config.rate_limit_period, config.rate_limits.rate_limit_period, found)
+    deprecated(config.files, config.storage.files, found)
+    deprecated(config.db, config.storage.db, found)
+    deprecated(config.thumbnails, config.storage.thumbnails, found)
+    deprecated(config.filename_length, config.uploads.filename_length, found)
+    deprecated(config.max_filename_length, config.uploads.max_filename_length, found)
+    deprecated(config.min_filename_length, config.uploads.min_filename_length, found)
+    deprecated(config.size_limit, config.uploads.size_limit, found)
+    deprecated(config.enable_checksums, config.uploads.enable_checksums, found)
+    deprecated(config.delete_files_after, config.uploads.deletion.delete_files_after, found)
+    deprecated(config.delete_files_check, config.uploads.deletion.delete_files_check, found)
+    deprecated(config.delete_key_length, config.uploads.deletion.delete_key_length, found)
+    deprecated(config.blocked_extensions, config.uploads.blocked_extensions, found)
+
+    if found > 0
+      Log.warn &.emit("Config: #{found} deprecated config options were found, please update them to their new options. You can find an example in the config.example.yml file")
+    end
+
+    config
+  end
+
+  private macro deprecated(old_option, new_option, found, replace = true)
+    if (old = {{old_option}}) && {{replace}}
+      {{new_option}} = old
+      {{found}} += 1
+      s = %q(Config: Deprecated config option {{ old_option.id.split(".")[1..].join(".") }}, use {{ new_option.id.split(".")[1..].join(".") }} instead)
+      Log.warn &.emit(s)
+>>>>>>> upstream/master
     end
   end
 
@@ -344,6 +520,10 @@ class Config
     {% end %}
 
     check_config(config)
+<<<<<<< HEAD
+=======
+    check_deprecated_options(config)
+>>>>>>> upstream/master
     config
   end
 end

@@ -6,18 +6,29 @@ module Operations
     @ip_addr : String
     getter fileinfo : Fileinfo = Fileinfo.new
     @ip : IPInfo = IPInfo.new
+<<<<<<< HEAD
 
     def initialize(@uploaded_file, @ip_addr)
+=======
+    @user_settings : ::UserSettings
+
+    def initialize(@uploaded_file, @ip_addr, @user_settings)
+>>>>>>> upstream/master
       @fileinfo.uploaded_at = Time.utc.to_unix
     end
 
     private def generate_checksum(file_path : String) : Nil
+<<<<<<< HEAD
       if CONFIG.enable_checksums
+=======
+      if CONFIG.uploads.enable_checksums
+>>>>>>> upstream/master
         @fileinfo.checksum = Utils::Hashing.hash_file(file_path)
       end
     end
 
     private def writefile : Nil
+<<<<<<< HEAD
       buffer = uninitialized UInt8[16]
       slice = buffer.to_slice
       @uploaded_file.body.read_fully(slice)
@@ -26,6 +37,22 @@ module Operations
 
       full_filename = @fileinfo.filename + @fileinfo.extension
       file_path = "#{CONFIG.files}/#{full_filename}"
+=======
+      slice = Bytes.new(CONFIG.uploads.magic_bytes.buffer_size, 0)
+      bytes_read = 0
+      bytes_to_read = slice.size
+      @uploaded_file.body.each_byte do |byte|
+        slice[bytes_read] = byte
+        bytes_read += 1
+        break if bytes_read == bytes_to_read
+      end
+      slice_for_magic_bytes = slice[0, bytes_read]
+
+      self.detect_extension(slice_for_magic_bytes)
+
+      full_filename = @fileinfo.filename + @fileinfo.extension
+      file_path = "#{CONFIG.storage.files}/#{full_filename}"
+>>>>>>> upstream/master
 
       if CONFIG.s3.enabled
         body = IO::Memory.new
@@ -37,7 +64,11 @@ module Operations
         Utils::S3::Client.as(Utils::S3::S3).upload(full_filename, body)
       else
         File.open(file_path, "wb") do |output|
+<<<<<<< HEAD
           output.write(slice)
+=======
+          output.write(slice_for_magic_bytes)
+>>>>>>> upstream/master
           IO.copy(@uploaded_file.body, output)
         end
         self.generate_checksum(file_path)
@@ -45,7 +76,11 @@ module Operations
     end
 
     private def valid_extension?(extension : String) : Nil
+<<<<<<< HEAD
       if CONFIG.blocked_extensions.includes?(extension.split(".")[1]?)
+=======
+      if CONFIG.uploads.blocked_extensions.includes?(extension.split(".")[1]?)
+>>>>>>> upstream/master
         raise ExtensionNotAllowed.new(extension)
       end
     end
@@ -72,7 +107,11 @@ module Operations
         raise NoFileProvided.new
       end
 
+<<<<<<< HEAD
       @fileinfo.filename = Utils.generate_filename
+=======
+      @fileinfo.filename = Utils.generate_filename(@user_settings.filename_length)
+>>>>>>> upstream/master
 
       # control_v.png and control_v.gif are filenames that are used for files
       # uploaded using Chatterino, so we change the original filename to the
@@ -87,6 +126,7 @@ module Operations
       @ip.ip = @ip_addr.to_s
       @ip.date = @fileinfo.uploaded_at
 
+<<<<<<< HEAD
       if CONFIG.delete_key_length > 0
         @fileinfo.delete_key = Random.base58(CONFIG.delete_key_length)
       end
@@ -95,6 +135,18 @@ module Operations
         @fileinfo.thumbnail = Utils::Thumbnails.generate_thumbnail(@fileinfo.filename, @fileinfo.extension)
       rescue ex
         Log.error &.emit("an error ocurred when trying to generate a thumbnail", error: ex.message)
+=======
+      if CONFIG.uploads.deletion.delete_key_length > 0
+        @fileinfo.delete_key = Random.base58(CONFIG.uploads.deletion.delete_key_length)
+      end
+
+      if !CONFIG.thumbnail_generation.background_generation
+        begin
+          @fileinfo.thumbnail = Utils::Thumbnails.generate_thumbnail(@fileinfo.filename, @fileinfo.extension, false)
+        rescue ex
+          Log.error &.emit("an error ocurred when trying to generate a thumbnail", error: ex.message)
+        end
+>>>>>>> upstream/master
       end
 
       begin

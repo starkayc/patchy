@@ -1,9 +1,14 @@
 <% content_for "head" do %>
+<<<<<<< HEAD
 <title> <%= host %> - <%= translate(locale, "file_does_not_exist") %></title>
+=======
+<title> <%= host %> - <%= I18n.translate(locale, "file_does_not_exist") %></title>
+>>>>>>> upstream/master
 <% end %>
 
 <div class="media-container">
   <div class="navbar">
+<<<<<<< HEAD
     <a href='/'><%= translate(locale, "go_back") %></a>
   </div>
   <hr>
@@ -11,3 +16,12 @@
     <p><%= translate(locale, "file_does_not_exist") %></p>
   </div>
 </div>
+=======
+    <a href='/'><%= I18n.translate(locale, "go_back") %></a>
+  </div>
+  <hr>
+  <div class="media">
+    <p><%= I18n.translate(locale, "file_does_not_exist") %></p>
+  </div>
+</div>
+>>>>>>> upstream/master
