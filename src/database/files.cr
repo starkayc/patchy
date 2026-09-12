@@ -38,14 +38,22 @@ module Database::Files
     SQL.exec(request, *fileinfo.to_tuple)
   end
 
+<<<<<<< HEAD
   def update_thumbnail(filename : String) : Nil
+=======
+  def update_thumbnail(thumbnail_filename : String, filename : String) : Nil
+>>>>>>> upstream/master
     request = <<-SQL
       UPDATE #{TABLE_NAME}
       SET thumbnail = ?
       WHERE filename = ?
     SQL
 
+<<<<<<< HEAD
     SQL.exec(request, "#{filename}.jpg", filename)
+=======
+    SQL.exec(request, thumbnail_filename, filename)
+>>>>>>> upstream/master
   end
 
   def delete(filename : String) : Nil
@@ -117,7 +125,11 @@ module Database::Files
     request = <<-SQL
       SELECT *
       FROM #{TABLE_NAME}
+<<<<<<< HEAD
       WHERE uploaded_at < strftime('%s', 'now') - #{CONFIG.delete_files_after.to_i64 * 60 * 60}
+=======
+      WHERE uploaded_at < strftime('%s', 'now') - #{CONFIG.uploads.deletion.delete_files_after.to_i64 * 60 * 60}
+>>>>>>> upstream/master
     SQL
 
     SQL.query_all(request, as: Fileinfo)

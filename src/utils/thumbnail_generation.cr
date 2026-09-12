@@ -2,6 +2,7 @@ module Utils::Thumbnails
   extend self
   Log = ::Log.for(self)
 
+<<<<<<< HEAD
   private AUDIO_EXTENSIONS =
     {".mp3", ".flac", ".ogg", ".opus", ".aac", ".wav"}
 
@@ -19,6 +20,22 @@ module Utils::Thumbnails
     process = is_audio ? generate_audio_cover(filename, extension) : generate(filename, extension, CONFIG.thumbnail_generation.resolution)
 
     if process.exit_reason == Process::ExitReason::Normal
+=======
+  private ALLOWED_EXTENSIONS =
+    Routes::Views::IMAGE_EXTENSIONS +
+      Routes::Views::VIDEO_EXTENSIONS +
+      Routes::Views::AUDIO_EXTENSIONS +
+      Set{".heic", ".crw", ".dng", ".wmv", ".flv", ".amv", ".3gp", ".mpg", ".mpeg", ".yuv", ".ogv"}
+
+  def generate_thumbnail(filename : String, extension : String, background_generation : Bool) : String?
+    return unless CONFIG.thumbnail_generation.enabled &&
+                  !ALLOWED_EXTENSIONS.none? { |ext| extension.downcase.includes?(ext) }
+    Log.debug &.emit("generating thumbnail for #{filename + extension}", background_generation: background_generation)
+
+    process = generate(filename, extension, CONFIG.thumbnail_generation.resolution)
+
+    if process.success?
+>>>>>>> upstream/master
       Log.debug &.emit("thumbnail for '#{filename + extension}' generated successfully")
       return "#{filename}.jpg"
     else
@@ -26,6 +43,7 @@ module Utils::Thumbnails
     end
   end
 
+<<<<<<< HEAD
   private def generate_audio_cover(filename : String, extension : String) : Process::Status
     arguments = [
       "-hide_banner",
@@ -38,6 +56,8 @@ module Utils::Thumbnails
     Process.run("ffmpeg", arguments)
   end
 
+=======
+>>>>>>> upstream/master
   private def generate(filename : String, extension : String, resolution : Config::ThumbnailGeneration::Resolution) : Process::Status
     w = resolution.max_width
     h = resolution.max_height
@@ -45,14 +65,22 @@ module Utils::Thumbnails
     arguments = [
       "-hide_banner",
       "-i",
+<<<<<<< HEAD
       "#{CONFIG.files}/#{filename + extension}",
+=======
+      "#{CONFIG.storage.files}/#{filename + extension}",
+>>>>>>> upstream/master
       "-movflags", "faststart",
       "-f", "mjpeg",
       "-q:v", "2",
       "-vf", "scale='min(#{w},iw)':'min(#{h},ih)':force_original_aspect_ratio=decrease, thumbnail=100",
       "-frames:v", "1",
       "-update", "1",
+<<<<<<< HEAD
       "#{CONFIG.thumbnails}/#{filename}.jpg",
+=======
+      "#{CONFIG.storage.thumbnails}/#{filename}.jpg",
+>>>>>>> upstream/master
     ]
 
     process = Process.run("ffmpeg", arguments)

@@ -28,6 +28,7 @@ module Routing
     env.set "ip", env.request.headers["X-Real-IP"]? || env.request.remote_address.as?(Socket::IPAddress).try &.address || nil
     env.set "user_agent", env.request.headers["User-Agent"]?
 
+<<<<<<< HEAD
     env.response.headers["Content-Security-Policy"] = {
       "sandbox allow-popups allow-popups-to-escape-sandbox allow-downloads allow-scripts allow-same-origin allow-forms",
       "default-src 'self'",
@@ -37,6 +38,28 @@ module Routing
       "style-src 'self' 'unsafe-inline'",
       "font-src 'self' data:",
       "connect-src 'self' https://pls.starkayc.moe https://cloudflareinsights.com https://ws.audioscrobbler.com",
+=======
+    user_settings = ::UserSettings.from_json("{}")
+    begin
+      if prefs_cookie = env.request.cookies["PREFS"]?
+        user_settings = ::UserSettings.from_json(URI.decode_www_form(prefs_cookie.value))
+      end
+    rescue
+      user_settings = ::UserSettings.from_json("{}")
+    end
+
+    env.set "user_settings", user_settings
+
+    env.response.headers["Content-Security-Policy"] = {
+      "sandbox allow-popups allow-popups-to-escape-sandbox allow-downloads allow-scripts allow-same-origin allow-forms",
+      "default-src 'self'",
+      "script-src 'self' 'unsafe-inline'",
+      "img-src 'self' data:",
+      "media-src 'self' data:",
+      "style-src 'self' 'unsafe-inline'",
+      "font-src 'self' data:",
+      "connect-src 'self'",
+>>>>>>> upstream/master
     }.join(";")
 
     if env.request.resource.starts_with?(ADMIN_API_ROUTE_PATH)
@@ -48,6 +71,13 @@ module Routing
         halt env, status_code: 401, response: res
       end
     end
+<<<<<<< HEAD
+=======
+
+    if CONFIG.server.no_robots
+      env.response.headers["X-Robots-Tag"] = "none"
+    end
+>>>>>>> upstream/master
   end
 
   private def before_upload(env : HTTP::Server::Context) : Nil
@@ -74,6 +104,7 @@ module Routing
     ip_info = Database::IPS.select(ip)
     return if ip_info.nil?
 
+<<<<<<< HEAD
     if CONFIG.files_per_ip > 0
       time_since_first_upload = Time.utc.to_unix - ip_info.date
       time_until_unban = ip_info.date - Time.utc.to_unix + CONFIG.rate_limit_period
@@ -83,6 +114,17 @@ module Routing
       end
 
       if ip_info.count >= CONFIG.files_per_ip && time_since_first_upload < CONFIG.rate_limit_period
+=======
+    if CONFIG.rate_limits.enabled && CONFIG.rate_limits.files_per_ip > 0
+      time_since_first_upload = Time.utc.to_unix - ip_info.date
+      time_until_unban = ip_info.date - Time.utc.to_unix + CONFIG.rate_limits.rate_limit_period
+
+      if time_since_first_upload > CONFIG.rate_limits.rate_limit_period
+        Database::IPS.delete(ip_info.ip)
+      end
+
+      if ip_info.count >= CONFIG.rate_limits.files_per_ip && time_since_first_upload < CONFIG.rate_limits.rate_limit_period
+>>>>>>> upstream/master
         ee 401, "Rate limited! Try again in #{time_until_unban} seconds"
       end
     end
@@ -99,6 +141,11 @@ module Routing
     get "/-/info/history", Routes::Views, :upload_history
     get "/-/settings", Routes::Views, :settings
     get "/-/admin", Routes::Views, :admin
+<<<<<<< HEAD
+=======
+    # Reserved path
+    # get "/-/admin/settings", Routes::Views, :admin
+>>>>>>> upstream/master
     get "/-/login", Routes::Views, :login
     get "/-/reportabuse", Routes::Views, :reportabuse
 
@@ -117,6 +164,12 @@ module Routing
     get "/-/api/stats", Routes::Misc, :stats
     get "/-/info/sharex.sxcu", Routes::Misc, :sharex_config
 
+<<<<<<< HEAD
+=======
+    # User settings
+    post "/-/settings/update_settings", Routes::UserSettings, :update_settings
+
+>>>>>>> upstream/master
     if CONFIG.cors.enabled
       paths = CONFIG.cors.paths
       paths.each do |path|
