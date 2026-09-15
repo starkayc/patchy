@@ -3,6 +3,7 @@ colorize_logs: true
 log_level: "info"
 
 # File paths, you generally don't need to change this
+<<<<<<< HEAD
 files: "./data/files/"
 thumbnails: "./data/thumbnails/"
 db: "./data/db/"
@@ -24,11 +25,67 @@ delete_files_after: 168
 # In seconds
 delete_files_check: 1800
 delete_key_length: 4
+=======
+storage:
+  files: "./data/files/"
+  thumbnails: "./data/thumbnails/"
+  db: "./data/db/"
+
+# Rate limit uploads per IP address
+rate_limits:
+  enabled: false
+  # How many files can be uploaded in the `rate_limit_period` time span.
+  # Setting this to 0 disables rate limits, regardless if rate limits
+  # are enabled.
+  files_per_ip: 32
+  # After 600 seconds, the limits for a specific IP will be lifted and
+  # that IP address will be able to upload files again.
+  rate_limit_period: 600
+
+# Upload related settings
+uploads:
+  # Length of the filename that is going to be generated
+  filename_length: 5
+  # Max length of the filename, this is going to be max value
+  # that can be set in the user settings ("/-/settings")
+  max_filename_length: 16
+  # Min length of the filename, this is going to be max value
+  # that can be set in the user settings ("/-/settings")
+  min_filename_length: 5
+  # File size limit in MiB
+  size_limit: 512
+  # Enable checksumming of files, it uses the SHA1 hashing algorithm
+  # and the computed hash will be used for ETag headers.
+  enable_checksums: false
+  # Blocked extensions that are not allowed to be uploaded to the server
+  blocked_extensions:
+    - "exe"
+  # Deletion options
+  deletion:
+    # In hours (168 = 7 days)
+    delete_files_after: 168
+    # In seconds
+    delete_files_check: 1800
+    delete_key_length: 4
+  magic_bytes:
+    # How many bytes of the uploaded file should be thrown into the buffer
+    # so libmagic can detect it's MIME type and extension.
+    # 1024 bytes is the recommended value. Lowering this value may
+    # reduce the precision of the guessed MIME type and extension.
+    #
+    # You shouldn't change this value, unless you know what you are doing!
+    buffer_size: 131072
+>>>>>>> upstream/master
 
 # http server
 server:
   port: 8080
   host: 0.0.0.0
+<<<<<<< HEAD
+=======
+  # Tell search engines you don't wanna be indexed
+  no_robots: false
+>>>>>>> upstream/master
   # Enabling the unix socket will disable port binding
   #unix_socket: "/tmp/patchy.sock"
 
@@ -60,6 +117,16 @@ cors:
 # https://codeberg.org/Fijxu/patchy/src/branch/master/docs/security/ffmpeg.md
 thumbnail_generation:
   enabled: false
+<<<<<<< HEAD
+=======
+  # Generate thumbnails in the background instead of processing them when the
+  # file is being processed for upload. This saves time when uploading files
+  # as it takes some time (around ~100ms more, depends of the file)
+  # to process the thumbnail.
+  # When having background generation enabled, the thumbnail will generate
+  # right after the file has been uploaded.
+  background_generation: false
+>>>>>>> upstream/master
   # When a file has no thumbnail, it will show a fallback thumbnail located in
   # ./public/-/assets/img/nothumbnail.jpg, it can be easily replaced by adding
   # an image file to ./public/-/assets/img/
@@ -137,6 +204,7 @@ views:
     autoplay_video: false
     autoplay_audio: false
 
+<<<<<<< HEAD
 blocked_extensions:
   - "exe"
 # alternative_domains:
@@ -147,3 +215,22 @@ blocked_extensions:
 # lastfm:
 #   enabled: false
 #   api_key: ""
+=======
+# Will display an abuse email contact link
+# To disable, set it to empty (`""`)
+# abuse_email: ""
+abuse_email: "example@example.com"
+
+# alternative_domains:
+#   - "example.com"
+
+# Advanced options that you shouldn't touch
+# but you can touch them if you really need it.
+advanced:
+  # Calls the GC.collect method, frees memory every <interval> seconds
+  # as Crystal by default frees memory when there is activity
+  # https://crystal-lang.org/api/1.19.1/GC.html#collect-class-method
+  gc:
+    enabled: true
+    interval: 10
+>>>>>>> upstream/master

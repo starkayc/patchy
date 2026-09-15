@@ -33,6 +33,7 @@ module Utils
       # TODO: Check if it's able to bypass the path using a filename with a `/` in their name
       Log.debug &.emit("deleting file '#{full_filename}'")
       begin
+<<<<<<< HEAD
         File.delete("#{CONFIG.files}/#{full_filename}")
 
         if thumbnail
@@ -44,6 +45,19 @@ module Utils
         Log.error &.emit("file '#{full_filename}' failed to be deleted due to bad permissions, deleting it from the database, error", error: ex.message)
       rescue ex
         Log.error &.emit("file '#{full_filename}' failed to be deleted, deleting it from the database, error", error: ex.message)
+=======
+        File.delete("#{CONFIG.storage.files}/#{full_filename}")
+
+        if thumbnail
+          File.delete("#{CONFIG.storage.thumbnails}/#{thumbnail}")
+        end
+      rescue File::NotFoundError
+        Log.error &.emit("file '#{full_filename}' doesn't exist on the '#{CONFIG.storage.files}', folder, deleting it from the database")
+      rescue ex : File::AccessDeniedError
+        Log.error &.emit("file '#{full_filename}' failed to be deleted due to bad permissions, deleting it from the database", error: ex.message)
+      rescue ex
+        Log.error &.emit("file '#{full_filename}' failed to be deleted, deleting it from the database", error: ex.message)
+>>>>>>> upstream/master
       ensure
         Database::Files.delete(f.filename)
       end
@@ -62,8 +76,13 @@ module Utils
   end
 
   # TODO: Check if there are no other possibilities to get a random filename and exit
+<<<<<<< HEAD
   def generate_filename : String
     filename = Random.base58(CONFIG.filename_length)
+=======
+  def generate_filename(filename_length : Int32 = CONFIG.uploads.filename_length) : String
+    filename = Random.base58(filename_length)
+>>>>>>> upstream/master
 
     loop do
       file = Database::Files.select(filename)
@@ -71,7 +90,11 @@ module Utils
         return filename
       else
         Log.trace &.emit("filename collision! Generating a new filename")
+<<<<<<< HEAD
         filename = Random.base58(CONFIG.filename_length)
+=======
+        filename = Random.base58(CONFIG.uploads.filename_length)
+>>>>>>> upstream/master
       end
     end
   end
