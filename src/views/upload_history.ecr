@@ -1,10 +1,18 @@
 <%
+<<<<<<< HEAD
   title = translate(locale, "upload_history")
+=======
+  title = I18n.translate(locale, "upload_history")
+>>>>>>> upstream/master
 %>
 
 <% content_for "head" do %>
 <title> <%= host %> - <%= title %></title>
+<<<<<<< HEAD
 <script type="module" src="/-/assets/js/uploadHistory.js?v=<%= ASSET_COMMIT %>"></script>
+=======
+<script type="module" src="/-/assets/<%= JS_PATH %>/uploadHistory.js?v=<%= ASSET_COMMIT %>"></script>
+>>>>>>> upstream/master
 <script id="patchy-config" type="application/json">
 <%=
 {
@@ -12,6 +20,7 @@
 }.to_pretty_json
 %>
 </script>
+<<<<<<< HEAD
 <%= translate_js(locale, "js_history_filename") %>
 <%= translate_js(locale, "js_history_link") %>
 <%= translate_js(locale, "js_history_empty") %>
@@ -31,12 +40,40 @@
 
 <div class="container">
   <a href='/'><%= translate(locale, "go_back") %></a>
+=======
+<%= I18n.translate_js(locale, "js_history_filename") %>
+<%= I18n.translate_js(locale, "js_history_link") %>
+<%= I18n.translate_js(locale, "js_history_empty") %>
+<%= I18n.translate_js(locale, "js_history_uploaded_at") %>
+<%= I18n.translate_js(locale, "js_history_expires_at") %>
+<%= I18n.translate_js(locale, "js_history_direct_link") %>
+<%= I18n.translate_js(locale, "js_history_delete_deleting_file") %>
+<%= I18n.translate_js(locale, "js_history_delete_success") %>
+<%= I18n.translate_js(locale, "js_history_delete_error_server_down") %>
+<%= I18n.translate_js(locale, "js_history_delete_error") %>
+<%= I18n.translate_js(locale, "js_history_delete_error_status_code") %>
+<%= I18n.translate_js(locale, "js_history_delete_error_unknown") %>
+<%= I18n.translate_js(locale, "js_history_delete_error_404") %>
+<%= I18n.translate_js(locale, "js_history_delete_from_history") %>
+<%= I18n.translate_js(locale, "js_btn_delete") %>
+<% end %>
+
+<div class="container">
+  <a href='/'><%= I18n.translate(locale, "go_back") %></a>
+>>>>>>> upstream/master
   <hr>
   <h2><%= title %></h2>
   <div id="file-history" class="file-history"></div>
   <noscript>
     <div class="file-history">
+<<<<<<< HEAD
       <p><%= translate(locale, "file_history_unavailable") %></p>
     </div>
   </noscript>
 </div>
+=======
+      <p><%= I18n.translate(locale, "file_history_unavailable") %></p>
+    </div>
+  </noscript>
+</div>
+>>>>>>> upstream/master

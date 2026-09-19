@@ -2,6 +2,7 @@
   original_filename_ = HTML.escape(fileinfo.original_filename)
   filename_ = HTML.escape(fileinfo.filename)
   extension_ = HTML.escape(fileinfo.extension)
+<<<<<<< HEAD
 
   filetype = Filetype::File
   if [".png", ".jpg", ".gif", ".webp", ".jpeg", ".bmp", ".tiff", ".jfif", ".avif", ".jxl"].any? { |ex| fileinfo.extension == ex }
@@ -11,14 +12,23 @@
   elsif [".flac", ".wav", ".mp3", ".aac", ".ogg", ".opus"].any? { |ex| fileinfo.extension == ex }
     filetype = Filetype::Audio
   end
+=======
+  thumbnail = fileinfo.thumbnail
+  full_filename = HTML.escape(fileinfo.filename + fileinfo.extension)
+>>>>>>> upstream/master
 %>
 
 <% content_for "head" do %>
 <title><%= original_filename_ %></title>
 <meta property="og:title" content="<%= original_filename_ %>">
 <meta property="og:url" content="<%= scheme %>://<%= host %>/<%= filename_ %>">
+<<<<<<< HEAD
 <% if fileinfo.thumbnail %>
 <meta property="og:image" content="<%= scheme %>://<%= host %>/-/thumbnail/<%= filename_ %>.jpg">
+=======
+<% if thumbnail %>
+<meta property="og:image" content="<%= scheme %>://<%= host %>/-/thumbnail/<%= thumbnail %>">
+>>>>>>> upstream/master
 <%
   elsif CONFIG.thumbnail_generation.enabled && CONFIG.thumbnail_generation.fallback_thumbnail.enabled
   nothumbnail = CONFIG.thumbnail_generation.fallback_thumbnail.thumbnail_file
@@ -26,6 +36,7 @@
 <meta property="og:image" content="<%= scheme %>://<%= host %>/-/assets/img/<%= nothumbnail %>">
 <% end %>
 <% if filetype == Filetype::Image %>
+<<<<<<< HEAD
 <meta property="og:image:secure_url" content="<%= scheme %>://<%= host %>/-/file/<%= filename_ %><%= extension_ %>">
 <meta property="og:image:type" content="<%= mime_type %>">
 <% elsif filetype == Filetype::Video %>
@@ -299,21 +310,66 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 </script>
 <% end %>
+=======
+<meta property="og:image:secure_url" content="<%= scheme %>://<%= host %>/-/file/<%= full_filename %>">
+<meta property="og:image:type" content="<%= mime_type %>">
+<% elsif filetype == Filetype::Video %>
+<meta property="og:video" content="<%= scheme %>://<%= host %>/-/file/<%= full_filename %>">
+<meta property="og:video:secure_url" content="<%= scheme %>://<%= host %>/-/file/<%= full_filename %>">
+<meta property="og:video:type" content="<%= mime_type %>">
+<meta property="og:type" content="video.other">
+<% elsif filetype == Filetype::Audio %>
+<meta property="og:audio" content="<%= scheme %>://<%= host %>/-/file/<%= full_filename %>">
+<meta property="og:audio:secure_url" content="<%= scheme %>://<%= host %>/-/file/<%= full_filename %>">
+<meta property="og:audio:type" content="<%= mime_type %>">
+<% end %>
+
+>>>>>>> upstream/master
 <% end %>
 
 <div class="media-container">
   <div class="navbar">
+<<<<<<< HEAD
     <a href='/'>← <%= translate(locale, "go_back") %></a>
     <a href='/-/file/<%= filename_ %>' download=''>⬇ <%= translate(locale, "download_file") %> (<%= original_filename_ %>)</a>
+=======
+    <a href='/'><%= I18n.translate(locale, "go_back") %></a>
+    <a href='/-/file/<%= filename_ %>' download=''><%= I18n.translate(locale, "download_file") %> (<%= original_filename_ %>)</a>
+>>>>>>> upstream/master
     <%
       # Disable view button for .html
       if fileinfo.extension != ".html"
     %>
+<<<<<<< HEAD
     <a href='/-/file/<%= filename_ %><%= extension_ %>'><%= translate(locale, "view_file") %></a>
     <% end %>
     <span class="end-of-flex"></span>
     <a href='/-/reportabuse?file=<%= filename_ %>'><%= translate(locale, "report_abuse") %></a>
   </div>
+=======
+    <a href='/-/file/<%= filename_ %><%= extension_ %>'><%= I18n.translate(locale, "view_file") %></a>
+    <% end %>
+    <span class="end-of-flex"></span>
+    <a href='/-/reportabuse?file=<%= filename_ %>'><%= I18n.translate(locale, "report_abuse") %></a>
+  </div>
+  <% if fileinfo.extension == ".mkv" %>
+    <div class="infobox">
+        <a><%= I18n.translate(locale, "info_mkv_may_not_play") %></a>
+    </div>
+  <% elsif fileinfo.extension == ".mov" %>
+    <div class="infobox">
+        <a><%= I18n.translate(locale, "info_mov_may_not_play") %></a>
+    </div>
+  <% elsif fileinfo.extension == ".ogv" %>
+    <div class="infobox">
+        <a><%= I18n.translate(locale, "info_ogv_may_not_play") %></a>
+    </div>
+  <% elsif fileinfo.extension == ".avi" %>
+    <div class="infobox">
+        <a><%= I18n.translate(locale, "info_avi_may_not_play") %></a>
+    </div>
+  <% end %>
+>>>>>>> upstream/master
   <hr>
   <div class="media">
     <% if filetype == Filetype::Image %>
@@ -324,6 +380,7 @@ document.addEventListener('DOMContentLoaded', () => {
         Your browser does not support the video tag.
       </video>
     <% elsif filetype == Filetype::Audio %>
+<<<<<<< HEAD
       <audio id="audio-el" src="/-/file/<%= filename_ %>" preload="metadata"></audio>
       <div id="ap-page-bg" class="ap-page-bg"></div>
       <div class="audio-player" id="audio-player"
@@ -385,6 +442,19 @@ document.addEventListener('DOMContentLoaded', () => {
           </svg>
           <%= translate(locale, "download_file") %>
         </a>
+=======
+      <% if thumbnail %>
+        <img class="media-audio-img" src="/-/thumbnail/<%= thumbnail %>">
+      <% end %>
+      <audio class="content" controls <%= CONFIG.views.show_file.autoplay_audio ? "autoplay" : "" %>>
+        <source src="/-/file/<%= filename_ %>" type="<%= mime_type %>">
+        Your browser does not support the audio tag.
+      </audio>
+    <% else %>
+      <div class="file-no-display">
+        <p><%= I18n.translate(locale, "file_cannot_be_displayed") %></p>
+        <a href='/-/file/<%= filename_ %>' download=''><%= I18n.translate(locale, "download_file") %> (<%= original_filename_ %>)</a>
+>>>>>>> upstream/master
       </div>
     <% end %>
   </div>

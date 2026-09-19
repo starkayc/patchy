@@ -1,12 +1,24 @@
 <% content_for "head" do %>
+<<<<<<< HEAD
 <title> <%= host %> - <%= translate(locale, "admin_panel") %></title>
 <% end %>
 
 <div class="container">
   <a href='/'><%= translate(locale, "go_back") %></a>
+=======
+<title> <%= host %> - <%= I18n.translate(locale, "admin_panel") %></title>
+<% end %>
+
+<div class="container">
+  <a href='/'><%= I18n.translate(locale, "go_back") %></a>
+>>>>>>> upstream/master
   <hr>
   <h2>Admin panel</h2>
     <p>
       Work in progress admin panel
     </p>
+<<<<<<< HEAD
 </div>
+=======
+</div>
+>>>>>>> upstream/master

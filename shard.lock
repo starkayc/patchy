@@ -18,12 +18,23 @@ shards:
 
   baked_file_handler:
     git: https://github.com/ralsina/baked_file_handler.git
+<<<<<<< HEAD
     version: 0.1.1
+=======
+    version: 0.1.5
+>>>>>>> upstream/master
 
   baked_file_system:
     git: https://github.com/fijxu/baked_file_system_no_gzip.git
     version: 0.13.0+git.commit.b7d7b7ae0754417a256f68ff170290e2f2f0c6f2
 
+<<<<<<< HEAD
+=======
+  base58:
+    git: https://github.com/crystal-china/base58.cr.git
+    version: 0.1.0+git.commit.0e2c44d16a8098b00d8bf0b74add8bb9ea2f1c5f
+
+>>>>>>> upstream/master
   db:
     git: https://github.com/crystal-lang/crystal-db.git
     version: 0.14.0
@@ -38,11 +49,19 @@ shards:
 
   kemal:
     git: https://github.com/kemalcr/kemal.git
+<<<<<<< HEAD
     version: 1.9.0
 
   lru:
     git: https://github.com/fijxu/crystal-lru.git
     version: 1.0.3
+=======
+    version: 1.10.1
+
+  lru:
+    git: https://github.com/fijxu/crystal-lru.git
+    version: 1.0.5
+>>>>>>> upstream/master
 
   markd:
     git: https://github.com/icyleaf/markd.git
@@ -60,6 +79,7 @@ shards:
     git: https://github.com/i3oris/reply.git
     version: 0.4.0
 
+<<<<<<< HEAD
   source-typer:
     git: https://github.com/vici37/cr-source-typer.git
     version: 0.3.5+git.commit.022b9d33e424826c5b20ab20b6cb4dd2f3b96db3
@@ -67,6 +87,19 @@ shards:
   spectator:
     git: https://gitlab.com/arctic-fox/spectator.git
     version: 0.12.2
+=======
+  sanitize:
+    git: https://github.com/straight-shoota/sanitize.git
+    version: 0.1.0+git.commit.75c141b619c77956e88f557149566cd28876398b
+
+  source-typer:
+    git: https://github.com/vici37/cr-source-typer.git
+    version: 0.3.5+git.commit.7861972279b26be6126fb0c7da5b844c05dcc386
+
+  spectator:
+    git: https://gitlab.com/arctic-fox/spectator.git
+    version: 0.12.4
+>>>>>>> upstream/master
 
   sqlite3:
     git: https://github.com/crystal-lang/crystal-sqlite3.git

@@ -3,6 +3,15 @@
 <!-- [![Translation status](https://translate.codeberg.org/widget/patchy/svg-badge.svg)](https://translate.codeberg.org/engage/patchy/)
 [![Translation status](https://translate.codeberg.org/widget/patchy/language-badge.svg)](https://translate.codeberg.org/engage/patchy/) -->
 
+<<<<<<< HEAD
+=======
+---
+
+[На русском 🇷🇺](./README-ru.md)
+
+---
+
+>>>>>>> upstream/master
 A temporary file uploader easy to host that I did to replace
 [Uguu](https://github.com/nokonoko/uguu), which is not easy to host due to PHP.
 
