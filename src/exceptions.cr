@@ -22,6 +22,12 @@ class NoFileProvided < Exception
   end
 end
 
+class EmptyFile < Exception
+  def message : String
+    return "File is empty"
+  end
+end
+
 class ExtensionNotAllowed < Exception
   getter extension : String
 

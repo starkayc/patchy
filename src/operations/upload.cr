@@ -29,6 +29,11 @@ module Operations
       end
       slice_for_magic_bytes = slice[0, bytes_read]
 
+      if bytes_read == 0
+        Log.trace &.emit("rejected empty file")
+        raise EmptyFile.new
+      end
+
       self.detect_extension(slice_for_magic_bytes)
 
       full_filename = @fileinfo.filename + @fileinfo.extension
