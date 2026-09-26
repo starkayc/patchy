@@ -8,11 +8,19 @@ module Operations
         Utils::S3::Client.as(Utils::S3::S3).delete(full_filename)
       else
         # Delete file
+<<<<<<< HEAD
         File.delete("#{CONFIG.files}/#{full_filename}")
 
         # Delete thumbnail if it was generated
         if thumbnail
           File.delete("#{CONFIG.thumbnails}/#{thumbnail}")
+=======
+        File.delete("#{CONFIG.storage.files}/#{full_filename}")
+
+        # Delete thumbnail if it was generated
+        if thumbnail
+          File.delete("#{CONFIG.storage.thumbnails}/#{thumbnail}")
+>>>>>>> upstream/master
         end
       end
     end

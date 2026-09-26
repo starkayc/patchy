@@ -68,4 +68,11 @@ module Headers
   macro user_agent
     env.get("user_agent").as(String)
   end
+<<<<<<< HEAD
+=======
+
+  macro user_settings
+    env.get("user_settings").as(::UserSettings)
+  end
+>>>>>>> upstream/master
 end

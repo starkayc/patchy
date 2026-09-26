@@ -22,6 +22,15 @@ class NoFileProvided < Exception
   end
 end
 
+<<<<<<< HEAD
+=======
+class EmptyFile < Exception
+  def message : String
+    return "File is empty"
+  end
+end
+
+>>>>>>> upstream/master
 class ExtensionNotAllowed < Exception
   getter extension : String
 
