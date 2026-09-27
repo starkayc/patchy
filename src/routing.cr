@@ -3,24 +3,28 @@ require "./exceptions"
 require "./routes/**"
 require "./operations/*"
 
-module Routing
-  extend self
-
-  private ADMIN_API_ROUTE_PATH = "/-/api/admin"
-
-  {% for http_method in {"get", "post", "delete", "options", "patch", "put"} %}
+module Kemal
+  class Router
+    {% for http_method in {"get", "post", "delete", "options", "patch", "put"} %}
 
     macro {{http_method.id}}(path, controller, method = :handle)
       unless Kemal::Utils.path_starts_with_slash?(\{{path}})
         raise Kemal::Exceptions::InvalidPathStartException.new({{http_method}}, \{{path}})
       end
 
-      Kemal::RouteHandler::INSTANCE.add_route({{http_method.upcase}}, \{{path}}) do |env|
+      add_route({{http_method.upcase}}, \{{path}}) do |env|
         \{{ controller }}.\{{ method.id }}(env)
       end
     end
 
-  {% end %}
+    {% end %}
+  end
+end
+
+module Routing
+  extend self
+
+  private ADMIN_API_ROUTE_PATH = "/-/api/admin"
 
   before_all do |env|
     env.set "host", env.request.headers["X-Forwarded-Host"]? || env.request.headers["Host"]? || nil
@@ -106,52 +110,60 @@ module Routing
   before_post "/upload" { |env| before_upload(env) }
   before_post "/-/upload" { |env| before_upload(env) }
 
-  def register_all : Array(Radix::Node(Kemal::Route)) | Kemal::Route | Radix::Node(Kemal::Route) | Nil
-    # Views
-    get "/", Routes::Views, :index
-    get "/:filename", Routes::Views, :show_file
-    get "/-/info/configs", Routes::Views, :uploader_configs
-    get "/-/info/history", Routes::Views, :upload_history
-    get "/-/settings", Routes::Views, :settings
-    get "/-/admin", Routes::Views, :admin
-    # Reserved path
-    # get "/-/admin/settings", Routes::Views, :admin
-    get "/-/login", Routes::Views, :login
-    get "/-/reportabuse", Routes::Views, :reportabuse
+  def register_all
+    public = Kemal::Router.new
 
-    # Upload
-    post "/upload", Routes::Upload, :upload
-    post "/-/upload", Routes::Upload, :upload
+    public.namespace "/" do
+      # Views
+      get "/", Routes::Views, :index
+      get "/:filename", Routes::Views, :show_file
+      get "/-/info/configs", Routes::Views, :uploader_configs
+      get "/-/info/history", Routes::Views, :upload_history
+      get "/-/settings", Routes::Views, :settings
+      get "/-/admin", Routes::Views, :admin
+      # Reserved path
+      # get "/-/admin/settings", Routes::Views, :admin
+      get "/-/login", Routes::Views, :login
+      get "/-/reportabuse", Routes::Views, :reportabuse
 
-    # Retrieve
-    get "/-/file/:filename", Routes::Retrieve, :retrieve_file
-    get "/-/thumbnail/:thumbnail", Routes::Retrieve, :retrieve_thumbnail
+      # Upload
+      post "/upload", Routes::Upload, :upload
+      post "/-/upload", Routes::Upload, :upload
 
-    # Delete
-    get "/-/delete", Routes::Delete, :delete_file
+      # Retrieve
+      get "/-/file/:filename", Routes::Retrieve, :retrieve_file
+      get "/-/thumbnail/:thumbnail", Routes::Retrieve, :retrieve_thumbnail
 
-    # Misc
-    get "/-/api/stats", Routes::Misc, :stats
-    get "/-/info/sharex.sxcu", Routes::Misc, :sharex_config
+      # Delete
+      get "/-/delete", Routes::Delete, :delete_file
 
-    # User settings
-    post "/-/settings/update_settings", Routes::UserSettings, :update_settings
+      # Misc
+      get "/-/api/stats", Routes::Misc, :stats
+      get "/-/info/sharex.sxcu", Routes::Misc, :sharex_config
 
-    if CONFIG.cors.enabled
-      paths = CONFIG.cors.paths
-      paths.each do |path|
-        options path, Handlers::Options, :options
+      # User settings
+      post "/-/settings/update_settings", Routes::UserSettings, :update_settings
+
+      if CONFIG.cors.enabled
+        paths = CONFIG.cors.paths
+        paths.each do |path|
+          options path, Handlers::Options, :options
+        end
       end
     end
 
     self.register_admin if CONFIG.admin.enabled
   end
 
-  def register_admin : Array(Radix::Node(Kemal::Route)) | Kemal::Route | Radix::Node(Kemal::Route) | Nil
-    post "#{ADMIN_API_ROUTE_PATH}/delete", Routes::Admin, :delete_file
-    post "#{ADMIN_API_ROUTE_PATH}/fileinfo", Routes::Admin, :retrieve_file_info
-    get "#{ADMIN_API_ROUTE_PATH}/torexitnodes", Routes::Admin, :tor_exit_nodes
-    get "#{ADMIN_API_ROUTE_PATH}/vpnips", Routes::Admin, :vpn_ips
-    get "#{ADMIN_API_ROUTE_PATH}/cachedfiles", Routes::Admin, :cached_files
+  def register_admin
+    admin = Kemal::Router.new
+
+    admin.namespace "/-/api/admin" do
+      post "#{ADMIN_API_ROUTE_PATH}/delete", Routes::Admin, :delete_file
+      post "#{ADMIN_API_ROUTE_PATH}/fileinfo", Routes::Admin, :retrieve_file_info
+      get "#{ADMIN_API_ROUTE_PATH}/torexitnodes", Routes::Admin, :tor_exit_nodes
+      get "#{ADMIN_API_ROUTE_PATH}/vpnips", Routes::Admin, :vpn_ips
+      get "#{ADMIN_API_ROUTE_PATH}/cachedfiles", Routes::Admin, :cached_files
+    end
   end
 end
