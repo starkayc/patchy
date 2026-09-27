@@ -1,7 +1,7 @@
 macro ee(status_code, message)
   env.response.content_type = "application/json"
-  env.response.status_code = {{status_code}}
-  msg = {"error" => {{message}}}.to_json
+  env.response.status_code = {{ status_code }}
+  msg = {"error" => {{ message }}}.to_json
   # We close the response instantly
   # https://github.com/kemalcr/kemal/issues/249#issuecomment-259763562
   env.response.print msg
@@ -11,7 +11,7 @@ end
 
 macro msg(message)
   env.response.content_type = "application/json"
-  msg = {"message" => {{message}}}.to_json
+  msg = {"message" => {{ message }}}.to_json
   # We close the response instantly
   # https://github.com/kemalcr/kemal/issues/249#issuecomment-259763562
   env.response.print msg
@@ -20,23 +20,23 @@ macro msg(message)
 end
 
 macro haltf(env, status_code = 200, response = "")
-  {{env}}.response.status_code = {{status_code}}
-  {{env}}.response.print {{response}}
-  {{env}}.response.close
+  {{ env }}.response.status_code = {{ status_code }}
+  {{ env }}.response.print {{ response }}
+  {{ env }}.response.close
   return
 end
 
 # https://github.com/iv-org/invidious/blob/4b37d47ebbc4d3a0a55c8febaca2b28a68e1d9b5/src/invidious/helpers/macros.cr#L51
 # https://kemalcr.com/guide/#views-templates
 macro templated(_filename, template = "template", navbar_search = true, buffer_footer = false)
-  navbar_search = {{navbar_search}}
-  buffer_footer = {{buffer_footer}}
+  navbar_search = {{ navbar_search }}
+  buffer_footer = {{ buffer_footer }}
 
   {{ filename = "src/views/" + _filename + ".ecr" }}
   {{ layout = "src/views/" + template + ".ecr" }}
 
-  __content_filename__ = {{filename}}
-  render {{filename}}, {{layout}}
+  __content_filename__ = {{ filename }}
+  render {{ filename }}, {{ layout }}
 end
 
 macro nodeProperties

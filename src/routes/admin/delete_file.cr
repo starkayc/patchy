@@ -19,7 +19,7 @@ module Routes::Admin
       successfull_files << filename
     end
 
-    def add_failed(failed_file : Hash(String, String | Nil)) : Array(Hash(String, String | Nil))
+    def add_failed(failed_file : Hash(String, String?)) : Array(Hash(String, String?))
       @failed = @failed + 1
       failed_files << failed_file
     end

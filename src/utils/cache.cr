@@ -77,23 +77,21 @@ module Utils::Cache
       if @client.ping
         Log.info &.emit("#{"connected to Redis compatible DB"}#{redis_url.presence ? " at '#{redis_url}'" : nil}")
         Log.info &.emit("setting 'notify-keyspace-events Ex' Redis config to inform about expired files")
-        self.notify_keyspace_events_expiration
+        notify_keyspace_events_expiration
       end
       Log.info &.emit("files smaller than this size limit will be stored into the cache: '#{(@max_allowed_filesize * 1000).humanize_bytes}'")
     end
 
-    private def notify_keyspace_events_expiration : Array(Redis::Value) | Int64 | String | Nil
+    private def notify_keyspace_events_expiration : Array(Redis::Value)? | Int64? | String?
       command = {"CONFIG", "SET", "notify-keyspace-events", "Ex"}
       @client.run(command)
     end
 
     def set(filename : String, filedata : String, expire_time : UInt64?) : String?
-      begin
-        @client.set(filename, filedata, ex: expire_time)
-      rescue ex
-        Log.error &.emit("failed to insert file '#{filename}' from cache", error: ex.message)
-        return
-      end
+      @client.set(filename, filedata, ex: expire_time)
+    rescue ex
+      Log.error &.emit("failed to insert file '#{filename}' from cache", error: ex.message)
+      return
     end
 
     def del(filename : String) : Nil
@@ -144,7 +142,7 @@ module Utils::Cache
       @@cache = LRU.new
     end
 
-    self.expire_listener
+    expire_listener
   end
 
   # NOTE: Since I have future ideas for Patchy being more distributed without a
@@ -173,7 +171,7 @@ module Utils::Cache
     end
   end
 
-  private def is_too_big_for_cache?(filename : String, filesize : Int64, max_allowed_filesize : Int32) : Bool
+  private def too_big_for_cache?(filename : String, filesize : Int64, max_allowed_filesize : Int32) : Bool
     if filesize > max_allowed_filesize &* 1000
       Log.debug &.emit("not caching '#{filename}', size too big to be cached", size: filesize.humanize_bytes)
       true
@@ -190,7 +188,7 @@ module Utils::Cache
     file = File.open(file_path)
     filesize = file.size
 
-    return if is_too_big_for_cache?(filename, filesize, CONFIG.cache.max_allowed_filesize)
+    return if too_big_for_cache?(filename, filesize, CONFIG.cache.max_allowed_filesize)
 
     if cache.is_a?(LRU)
       filedata = Bytes.new(filesize)
@@ -237,6 +235,6 @@ module Utils::Cache
   end
 
   def files : Hash(String, Int64)
-    return @@files
+    @@files
   end
 end

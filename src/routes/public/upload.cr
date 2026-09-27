@@ -65,26 +65,22 @@ module Routes::Upload
     fileinfo = Fileinfo.new
 
     HTTP::FormData.parse(env.request) do |upload|
-      begin
-        up = Operations::Upload.new(upload, ip_addr, user_settings)
-        up.process
-        fileinfo = up.fileinfo
-        if CONFIG.thumbnail_generation.background_generation
-          spawn do
-            begin
-              thumbnail_filename = Utils::Thumbnails.generate_thumbnail(fileinfo.filename, fileinfo.extension, true)
-              if thumbnail_filename
-                Database::Files.update_thumbnail(thumbnail_filename, fileinfo.filename)
-              end
-            rescue ex
-              Log.error &.emit("an error ocurred when trying to generate a thumbnail in the background", error: ex.message)
-            end
+      up = Operations::Upload.new(upload, ip_addr, user_settings)
+      up.process
+      fileinfo = up.fileinfo
+      if CONFIG.thumbnail_generation.background_generation
+        spawn do
+          thumbnail_filename = Utils::Thumbnails.generate_thumbnail(fileinfo.filename, fileinfo.extension, true)
+          if thumbnail_filename
+            Database::Files.update_thumbnail(thumbnail_filename, fileinfo.filename)
           end
+        rescue ex
+          Log.error &.emit("an error ocurred when trying to generate a thumbnail in the background", error: ex.message)
         end
-      rescue ex
-        Log.error &.emit("failed to process upload", error: ex.message)
-        ee 403, "Failed to process upload"
       end
+    rescue ex
+      Log.error &.emit("failed to process upload", error: ex.message)
+      ee 403, "Failed to process upload"
     end
 
     # Redirect to uploaded file if it's a browser

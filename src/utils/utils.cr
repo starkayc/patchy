@@ -26,9 +26,9 @@ module Utils
     Log.info &.emit("deleting old files")
     files = Database::Files.old_files
 
-    files.each do |f|
-      full_filename = f.filename + f.extension
-      thumbnail = f.thumbnail
+    files.each do |file|
+      full_filename = file.filename + file.extension
+      thumbnail = file.thumbnail
 
       # TODO: Check if it's able to bypass the path using a filename with a `/` in their name
       Log.debug &.emit("deleting file '#{full_filename}'")
@@ -45,7 +45,7 @@ module Utils
       rescue ex
         Log.error &.emit("file '#{full_filename}' failed to be deleted, deleting it from the database", error: ex.message)
       ensure
-        Database::Files.delete(f.filename)
+        Database::Files.delete(file.filename)
       end
     end
   end

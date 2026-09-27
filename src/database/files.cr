@@ -19,7 +19,7 @@ module Database::Files
       thumbnail text,
       PRIMARY KEY(filename)
       )
-    SQL
+      SQL
 
     SQL.exec(request)
   end
@@ -33,7 +33,7 @@ module Database::Files
       INSERT INTO #{TABLE_NAME}
       VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
       ON CONFLICT DO NOTHING
-    SQL
+      SQL
 
     SQL.exec(request, *fileinfo.to_tuple)
   end
@@ -43,7 +43,7 @@ module Database::Files
       UPDATE #{TABLE_NAME}
       SET thumbnail = ?
       WHERE filename = ?
-    SQL
+      SQL
 
     SQL.exec(request, thumbnail_filename, filename)
   end
@@ -53,7 +53,7 @@ module Database::Files
       DELETE
       FROM #{TABLE_NAME}
       WHERE filename = ?
-    SQL
+      SQL
 
     SQL.exec(request, filename)
   end
@@ -66,7 +66,7 @@ module Database::Files
     request = <<-SQL
       DELETE FROM #{TABLE_NAME}
       WHERE delete_key = ?
-    SQL
+      SQL
 
     SQL.exec(request, key)
   end
@@ -80,7 +80,7 @@ module Database::Files
       SELECT *
       FROM #{TABLE_NAME}
       WHERE filename = ?
-    SQL
+      SQL
 
     SQL.query_one?(request, filename, as: Fileinfo)
   end
@@ -94,7 +94,7 @@ module Database::Files
       SELECT *
       FROM #{TABLE_NAME}
       WHERE delete_key = ?
-    SQL
+      SQL
 
     SQL.query_one?(request, delete_key, as: Fileinfo)
   end
@@ -104,7 +104,7 @@ module Database::Files
       SELECT *
       FROM #{TABLE_NAME}
       WHERE thumbnail = ?
-    SQL
+      SQL
 
     SQL.query_one?(request, thumbnail, as: Fileinfo)
   end
@@ -118,7 +118,7 @@ module Database::Files
       SELECT *
       FROM #{TABLE_NAME}
       WHERE uploaded_at < strftime('%s', 'now') - #{CONFIG.uploads.deletion.delete_files_after.to_i64 * 60 * 60}
-    SQL
+      SQL
 
     SQL.query_all(request, as: Fileinfo)
   end
@@ -127,7 +127,7 @@ module Database::Files
     request = <<-SQL
       SELECT COUNT (filename)
       FROM #{TABLE_NAME}
-    SQL
+      SQL
 
     SQL.query_one(request, as: Int32)
   end

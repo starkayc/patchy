@@ -7,12 +7,12 @@ module Kemal
   class Router
     {% for http_method in {"get", "post", "delete", "options", "patch", "put"} %}
 
-    macro {{http_method.id}}(path, controller, method = :handle)
+    macro {{ http_method.id }}(path, controller, method = :handle)
       unless Kemal::Utils.path_starts_with_slash?(\{{path}})
-        raise Kemal::Exceptions::InvalidPathStartException.new({{http_method}}, \{{path}})
+        raise Kemal::Exceptions::InvalidPathStartException.new({{ http_method }}, \{{path}})
       end
 
-      add_route({{http_method.upcase}}, \{{path}}) do |env|
+      add_route({{ http_method.upcase }}, \{{path}}) do |env|
         \{{ controller }}.\{{ method.id }}(env)
       end
     end
@@ -152,7 +152,7 @@ module Routing
       end
     end
 
-    self.register_admin if CONFIG.admin.enabled
+    register_admin if CONFIG.admin.enabled
   end
 
   def register_admin

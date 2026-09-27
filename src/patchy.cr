@@ -45,15 +45,15 @@ ASSET_COMMIT = {{ "#{`git rev-list HEAD --max-count=1 --abbrev-commit -- public/
 
 CONFIG = Config.load
 
-Log.setup do |c|
+Log.setup do |config|
   backend = Log::IOBackend.new(formatter: Flib::Logger::FORMATTER)
 
-  c.bind "*", CONFIG.log_level, backend
-  c.bind "db.*", :none, backend
-  c.bind "http.*", :none, backend
-  c.bind "baked_file_handler.*", :none, backend
-  c.bind "redis.*", :none, backend
-  c.bind "lru_cache.*", CONFIG.log_level, backend
+  config.bind "*", CONFIG.log_level, backend
+  config.bind "db.*", :none, backend
+  config.bind "http.*", :none, backend
+  config.bind "baked_file_handler.*", :none, backend
+  config.bind "redis.*", :none, backend
+  config.bind "lru_cache.*", CONFIG.log_level, backend
 end
 
 Kemal.config.port = CONFIG.server.port

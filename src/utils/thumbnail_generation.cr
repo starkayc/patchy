@@ -9,15 +9,17 @@ module Utils::Thumbnails
       Set{".heic", ".crw", ".dng", ".wmv", ".flv", ".amv", ".3gp", ".mpg", ".mpeg", ".yuv", ".ogv"}
 
   def generate_thumbnail(filename : String, extension : String, background_generation : Bool) : String?
-    return unless CONFIG.thumbnail_generation.enabled &&
-                  !ALLOWED_EXTENSIONS.none? { |ext| extension.downcase.includes?(ext) }
-    Log.debug &.emit("generating thumbnail for #{filename + extension}", background_generation: background_generation)
+    if !CONFIG.thumbnail_generation.enabled ||
+       ALLOWED_EXTENSIONS.none? { |ext| extension.downcase.includes?(ext) }
+      return
+    end
 
+    Log.debug &.emit("generating thumbnail for #{filename + extension}", background_generation: background_generation)
     process = generate(filename, extension, CONFIG.thumbnail_generation.resolution)
 
     if process.success?
       Log.debug &.emit("thumbnail for '#{filename + extension}' generated successfully")
-      return "#{filename}.jpg"
+      "#{filename}.jpg"
     else
       Log.debug &.emit("failed to generate thumbnail for '#{filename + extension}'. Exit code of ffmpeg: #{process.exit_code}")
     end

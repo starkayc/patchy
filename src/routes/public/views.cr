@@ -22,9 +22,10 @@ module Routes::Views
   end
 
   def show_file(env : HTTP::Server::Context) : String?
-    user_agent = Headers.user_agent
+    client_user_agent = Headers.user_agent
 
-    if ["Discordbot/2.0"].any? { |ua| user_agent.includes?(ua) }
+    # Sends the file instead of SHOWING the file.
+    if ["Discordbot/2.0"].any? { |bot_user_agents| client_user_agent.includes?(bot_user_agents) }
       return Routes::Retrieve.retrieve_file(env)
     end
 
@@ -38,7 +39,7 @@ module Routes::Views
       if fileinfo.nil?
         return templated "show_file_not_exist"
       end
-    rescue ex
+    rescue
       return templated "show_file_error"
     end
 

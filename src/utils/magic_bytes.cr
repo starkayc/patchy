@@ -7,10 +7,8 @@ module Utils::MagicBytes
       Log.debug &.emit("mime type '#{mime_type}' detected")
       if extension = EXTENSION_MAP[mime_type]?
         ext = extension.first
-        return ("." + ext)
+        ("." + ext)
       end
-    else
-      nil
     end
   end
 

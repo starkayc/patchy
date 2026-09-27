@@ -49,17 +49,15 @@ module Jobs
     end
 
     spawn do
-      begin
-        Kemal.run(args: nil) do |kemal_config|
-          if !CONFIG.server.unix_socket.nil?
-            Utils.delete_socket
-            kemal_config.server.not_nil!.bind_unix "#{CONFIG.server.unix_socket}"
-          end
+      Kemal.run(args: nil) do |kemal_config|
+        if !CONFIG.server.unix_socket.nil?
+          Utils.delete_socket
+          kemal_config.server.try &.bind_unix "#{CONFIG.server.unix_socket}"
         end
-      rescue ex
-        Log.fatal &.emit("patchy http server failed to start, exiting!", error: ex.message)
-        exit(1)
       end
+    rescue ex
+      Log.fatal &.emit("patchy http server failed to start, exiting!", error: ex.message)
+      exit(1)
     end
 
     if !CONFIG.server.unix_socket.nil?

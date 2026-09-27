@@ -14,7 +14,7 @@ module Database::IPS
       date integer,
       PRIMARY KEY(ip)
       )
-    SQL
+      SQL
 
     SQL.exec(request)
   end
@@ -28,7 +28,7 @@ module Database::IPS
       INSERT OR IGNORE
       INTO #{TABLE_NAME}
       VALUES ($1, $2, $3)
-    SQL
+      SQL
 
     SQL.exec(request, *ip.to_tuple)
   end
@@ -38,7 +38,7 @@ module Database::IPS
       DELETE
       FROM #{TABLE_NAME}
       WHERE ip = ?
-    SQL
+      SQL
 
     SQL.exec(request, ip)
   end
@@ -52,7 +52,7 @@ module Database::IPS
       SELECT *
       FROM #{TABLE_NAME}
       WHERE ip = ?
-    SQL
+      SQL
 
     SQL.query_one?(request, ip, as: IPInfo)
   end
@@ -66,7 +66,7 @@ module Database::IPS
       UPDATE #{TABLE_NAME}
       SET count = count + 1
       WHERE ip = $1
-    SQL
+      SQL
 
     SQL.exec(request, ip.ip)
   end

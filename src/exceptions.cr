@@ -1,30 +1,30 @@
 class EndpointDisabled < Exception
   def message : String
-    return "Endpoint disabled"
+    "Endpoint disabled"
   end
 end
 
 class DeletionKeyNotFound < Exception
   def message : String
-    return "Deletion key not found."
+    "Deletion key not found."
   end
 end
 
 class FileNotFound < Exception
   def message : String
-    return "File not found in the database."
+    "File not found in the database."
   end
 end
 
 class NoFileProvided < Exception
   def message : String
-    return "No file provided"
+    "No file provided"
   end
 end
 
 class EmptyFile < Exception
   def message : String
-    return "File is empty"
+    "File is empty"
   end
 end
 
@@ -35,12 +35,12 @@ class ExtensionNotAllowed < Exception
   end
 
   def message : String
-    return "Extension '#{extension}' is not allowed"
+    "Extension '#{extension}' is not allowed"
   end
 end
 
 class DBError < Exception
   def message : String
-    return "An error ocurred when trying to insert the data into the DB"
+    "An error ocurred when trying to insert the data into the DB"
   end
 end

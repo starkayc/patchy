@@ -33,7 +33,7 @@ module Utils::DB
         WHERE type = 'table'
         AND name = ?
       )
-    SQL
+      SQL
 
     SQL.query_one(request, table_name, as: Bool?)
   end

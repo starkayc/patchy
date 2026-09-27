@@ -20,10 +20,10 @@ module I18n
       locales[name] = JSON.parse(BakedFiles::Locales.get("#{name}.json")).as_h
     end
 
-    return locales
+    locales
   end
 
-  def translate(locale : String?, key : String, text : String | Hash(String, String) | Nil = nil) : String
+  def translate(locale : String?, key : String, text : String? | Hash(String, String)? = nil) : String
     if locale
       locale = locale.split("-")[0]
     end
@@ -73,15 +73,15 @@ module I18n
       end
     end
 
-    return translation
+    translation
   end
 
   def translate_bool(locale : String?, translation : Bool)
     case translation
     when true
-      return translate(locale, "Yes")
+      translate(locale, "Yes")
     when false
-      return translate(locale, "No")
+      translate(locale, "No")
     end
   end
 

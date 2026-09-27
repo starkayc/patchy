@@ -34,7 +34,7 @@ module Operations
         raise EmptyFile.new
       end
 
-      self.detect_extension(slice_for_magic_bytes)
+      detect_extension(slice_for_magic_bytes)
 
       full_filename = @fileinfo.filename + @fileinfo.extension
       file_path = "#{CONFIG.storage.files}/#{full_filename}"
@@ -52,7 +52,7 @@ module Operations
           output.write(slice_for_magic_bytes)
           IO.copy(@uploaded_file.body, output)
         end
-        self.generate_checksum(file_path)
+        generate_checksum(file_path)
       end
     end
 
@@ -66,12 +66,12 @@ module Operations
       extension = Utils::MagicBytes.detect(slice)
 
       if extension
-        self.valid_extension?(extension)
+        valid_extension?(extension)
         @fileinfo.extension = extension
       else
         # Detect by filename if it wasn't detected by magic bytes
         extension = File.extname("#{@uploaded_file.filename}")
-        self.valid_extension?(extension)
+        valid_extension?(extension)
         @fileinfo.extension = extension
       end
     end
@@ -93,7 +93,7 @@ module Operations
         @fileinfo.original_filename = @fileinfo.filename
       end
 
-      self.writefile
+      writefile
 
       @fileinfo.ip = @ip_addr.to_s
       @ip.ip = @ip_addr.to_s
@@ -119,8 +119,6 @@ module Operations
         Log.error &.emit("an error ocurred when trying to insert the data into the DB", error: ex.message)
         raise DBError.new
       end
-
-      return @fileinfo
     end
   end
 end

@@ -23,11 +23,11 @@ module Operations
         full_filename = fileinfo.filename + fileinfo.extension
         thumbnail = fileinfo.thumbnail
         begin
-          self.delete(full_filename, thumbnail)
+          delete(full_filename, thumbnail)
           # Delete entry from db
           Database::Files.delete(fileinfo)
           Log.debug &.emit "file '#{full_filename}' was deleted"
-          return full_filename
+          full_filename
         rescue ex
           Log.error &.emit("unknown error: #{ex.message}")
           raise ex

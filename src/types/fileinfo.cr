@@ -25,10 +25,10 @@ struct Fileinfo
   )
   end
 
-  def to_tuple : Tuple(String, String, String, Int64, String | Nil, String, String, String | Nil)
+  def to_tuple : Tuple(String, String, String, Int64, String?, String, String, String?)
     {% begin %}
       {
-        {{@type.instance_vars.map(&.name).splat}}
+        {{ @type.instance_vars.map(&.name).splat }}
       }
     {% end %}
   end
