@@ -1,5 +1,6 @@
 module Routes::Upload
   extend self
+  Log = ::Log.for(self)
 
   struct Response
     include JSON::Serializable
@@ -26,7 +27,7 @@ module Routes::Upload
     @[JSON::Field(key: "expiresAt")]
     property expires_at : Int64
 
-    def initialize(fileinfo : Fileinfo, scheme : String, host : String?)
+    def initialize(fileinfo : Fileinfo, scheme : String, host : String?, user_settings : ::UserSettings)
       @link = "#{scheme}://#{host}/#{fileinfo.filename}"
       @link_ext = "#{scheme}://#{host}/#{fileinfo.filename}#{fileinfo.extension}"
       @direct_link = "#{scheme}://#{host}/-/file/#{fileinfo.filename}"
@@ -40,6 +41,14 @@ module Routes::Upload
       @delete_link = "#{scheme}://#{host}/-/delete?key=#{fileinfo.delete_key}"
       @uploaded_at = fileinfo.uploaded_at
       @expires_at = fileinfo.uploaded_at + (CONFIG.uploads.deletion.delete_files_after.to_i64 * 3600)
+
+      post_process(user_settings)
+    end
+
+    private def post_process(user_settings : ::UserSettings)
+      if user_settings.show_file_directly
+        @link = @direct_link
+      end
     end
   end
 
@@ -48,6 +57,9 @@ module Routes::Upload
     scheme = Headers.scheme
     ip_addr = Headers.ip_addr
     user_settings = Headers.user_settings
+
+    Log.trace &.emit("current user settings", user_settings: user_settings.to_json)
+
     no_js = env.params.query.has_key?("nojs")
     env.response.content_type = "application/json"
 
@@ -88,7 +100,7 @@ module Routes::Upload
       return env.redirect "/#{fileinfo.filename}"
     end
 
-    res = Response.new(fileinfo, scheme, host)
+    res = Response.new(fileinfo, scheme, host, user_settings)
     res.to_json
   end
 end

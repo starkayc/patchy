@@ -27,6 +27,17 @@
                     </div>
                 </div>
               </div>
+              <div class="">
+                <label for="show_file_directly" class="label"><%= I18n.translate(locale, "user_settings_show_file_directly") %></label>
+                <input name="show_file_directly" id="show_file_directly" type="checkbox" <%= user_settings.show_file_directly ? "checked" : "" %>>
+                <div class="user-settings-description-box">
+                    <div class="user-settings-description-elements">
+                        <span class="">
+                            <%= I18n.translate(locale, "user_settings_show_file_directly_description") %>
+                        </span>
+                    </div>
+                </div>
+              </div>
           </div>
 
           <br>

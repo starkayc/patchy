@@ -292,6 +292,14 @@ class Config
   # and in `/api/stats`
   property alternative_domains : Array(String) = [] of String
 
+  property default_user_settings : DefaultUserSettings = DefaultUserSettings.from_yaml("")
+
+  struct DefaultUserSettings
+    include YAML::Serializable
+
+    property show_file_directly : Bool = true
+  end
+
   property advanced : Advanced = Advanced.from_yaml("")
 
   struct Advanced
