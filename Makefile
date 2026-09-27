@@ -29,6 +29,9 @@ fmt:
 typer:
 	./bin/typer --progress --stats ./src/$(PROGRAM_NAME).cr src
 
+lint-workflow:
+	forgejo-runner exec --job lint --image ghcr.io/catthehacker/ubuntu:act-24.04
+
 clean:
 	rm -rf data
 	rm -f patchy

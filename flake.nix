@@ -50,6 +50,8 @@
             esbuild
             # for pre-commit hooks
             pre-commit
+            # to test workflows locally
+            forgejo-runner
           ];
           # sqlite library needs to be in the LD_LIBRARY_PATH environment variable
           # so crystal can detect it in the linking stage.
