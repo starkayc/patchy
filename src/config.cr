@@ -16,7 +16,7 @@ class Config
     # Port on which the uploader will bind
     property port : Int32 = 8080
     # IP address on which the uploader will bind
-    property host : String = "0.0.0.0"
+    property host : String = "::"
     # A file path where do you want to place a unix socket (THIS WILL DISABLE ACCESS
     # BY IP ADDRESS)
     property unix_socket : String?
