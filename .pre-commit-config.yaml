@@ -6,10 +6,8 @@ repos:
         entry: crystal tool format --check
         language: system
         types: [crystal]
-        # always_run: true
       - id: ameba-lint
         name: Run Ameba Linter (ameba)
         entry: ameba
         language: system
         types: [crystal]
-        # always_run: true
