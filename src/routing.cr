@@ -159,11 +159,11 @@ module Routing
     admin = Kemal::Router.new
 
     admin.namespace "/-/api/admin" do
-      post "#{ADMIN_API_ROUTE_PATH}/delete", Routes::Admin, :delete_file
-      post "#{ADMIN_API_ROUTE_PATH}/fileinfo", Routes::Admin, :retrieve_file_info
-      get "#{ADMIN_API_ROUTE_PATH}/torexitnodes", Routes::Admin, :tor_exit_nodes
-      get "#{ADMIN_API_ROUTE_PATH}/vpnips", Routes::Admin, :vpn_ips
-      get "#{ADMIN_API_ROUTE_PATH}/cachedfiles", Routes::Admin, :cached_files
+      post "/delete", Routes::Admin, :delete_file
+      post "/fileinfo", Routes::Admin, :retrieve_file_info
+      get "/torexitnodes", Routes::Admin, :tor_exit_nodes
+      get "/vpnips", Routes::Admin, :vpn_ips
+      get "/cachedfiles", Routes::Admin, :cached_files
     end
   end
 end
