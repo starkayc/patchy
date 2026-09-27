@@ -24,8 +24,6 @@ end
 module Routing
   extend self
 
-  private ADMIN_API_ROUTE_PATH = "/-/api/admin"
-
   before_all do |env|
     env.set "host", env.request.headers["X-Forwarded-Host"]? || env.request.headers["Host"]? || nil
     env.set "scheme", env.request.headers["X-Forwarded-Proto"]? || "http"
@@ -53,16 +51,6 @@ module Routing
       "font-src 'self' data:",
       "connect-src 'self'",
     }.join(";")
-
-    if env.request.resource.starts_with?(ADMIN_API_ROUTE_PATH)
-      env.response.content_type = "application/json"
-      api_key = env.request.headers["X-Api-Key"]?
-
-      if api_key != CONFIG.admin.api_key
-        res = {"error" => "Wrong API Key"}.to_json
-        halt env, status_code: 401, response: res
-      end
-    end
 
     if CONFIG.server.no_robots
       env.response.headers["X-Robots-Tag"] = "none"
@@ -121,6 +109,7 @@ module Routing
       get "/-/info/history", Routes::Views, :upload_history
       get "/-/settings", Routes::Views, :settings
       get "/-/admin", Routes::Views, :admin
+
       # Reserved path
       # get "/-/admin/settings", Routes::Views, :admin
       get "/-/login", Routes::Views, :login
@@ -152,6 +141,8 @@ module Routing
       end
     end
 
+    mount "/", public
+
     register_admin if CONFIG.admin.enabled
   end
 
@@ -159,11 +150,23 @@ module Routing
     admin = Kemal::Router.new
 
     admin.namespace "/-/api/admin" do
+      before do |env|
+        env.response.content_type = "application/json"
+        api_key = env.request.headers["X-Api-Key"]?
+
+        if api_key != CONFIG.admin.api_key
+          res = {"error" => "Wrong API Key"}.to_json
+          halt env, status_code: 401, response: res
+        end
+      end
+
       post "/delete", Routes::Admin, :delete_file
       post "/fileinfo", Routes::Admin, :retrieve_file_info
       get "/torexitnodes", Routes::Admin, :tor_exit_nodes
       get "/vpnips", Routes::Admin, :vpn_ips
       get "/cachedfiles", Routes::Admin, :cached_files
     end
+
+    mount "", admin
   end
 end
