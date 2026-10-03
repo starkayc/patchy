@@ -19,7 +19,11 @@ module Database::Files
       thumbnail text,
       PRIMARY KEY(filename)
       )
+<<<<<<< HEAD
     SQL
+=======
+      SQL
+>>>>>>> upstream/master
 
     SQL.exec(request)
   end
@@ -33,19 +37,33 @@ module Database::Files
       INSERT INTO #{TABLE_NAME}
       VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
       ON CONFLICT DO NOTHING
+<<<<<<< HEAD
     SQL
+=======
+      SQL
+>>>>>>> upstream/master
 
     SQL.exec(request, *fileinfo.to_tuple)
   end
 
+<<<<<<< HEAD
   def update_thumbnail(filename : String) : Nil
+=======
+  def update_thumbnail(thumbnail_filename : String, filename : String) : Nil
+>>>>>>> upstream/master
     request = <<-SQL
       UPDATE #{TABLE_NAME}
       SET thumbnail = ?
       WHERE filename = ?
+<<<<<<< HEAD
     SQL
 
     SQL.exec(request, "#{filename}.jpg", filename)
+=======
+      SQL
+
+    SQL.exec(request, thumbnail_filename, filename)
+>>>>>>> upstream/master
   end
 
   def delete(filename : String) : Nil
@@ -53,7 +71,11 @@ module Database::Files
       DELETE
       FROM #{TABLE_NAME}
       WHERE filename = ?
+<<<<<<< HEAD
     SQL
+=======
+      SQL
+>>>>>>> upstream/master
 
     SQL.exec(request, filename)
   end
@@ -66,7 +88,11 @@ module Database::Files
     request = <<-SQL
       DELETE FROM #{TABLE_NAME}
       WHERE delete_key = ?
+<<<<<<< HEAD
     SQL
+=======
+      SQL
+>>>>>>> upstream/master
 
     SQL.exec(request, key)
   end
@@ -80,7 +106,11 @@ module Database::Files
       SELECT *
       FROM #{TABLE_NAME}
       WHERE filename = ?
+<<<<<<< HEAD
     SQL
+=======
+      SQL
+>>>>>>> upstream/master
 
     SQL.query_one?(request, filename, as: Fileinfo)
   end
@@ -94,7 +124,11 @@ module Database::Files
       SELECT *
       FROM #{TABLE_NAME}
       WHERE delete_key = ?
+<<<<<<< HEAD
     SQL
+=======
+      SQL
+>>>>>>> upstream/master
 
     SQL.query_one?(request, delete_key, as: Fileinfo)
   end
@@ -104,7 +138,11 @@ module Database::Files
       SELECT *
       FROM #{TABLE_NAME}
       WHERE thumbnail = ?
+<<<<<<< HEAD
     SQL
+=======
+      SQL
+>>>>>>> upstream/master
 
     SQL.query_one?(request, thumbnail, as: Fileinfo)
   end
@@ -117,8 +155,13 @@ module Database::Files
     request = <<-SQL
       SELECT *
       FROM #{TABLE_NAME}
+<<<<<<< HEAD
       WHERE uploaded_at < strftime('%s', 'now') - #{CONFIG.delete_files_after.to_i64 * 60 * 60}
     SQL
+=======
+      WHERE uploaded_at < strftime('%s', 'now') - #{CONFIG.uploads.deletion.delete_files_after.to_i64 * 60 * 60}
+      SQL
+>>>>>>> upstream/master
 
     SQL.query_all(request, as: Fileinfo)
   end
@@ -127,7 +170,11 @@ module Database::Files
     request = <<-SQL
       SELECT COUNT (filename)
       FROM #{TABLE_NAME}
+<<<<<<< HEAD
     SQL
+=======
+      SQL
+>>>>>>> upstream/master
 
     SQL.query_one(request, as: Int32)
   end

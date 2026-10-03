@@ -13,7 +13,11 @@ module Utils::S3
       @client = begin
         Awscr::S3::Client.new(CONFIG.s3.region, CONFIG.s3.key, CONFIG.s3.secret, endpoint: CONFIG.s3.endpoint, signer: :v4)
       rescue ex : Awscr::S3::InvalidAccessKeyId
+<<<<<<< HEAD
         Log.fatal &.emit("invalid access key id, please check your configuration")
+=======
+        Log.fatal &.emit("invalid access key id, please check your configuration", error: ex.message)
+>>>>>>> upstream/master
         exit(1)
       rescue ex
         Log.fatal &.emit("unknown error", error: ex.message)
@@ -46,6 +50,7 @@ module Utils::S3
     end
 
     def delete(full_filename : String) : Bool?
+<<<<<<< HEAD
       begin
         @client.delete_object(CONFIG.s3.bucket_name, full_filename)
       rescue ex
@@ -67,6 +72,25 @@ module Utils::S3
       rescue ex
         Log.error &.emit("failed to retrieve file from bucket", error: ex.message)
       end
+=======
+      @client.delete_object(CONFIG.s3.bucket_name, full_filename)
+    rescue ex
+      Log.error &.emit("failed to delete file from bucket", error: ex.message)
+    end
+
+    def retrieve(full_filename : String) : Slice(UInt8)?
+      io = IO::Memory.new
+      @client.get_object(CONFIG.s3.bucket_name, full_filename) do |file|
+        IO.copy(file.body_io, io)
+      end
+      io.rewind
+      slice = Bytes.new(io.size)
+      io.read_fully(slice)
+      Log.debug &.emit("file '#{full_filename}' retrieved")
+      slice
+    rescue ex
+      Log.error &.emit("failed to retrieve file from bucket", error: ex.message)
+>>>>>>> upstream/master
     end
   end
 end

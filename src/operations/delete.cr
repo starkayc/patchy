@@ -8,11 +8,19 @@ module Operations
         Utils::S3::Client.as(Utils::S3::S3).delete(full_filename)
       else
         # Delete file
+<<<<<<< HEAD
         File.delete("#{CONFIG.files}/#{full_filename}")
 
         # Delete thumbnail if it was generated
         if thumbnail
           File.delete("#{CONFIG.thumbnails}/#{thumbnail}")
+=======
+        File.delete("#{CONFIG.storage.files}/#{full_filename}")
+
+        # Delete thumbnail if it was generated
+        if thumbnail
+          File.delete("#{CONFIG.storage.thumbnails}/#{thumbnail}")
+>>>>>>> upstream/master
         end
       end
     end
@@ -23,11 +31,19 @@ module Operations
         full_filename = fileinfo.filename + fileinfo.extension
         thumbnail = fileinfo.thumbnail
         begin
+<<<<<<< HEAD
           self.delete(full_filename, thumbnail)
           # Delete entry from db
           Database::Files.delete(fileinfo)
           Log.debug &.emit "file '#{full_filename}' was deleted"
           return full_filename
+=======
+          delete(full_filename, thumbnail)
+          # Delete entry from db
+          Database::Files.delete(fileinfo)
+          Log.debug &.emit "file '#{full_filename}' was deleted"
+          full_filename
+>>>>>>> upstream/master
         rescue ex
           Log.error &.emit("unknown error: #{ex.message}")
           raise ex
