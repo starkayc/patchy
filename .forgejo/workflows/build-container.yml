@@ -18,7 +18,8 @@ on:
       - docs/**
 
 env:
-  registry: git.nadeko.net
+  nadeko_registry: git.nadeko.net
+  quay_registry: quay.io
 
 jobs:
   build:
@@ -34,16 +35,24 @@ jobs:
       - name: Login to Docker Container Registry (git.nadeko.net)
         uses: https://code.forgejo.org/docker/login-action@v4
         with:
-          registry: ${{ env.registry }}
-          username: ${{ secrets.USERNAME }}
-          password: ${{ secrets.TOKEN }}
+          registry: ${{ env.nadeko_registry }}
+          username: ${{ secrets.NADEKO_USERNAME }}
+          password: ${{ secrets.NADEKO_TOKEN }}
+
+      - name: Login to Docker Container Registry (quay.io)
+        uses: https://code.forgejo.org/docker/login-action@v4
+        with:
+          registry: ${{ env.quay_registry }}
+          username: ${{ secrets.QUAY_USERNAME }}
+          password: ${{ secrets.QUAY_TOKEN }}
 
       - name: Docker meta
         id: meta
         uses: https://code.forgejo.org/docker/metadata-action@v6
         with:
           images: |
-            ${{ env.registry }}/fijxu/patchy
+            ${{ env.nadeko_registry }}/fijxu/patchy
+            ${{ env.quay_registry }}/fijxu/patchy
           tags: |
             type=sha,format=short,prefix={{date 'YYYY.MM.DD'}}-,enable=${{ github.ref == format('refs/heads/{0}', 'master') }}
             type=raw,value=latest,enable=${{ github.ref == format('refs/heads/{0}', 'master') }}

@@ -90,6 +90,12 @@ Patchy source code is currently hosted at:
 
 ### Containers
 
+Patchy pushes to two containers registries, `git.nadeko.net` (this one of course)
+and `quay.io`. You can use whatever image registry you want to use.
+
+- `git.nadeko.net/fijxu/patchy:latest`
+- `quay.io/fijxu/patchy:latest`
+
 #### Docker Compose / Podman Compose
 
 - Create a folder with the name you want
