@@ -39,6 +39,7 @@ jobs:
         uses: https://github.com/crystal-lang/install-crystal@v1.9.3
         with:
           crystal: 1.21.1
+          token: ${{ secrets.GH_PAT }}
 
       - name: Check Crystal formatter compliance
         run: |
