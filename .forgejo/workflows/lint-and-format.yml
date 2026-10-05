@@ -1,0 +1,49 @@
+name: Run Ameba Linter and Crystal Formatter against Patchy source code
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - "main"
+      - "master"
+    paths-ignore: &paths_ignore
+      - "*.md"
+      - LICENCE
+      - .git*
+      - screenshots/*
+      - config/**
+      - .vscode/**
+      - patchy.service
+      - docker-compose.yml
+      - docs/**
+  pull_request:
+    branches:
+      - "*"
+    paths-ignore: *paths_ignore
+
+jobs:
+  ameba-lint:
+    runs-on: ubuntu-24.04
+
+    steps:
+      - uses: actions/checkout@v7
+      - uses: https://github.com/crystal-ameba/github-action@v1
+
+  crystal-format:
+    runs-on: ubuntu-24.04
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Install Crystal
+        uses: https://github.com/crystal-lang/install-crystal@v1.9.3
+        with:
+          crystal: 1.21.1
+
+      - name: Check Crystal formatter compliance
+        run: |
+          if ! crystal tool format --check; then
+            crystal tool format
+            git diff
+            exit 1
+          fi
