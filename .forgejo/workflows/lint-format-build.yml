@@ -76,6 +76,7 @@ jobs:
         uses: https://github.com/crystal-lang/install-crystal@v1.9.3
         with:
           crystal: ${{ matrix.crystal }}
+          token: ${{ secrets.GH_PAT }}
 
       - name: Cache Shards
         uses: actions/cache@v6
