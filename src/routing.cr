@@ -3,6 +3,7 @@ require "./exceptions"
 require "./routes/**"
 require "./operations/*"
 
+<<<<<<< HEAD
 module Routing
   extend self
 
@@ -16,11 +17,32 @@ module Routing
       end
 
       Kemal::RouteHandler::INSTANCE.add_route({{http_method.upcase}}, \{{path}}) do |env|
+=======
+module Kemal
+  class Router
+    {% for http_method in {"get", "post", "delete", "options", "patch", "put"} %}
+
+    macro {{ http_method.id }}(path, controller, method = :handle)
+      unless Kemal::Utils.path_starts_with_slash?(\{{path}})
+        raise Kemal::Exceptions::InvalidPathStartException.new({{ http_method }}, \{{path}})
+      end
+
+      add_route({{ http_method.upcase }}, \{{path}}) do |env|
+>>>>>>> upstream/master
         \{{ controller }}.\{{ method.id }}(env)
       end
     end
 
+<<<<<<< HEAD
   {% end %}
+=======
+    {% end %}
+  end
+end
+
+module Routing
+  extend self
+>>>>>>> upstream/master
 
   before_all do |env|
     env.set "host", env.request.headers["X-Forwarded-Host"]? || env.request.headers["Host"]? || nil
@@ -28,6 +50,7 @@ module Routing
     env.set "ip", env.request.headers["X-Real-IP"]? || env.request.remote_address.as?(Socket::IPAddress).try &.address || nil
     env.set "user_agent", env.request.headers["User-Agent"]?
 
+<<<<<<< HEAD
     env.response.headers["Content-Security-Policy"] = {
       "sandbox allow-popups allow-popups-to-escape-sandbox allow-downloads allow-scripts allow-same-origin allow-forms",
       "default-src 'self'",
@@ -47,6 +70,32 @@ module Routing
         res = {"error" => "Wrong API Key"}.to_json
         halt env, status_code: 401, response: res
       end
+=======
+    user_settings = ::UserSettings.from_json("{}")
+    begin
+      if prefs_cookie = env.request.cookies["PREFS"]?
+        user_settings = ::UserSettings.from_json(URI.decode_www_form(prefs_cookie.value))
+      end
+    rescue
+      user_settings = ::UserSettings.from_json("{}")
+    end
+
+    env.set "user_settings", user_settings
+
+    env.response.headers["Content-Security-Policy"] = {
+      "sandbox allow-popups allow-popups-to-escape-sandbox allow-downloads allow-scripts allow-same-origin allow-forms",
+      "default-src 'self'",
+      "script-src 'self' 'unsafe-inline'",
+      "img-src 'self' data:",
+      "media-src 'self' data:",
+      "style-src 'self' 'unsafe-inline'",
+      "font-src 'self' data:",
+      "connect-src 'self'",
+    }.join(";")
+
+    if CONFIG.server.no_robots
+      env.response.headers["X-Robots-Tag"] = "none"
+>>>>>>> upstream/master
     end
   end
 
@@ -74,6 +123,7 @@ module Routing
     ip_info = Database::IPS.select(ip)
     return if ip_info.nil?
 
+<<<<<<< HEAD
     if CONFIG.files_per_ip > 0
       time_since_first_upload = Time.utc.to_unix - ip_info.date
       time_until_unban = ip_info.date - Time.utc.to_unix + CONFIG.rate_limit_period
@@ -83,6 +133,17 @@ module Routing
       end
 
       if ip_info.count >= CONFIG.files_per_ip && time_since_first_upload < CONFIG.rate_limit_period
+=======
+    if CONFIG.rate_limits.enabled && CONFIG.rate_limits.files_per_ip > 0
+      time_since_first_upload = Time.utc.to_unix - ip_info.date
+      time_until_unban = ip_info.date - Time.utc.to_unix + CONFIG.rate_limits.rate_limit_period
+
+      if time_since_first_upload > CONFIG.rate_limits.rate_limit_period
+        Database::IPS.delete(ip_info.ip)
+      end
+
+      if ip_info.count >= CONFIG.rate_limits.files_per_ip && time_since_first_upload < CONFIG.rate_limits.rate_limit_period
+>>>>>>> upstream/master
         ee 401, "Rate limited! Try again in #{time_until_unban} seconds"
       end
     end
@@ -91,6 +152,7 @@ module Routing
   before_post "/upload" { |env| before_upload(env) }
   before_post "/-/upload" { |env| before_upload(env) }
 
+<<<<<<< HEAD
   def register_all : Array(Radix::Node(Kemal::Route)) | Kemal::Route | Radix::Node(Kemal::Route) | Nil
     # Views
     get "/", Routes::Views, :index
@@ -133,5 +195,77 @@ module Routing
     get "#{ADMIN_API_ROUTE_PATH}/torexitnodes", Routes::Admin, :tor_exit_nodes
     get "#{ADMIN_API_ROUTE_PATH}/vpnips", Routes::Admin, :vpn_ips
     get "#{ADMIN_API_ROUTE_PATH}/cachedfiles", Routes::Admin, :cached_files
+=======
+  def register_all
+    public = Kemal::Router.new
+
+    public.namespace "/" do
+      # Views
+      get "/", Routes::Views, :index
+      get "/:filename", Routes::Views, :show_file
+      get "/-/info/configs", Routes::Views, :uploader_configs
+      get "/-/info/history", Routes::Views, :upload_history
+      get "/-/settings", Routes::Views, :settings
+      get "/-/admin", Routes::Views, :admin
+
+      # Reserved path
+      # get "/-/admin/settings", Routes::Views, :admin
+      get "/-/login", Routes::Views, :login
+      get "/-/reportabuse", Routes::Views, :reportabuse
+
+      # Upload
+      post "/upload", Routes::Upload, :upload
+      post "/-/upload", Routes::Upload, :upload
+
+      # Retrieve
+      get "/-/file/:filename", Routes::Retrieve, :retrieve_file
+      get "/-/thumbnail/:thumbnail", Routes::Retrieve, :retrieve_thumbnail
+
+      # Delete
+      get "/-/delete", Routes::Delete, :delete_file
+
+      # Misc
+      get "/-/api/stats", Routes::Misc, :stats
+      get "/-/info/sharex.sxcu", Routes::Misc, :sharex_config
+
+      # User settings
+      post "/-/settings/update_settings", Routes::UserSettings, :update_settings
+
+      if CONFIG.cors.enabled
+        paths = CONFIG.cors.paths
+        paths.each do |path|
+          options path, Handlers::Options, :options
+        end
+      end
+    end
+
+    mount "/", public
+
+    register_admin if CONFIG.admin.enabled
+  end
+
+  def register_admin
+    admin = Kemal::Router.new
+
+    admin.namespace "/-/api/admin" do
+      before do |env|
+        env.response.content_type = "application/json"
+        api_key = env.request.headers["X-Api-Key"]?
+
+        if api_key != CONFIG.admin.api_key
+          res = {"error" => "Wrong API Key"}.to_json
+          halt env, status_code: 401, response: res
+        end
+      end
+
+      post "/delete", Routes::Admin, :delete_file
+      post "/fileinfo", Routes::Admin, :retrieve_file_info
+      get "/torexitnodes", Routes::Admin, :tor_exit_nodes
+      get "/vpnips", Routes::Admin, :vpn_ips
+      get "/cachedfiles", Routes::Admin, :cached_files
+    end
+
+    mount "", admin
+>>>>>>> upstream/master
   end
 end

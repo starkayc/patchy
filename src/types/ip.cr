@@ -17,7 +17,11 @@ struct IPInfo
   def to_tuple : Tuple(String, Int32, Int64)
     {% begin %}
       {
+<<<<<<< HEAD
         {{@type.instance_vars.map(&.name).splat}}
+=======
+        {{ @type.instance_vars.map(&.name).splat }}
+>>>>>>> upstream/master
       }
     {% end %}
   end
