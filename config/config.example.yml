@@ -168,8 +168,8 @@ views:
       enabled: true
       show_uploader_configs: true
       show_upload_history: true
-      show_admin: true
-      show_login: true
+      show_admin: false
+      show_login: false
   show_file:
     autoplay_video: false
     autoplay_audio: false

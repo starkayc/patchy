@@ -158,8 +158,8 @@ class Config
         property show_uploader_configs : Bool = true
         property show_upload_history : Bool = true
         property show_settings : Bool = true
-        property show_admin : Bool = true
-        property show_login : Bool = true
+        property show_admin : Bool = false
+        property show_login : Bool = false
       end
     end
 
