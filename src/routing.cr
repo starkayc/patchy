@@ -128,6 +128,7 @@ module Routing
 
       # Misc
       get "/-/api/stats", Routes::Misc, :stats
+      get "/-/healthz", Routes::Misc, :healthz
       get "/-/info/sharex.sxcu", Routes::Misc, :sharex_config
 
       # User settings

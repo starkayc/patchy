@@ -56,4 +56,9 @@ module Routes::Misc
 
     config
   end
+
+  def healthz(env)
+    env.response.content_type = "text/plain"
+    "OK"
+  end
 end
