@@ -297,7 +297,7 @@ class Config
   struct DefaultUserSettings
     include YAML::Serializable
 
-    property show_file_directly : Bool = true
+    property show_file_directly : Bool = false
   end
 
   property advanced : Advanced = Advanced.from_yaml("")
