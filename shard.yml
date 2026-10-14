@@ -7,6 +7,8 @@ authors:
 targets:
   patchy:
     main: src/patchy.cr
+  ameba:
+    main: lib/ameba/bin/ameba.cr
 
 dependencies:
   awscr-s3:
