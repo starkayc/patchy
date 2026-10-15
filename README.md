@@ -1,9 +1,9 @@
 # Patchy
 
-<!-- [![Translation status](https://translate.codeberg.org/widget/patchy/svg-badge.svg)](https://translate.codeberg.org/engage/patchy/)
-[![Translation status](https://translate.codeberg.org/widget/patchy/language-badge.svg)](https://translate.codeberg.org/engage/patchy/) -->
-
----
+<!--
+[![Translation status](https://translate.codeberg.org/widget/patchy/svg-badge.svg)](https://translate.codeberg.org/engage/patchy)
+[![Translation status](https://translate.codeberg.org/widget/patchy/language-badge.svg)](https://translate.codeberg.org/engage/patchy)
+-->
 
 [На русском 🇷🇺](./README-ru.md)
 
@@ -31,7 +31,7 @@ So, why is called Patchy and how it's related to a file uploader service? Think
 about it, Patchy is a librarian, take the books as files, and Patchy as the
 software that manages them ;)
 
-<img src="./screenshots/patchy.jpg" height="500px"/>
+<img src="./screenshots/patchy.jpg" height="500px" />
 
 > <https://safebooru.org/index.php?page=post&s=view&id=905633>
 
@@ -39,11 +39,11 @@ software that manages them ;)
 
 ### Javascript enabled
 
-![](./screenshots/demo.png)
+![Patchy](./screenshots/demo.png)
 
 ### Javascript disabled
 
-![](./screenshots/demo-nojs.png)
+![Patchy No Javascript](./screenshots/demo-nojs.png)
 
 ## Features
 
@@ -65,14 +65,14 @@ software that manages them ;)
   retrieved. It will depend of your traffic, if cache is enabled and if
   checksumming is enabled.
 - **Experimental** S3 bucket support (OpenGraph thumbnails are not available,
-  tested using [Minio](https://min.io/))
-- Localization support (Only English and Spanish supported for now)
+  tested using [Minio](https://min.io))
+- Localization support (Only English, Spanish and Russian supported for now)
 - VPN blocking (Not really necessary, but still, it's a good addition) (**In
   progress**)
 
 ## TODO
 
-<https://codeberg.org/Fijxu/patchy/issues/9>
+<https://codeberg.org/Fijxu/patchy/issues/9>.
 
 ## Docs
 
@@ -90,8 +90,8 @@ Patchy source code is currently hosted at:
 
 ### Containers
 
-Patchy pushes to two containers registries, `git.nadeko.net` (this one of course)
-and `quay.io`. You can use whatever image registry you want to use.
+Patchy pushes to two containers registries, `git.nadeko.net` (this one of
+course) and `quay.io`. You can use whatever image registry you want to use.
 
 - `git.nadeko.net/fijxu/patchy:latest`
 - `quay.io/fijxu/patchy:latest`
@@ -101,16 +101,17 @@ and `quay.io`. You can use whatever image registry you want to use.
 - Create a folder with the name you want
 - Download the [docker-compose.yml](./docker-compose.yml) file into the folder
   you created
-- **If you are using docker**, create the data folder using
-  `mkdir ./data && sudo
-chown -R 10000:10000 ./data`
+- **If you are using docker**, create the data folder using `mkdir ./data &&
+  sudo chown -R 10000:10000 ./data`
 - Run it using `docker compose up` if using docker or `podman compose up` if
   using Podman. If it works fine, then you can append the `-d` argument next to
   leave the container running on the background
 
 #### Kubernetes
 
-**TODO**
+> [!NOTE]
+>
+> TODO.
 
 ### Native (Compiling it yourself)
 
@@ -121,11 +122,12 @@ chown -R 10000:10000 ./data`
 - Change the settings file `./config/config.yml` according to what you need.
 - Setup a systemd service to keep the uploader running. Copy
   [patchy.service](./patchy.service) into `/etc/systemd/system/patchy.service`
-- Give permissions to the `/opt/patchy` folder to the user `patchy` using
-  `sudo chown -R 10000:10000 /opt/patchy`
+- Give permissions to the `/opt/patchy` folder to the user `patchy` using `sudo
+  chown -R 10000:10000 /opt/patchy`
 - Start the uploader using `sudo systemctl start patchy`
 
 > [!WARNING]
+>
 > This was not tested, if you have any issues with it, please open an issue!
 
 ## NGINX Server block
@@ -159,20 +161,27 @@ server {
 }
 ```
 
-<!-- ---
+<!--
 
 ## Translations
 
 Feel free to translate Patchy to your own language if it's not supported here:
-https://translate.codeberg.org/projects/patchy/patchy/ (Requires a Codeberg
-account)
+<https://translate.codeberg.org/projects/patchy/patchy> (Requires a Codeberg
+account).
 
-[![Translation status](https://translate.codeberg.org/widget/patchy/multi-auto.svg)](https://translate.codeberg.org/engage/patchy/) -->
+[![Translation status](https://translate.codeberg.org/widget/patchy/multi-auto.svg)](https://translate.codeberg.org/engage/patchy)
+
+-->
 
 ## Development
 
-Patchy uses Nix package manager as it's main development environment to install all the development dependencies and packages like `forgejo-runner` to test Actions workflows, `pre-commit` to install pre-commit hooks and other tools that you can find in [flake.nix](./flake.nix)
+Patchy uses Nix package manager as it's main development environment to install
+all the development dependencies and packages like `forgejo-runner` to test
+Actions workflows, `pre-commit` to install pre-commit hooks and other tools that
+you can find in [flake.nix](./flake.nix)
 
 ### Preparing your environment for development
 
-**TODO**
+> [!NOTE]
+>
+> TODO.
