@@ -103,7 +103,7 @@ and `quay.io`. You can use whatever image registry you want to use.
   you created
 - **If you are using docker**, create the data folder using
   `mkdir ./data && sudo
-  chown -R 10000:10000 ./data`
+chown -R 10000:10000 ./data`
 - Run it using `docker compose up` if using docker or `podman compose up` if
   using Podman. If it works fine, then you can append the `-d` argument next to
   leave the container running on the background
@@ -168,3 +168,11 @@ https://translate.codeberg.org/projects/patchy/patchy/ (Requires a Codeberg
 account)
 
 [![Translation status](https://translate.codeberg.org/widget/patchy/multi-auto.svg)](https://translate.codeberg.org/engage/patchy/) -->
+
+## Development
+
+Patchy uses Nix package manager as it's main development environment to install all the development dependencies and packages like `forgejo-runner` to test Actions workflows, `pre-commit` to install pre-commit hooks and other tools that you can find in [flake.nix](./flake.nix)
+
+### Preparing your environment for development
+
+**TODO**
