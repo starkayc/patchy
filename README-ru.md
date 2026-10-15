@@ -1,76 +1,72 @@
 # Patchy
 
 <!--
-[![Translation status](https://translate.codeberg.org/widget/patchy/svg-badge.svg)](https://translate.codeberg.org/engage/patchy)
-[![Translation status](https://translate.codeberg.org/widget/patchy/language-badge.svg)](https://translate.codeberg.org/engage/patchy)
+[![Статус перевода](https://translate.codeberg.org/widget/patchy/svg-badge.svg)](https://translate.codeberg.org/engage/patchy)
+[![Статус перевода](https://translate.codeberg.org/widget/patchy/language-badge.svg)](https://translate.codeberg.org/engage/patchy)
 -->
 
-Простой в размещении временный загрузчик файлов, который я сделал для замены
-[Uguu](https://github.com/nokonoko/uguu), который сложно разместить из-за PHP.
+[English 🇬🇧](./README.md)
 
-Использует малый объем памяти, работает без JS, может использоваться в другом
-программном обеспечении, таком как Chatterino2 и ShareX, и имеет другие функции,
-перечисленные ниже
+---
 
-Действующий сервер этого ПО:
-[patchy.moe](https://patchy.moe)
+Простой в размещении временный загрузчик файлов, созданный для замены
+[Uguu](https://github.com/nokonoko/uguu), который сложно развернуть из-за PHP.
 
-## Почему название Patchy?
+Использует мало памяти, работает без JS, совместим с Chatterino2 и ShareX, а
+также имеет другие функции, перечисленные ниже.
 
-Сначала я хотел назвать его "Patchouli" в честь
+Основной сервер: [patchy.moe](https://patchy.moe)
+
+## Почему Patchy?
+
+Сначала я хотел назвать его Patchouli в честь
 [Patchouli Knowledge](https://en.touhouwiki.net/wiki/Patchouli_Knowledge), но
-уже были проекты, которые использовали это название, вероятно, по той же
-причине, что и я (им нравится Touhou). Поэтому я выбрал **Patchy**,
-так [Remi](https://en.touhouwiki.net/wiki/Remilia_Scarlet) называет Patchouli.
+уже были проекты с таким именем (вероятно, по той же причине - им нравится
+Touhou). Поэтому я выбрал **Patchy** - так Remi называет Patchouli.
 
-Итак, почему он называется Patchy и как это связано с сервисом загрузки файлов?
-Подумайте об этом, Patchy - библиотекарь, возьмите книги как файлы, а Patchy как
-ПО, которое ими управляет ;)
+Почему Patchy и как это связано с загрузчиком файлов? Подумайте: Patchy - это
+библиотекарь, книги - это файлы, а Patchy - это ПО, которое ими управляет ;)
 
-<img src="./screenshots/patchy.jpg" height="500px"/>
+<img src="./screenshots/patchy.jpg" height="500px" />
 
 > <https://safebooru.org/index.php?page=post&s=view&id=905633>
 
 ## Скриншоты
 
-### Javascript включен
+### С включенным JavaScript
 
-![demo.png](./screenshots/demo.png)
+![Patchy](./screenshots/demo.png)
 
-### Javascript отключен
+### С отключенным JavaScript
 
-![demo-nojs.png](./screenshots/demo-nojs.png)
+![Patchy без JavaScript](./screenshots/demo-nojs.png)
 
 ## Возможности
 
 - Временная загрузка файлов, как в Uguu
-- Ссылка для удаления файла (недоступна в версии без JS, пока я не найду способ)
+- Ссылка для удаления файла (пока недоступна в версии без JS)
 - Поддержка Chatterino и ShareX
-- Миниатюры для OpenGraph User-Agents (требуется установка `ffmpeg`,
-  по умолчанию отключено)
-- Ограничения скорости загрузки файлов (на основе IP-адреса)
-- [Небольшой Admin API](./src/routes/admin/), который позволяет удалять файлы, собирать
-  информацию о файлах, просматривать кэшированные файлы в ОЗУ и многое другое
-  (необходимо включить в конфигурации)
-- Поддержка Unix-сокетов, если вы не хотите
-  иметь дело со всеми накладными расходами TCP
-- Автоматическое определение протокола (HTTPS или HTTP)
-- Кэширование файлов в памяти для снижения нагрузки на диск с использованием
-  [LRU](https://en.wikipedia.org/wiki/Cache_replacement_policies#LRU), подробнее
-  в [config.example.yml](./config/config.example.yml)
-- Низкое потребление памяти: от 6 МБ в режиме простоя до 40 МБ,
-  если файл загружается или извлекается.
-  Это будет зависеть от вашего трафика, включен ли кэш и
-  включено ли вычисление контрольных сумм.
+- Миниатюры для OpenGraph User-Agents (требуется `ffmpeg`, по умолчанию
+  отключено)
+- Ограничение скорости загрузки (на основе IP-адреса)
+- [Небольшой Admin API](./src/routes/admin/) для удаления файлов, получения
+  информации о них, просмотра кэша в ОЗУ и другого (нужно включить в конфиге)
+- Поддержка Unix-сокетов, чтобы избежать накладных расходов TCP
+- Автоопределение протокола (HTTPS или HTTP)
+- Кэширование файлов в памяти для снижения нагрузки на диск через
+  [LRU](https://en.wikipedia.org/wiki/Cache_replacement_policies#LRU) (подробнее
+  в [config.example.yml](./config/config.example.yml))
+- Низкое потребление памяти: от 6 МБ в простое до 40 МБ при загрузке или чтении
+  файла. Зависит от трафика, включения кэша и вычисления контрольных сумм.
 - **Экспериментальная** поддержка S3 bucket (миниатюры OpenGraph недоступны,
-  протестировано с использованием [Minio](https://min.io/))
-- Поддержка локализации (в настоящее время поддерживаются только английский и испанский)
-- Блокировка VPN (не совсем необходимо, но всё же,
-  это хорошее дополнение) (**В разработке**)
+  протестировано с [Minio](https://min.io))
+- Поддержка локализации (сейчас поддерживаются английский, испанский и русский)
+- Блокировка VPN (не самое необходимое, но полезное дополнение) (**В
+  разработке**)
 
 ## Планы
 
-<https://codeberg.org/Fijxu/patchy/issues/9>
+<https://codeberg.org/Fijxu/patchy/issues/9>.
 
 ## Документация
 
@@ -78,7 +74,7 @@
 
 ## Зеркала репозитория
 
-Исходный код Patchy в настоящее время размещен тут:
+Исходный код Patchy размещен здесь:
 
 - <https://git.nadeko.net/Fijxu/patchy>
 - <https://codeberg.org/Fijxu/patchy>
@@ -88,54 +84,59 @@
 
 ### Контейнеры
 
+Patchy публикует образы в два реестра: `git.nadeko.net` (конечно тут) и
+`quay.io`. Вы можете использовать любой удобный реестр.
+
+- `git.nadeko.net/fijxu/patchy:latest`
+- `quay.io/fijxu/patchy:latest`
+
 #### Docker Compose / Podman Compose
 
 - Создайте папку с любым именем
-- Скачайте файл [docker-compose.yml](./docker-compose.yml) в папку,
-  которую вы создали
-- **Если вы используете docker**, создайте папку данных с помощью
-  `mkdir ./data && sudo
+- Скачайте файл [docker-compose.yml](./docker-compose.yml) в созданную папку
+- **Если вы используете Docker**, создайте папку данных: `mkdir ./data && sudo
   chown -R 10000:10000 ./data`
-- Запустите его с помощью `docker compose up`,
-  если используете Docker, или `podman compose up`, если используете Podman.
-  Если всё работает нормально, вы можете добавить аргумент `-d` в конце,
-  чтобы контейнер работал в фоновом режиме.
+- Запустите через `docker compose up` (Docker) или `podman compose up` (Podman).
+  Если всё работает, добавьте флаг `-d` для запуска в фоне.
 
 #### Kubernetes
 
-### Нативная установка (компиляция самостоятельно)
+> [!NOTE]
+>
+> TODO.
 
-- Создайте пользователя для загрузчика: `sudo useradd -u 10000 patchy` (вы можете
-  заменить имя пользователя на любое другое)
-- Клонируйте этот репозиторий, например, в `/opt/patchy`
-- Установите Crystal и скомпилируйте загрузчик с помощью `shards build --release`
-- Измените файл настроек `./config/config.yml` в соответствии с вашими потребностями.
-- Настройте службу systemd для поддержания работы загрузчика. Скопируйте
+### Нативная установка (самостоятельная компиляция)
+
+- Создайте пользователя для загрузчика: `sudo useradd -u 10000 patchy` (имя
+  можно изменить)
+- Клонируйте репозиторий, например, в `/opt/patchy`
+- Установите Crystal и скомпилируйте загрузчик: `shards build --release`
+- Настройте файл `./config/config.yml` под свои нужды.
+- Настройте службу systemd для автозапуска. Скопируйте
   [patchy.service](./patchy.service) в `/etc/systemd/system/patchy.service`
-- Выдайте права на папку `/opt/patchy` пользователю `patchy` с помощью
-  `sudo chown -R 10000:10000 /opt/patchy`
-- Запустите загрузчик с помощью `sudo systemctl start patchy`
+- Выдайте права на папку `/opt/patchy` пользователю `patchy`: `sudo chown -R
+  10000:10000 /opt/patchy`
+- Запустите загрузчик: `sudo systemctl start patchy`
 
 > [!WARNING]
-> Это не тестировалось, если у вас возникнут
-> какие-либо проблемы, пожалуйста, откройте issue!
+>
+> Это не тестировалось. Если возникнут проблемы, создайте issue!
 
 ## Блок сервера NGINX
 
-Предполагая, что вы уже используете NGINX и знаете,
-как его использовать, вы можете использовать этот пример блока сервера.
+Если вы уже используете NGINX, вы можете использовать этот пример блока сервера.
 
 ```nginx
 server {
-  # You can keep the domain prefixed with `~.` if you want
-  # to allow users to use any domain to upload and retrieve
-  # files. Like xdxd.example.com or lolol.example.com
-  # This will only work if you have a wildcard domain and certificate.
+  # Вы можете оставить домен с префиксом `~.`, если хотите
+  # разрешить пользователям использовать любой домен для загрузки и получения
+  # файлов. Например, xdxd.example.com или lolol.example.com
+  # Это будет работать только при наличии wildcard-домена и сертификата.
   server_name ~.example.com example.com;
 
   location / {
     proxy_pass http://127.0.0.1:8080;
-    # This if you want to use a UNIX socket instead
+    # Если вы хотите использовать UNIX-сокет вместо этого:
     # proxy_pass http://unix:/tmp/patchy.sock;
     proxy_set_header X-Real-IP   $proxy_add_x_forwarded_for;
     proxy_set_header X-Forwarded-Proto $scheme;
@@ -143,7 +144,7 @@ server {
     proxy_pass_request_headers      on;
   }
 
-  # This should be the size_limit value (from config.yml)
+  # Это значение должно соответствовать size_limit (из config.yml)
   client_max_body_size 512M;
 
   listen 443 ssl;
@@ -155,7 +156,19 @@ server {
 ## Переводы
 
 Не стесняйтесь переводить Patchy на свой язык, если он здесь не поддерживается:
-https://translate.codeberg.org/projects/patchy/patchy/ (требуется аккаунт Codeberg)
+<https://translate.codeberg.org/projects/patchy/patchy> (требуется аккаунт Codeberg)
 
-[![Translation status](https://translate.codeberg.org/widget/patchy/multi-auto.svg)](https://translate.codeberg.org/engage/patchy)
+[![Статус перевода](https://translate.codeberg.org/widget/patchy/multi-auto.svg)](https://translate.codeberg.org/engage/patchy)
 -->
+
+## Разработка
+
+Patchy использует Nix как основную среду разработки для установки зависимостей,
+таких как `forgejo-runner` для тестирования Actions, `pre-commit` для хуков и
+других инструментов из [flake.nix](./flake.nix)
+
+### Подготовка среды для разработки
+
+> [!NOTE]
+>
+> TODO.
