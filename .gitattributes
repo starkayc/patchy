@@ -1,0 +1,7 @@
+*            text=auto eol=lf
+*.ecr        linguist-language=HTML
+*.yaml       linguist-detectable
+*.yml        linguist-language=YAML
+.git*        linguist-language=Shell
+flake.lock   linguist-language=JSON linguist-generated
+shard.lock   linguist-language=YAML linguist-generated
