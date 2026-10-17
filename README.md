@@ -3,6 +3,15 @@
 <!-- [![Translation status](https://translate.codeberg.org/widget/patchy/svg-badge.svg)](https://translate.codeberg.org/engage/patchy/)
 [![Translation status](https://translate.codeberg.org/widget/patchy/language-badge.svg)](https://translate.codeberg.org/engage/patchy/) -->
 
+<<<<<<< HEAD
+=======
+---
+
+[На русском 🇷🇺](./README-ru.md)
+
+---
+
+>>>>>>> upstream/master
 A temporary file uploader easy to host that I did to replace
 [Uguu](https://github.com/nokonoko/uguu), which is not easy to host due to PHP.
 
@@ -84,6 +93,15 @@ Patchy source code is currently hosted at:
 
 ### Containers
 
+<<<<<<< HEAD
+=======
+Patchy pushes to two containers registries, `git.nadeko.net` (this one of course)
+and `quay.io`. You can use whatever image registry you want to use.
+
+- `git.nadeko.net/fijxu/patchy:latest`
+- `quay.io/fijxu/patchy:latest`
+
+>>>>>>> upstream/master
 #### Docker Compose / Podman Compose
 
 - Create a folder with the name you want
@@ -91,7 +109,11 @@ Patchy source code is currently hosted at:
   you created
 - **If you are using docker**, create the data folder using
   `mkdir ./data && sudo
+<<<<<<< HEAD
   chown -R 10000:10000 ./data`
+=======
+chown -R 10000:10000 ./data`
+>>>>>>> upstream/master
 - Run it using `docker compose up` if using docker or `podman compose up` if
   using Podman. If it works fine, then you can append the `-d` argument next to
   leave the container running on the background
@@ -156,3 +178,14 @@ https://translate.codeberg.org/projects/patchy/patchy/ (Requires a Codeberg
 account)
 
 [![Translation status](https://translate.codeberg.org/widget/patchy/multi-auto.svg)](https://translate.codeberg.org/engage/patchy/) -->
+<<<<<<< HEAD
+=======
+
+## Development
+
+Patchy uses Nix package manager as it's main development environment to install all the development dependencies and packages like `forgejo-runner` to test Actions workflows, `pre-commit` to install pre-commit hooks and other tools that you can find in [flake.nix](./flake.nix)
+
+### Preparing your environment for development
+
+**TODO**
+>>>>>>> upstream/master

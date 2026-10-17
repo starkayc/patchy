@@ -7,6 +7,11 @@ authors:
 targets:
   patchy:
     main: src/patchy.cr
+<<<<<<< HEAD
+=======
+  ameba:
+    main: lib/ameba/bin/ameba.cr
+>>>>>>> upstream/master
 
 dependencies:
   awscr-s3:
@@ -25,6 +30,11 @@ dependencies:
     git: git://codeberg.org/Fijxu/flib.git
   lru:
     github: fijxu/crystal-lru
+<<<<<<< HEAD
+=======
+  base58:
+    github: crystal-china/base58.cr
+>>>>>>> upstream/master
 
 development_dependencies:
   ameba:
@@ -35,6 +45,17 @@ development_dependencies:
   source-typer:
     github: Vici37/cr-source-typer
 
+<<<<<<< HEAD
 crystal: '>= 1.12.2'
 
 license: AGPL-3.0-only
+=======
+crystal: ">= 1.18.2"
+
+license: AGPL-3.0-only
+
+libraries:
+  # For MIME Types and Encodings
+  # Requires `file` package, available on most OSes
+  libmagic: "*"
+>>>>>>> upstream/master
