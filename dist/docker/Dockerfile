@@ -1,5 +1,5 @@
 # Based on https://github.com/iv-org/invidious/blob/master/docker/Dockerfile
-FROM crystallang/crystal:1.21.1-alpine AS builder
+FROM crystallang/crystal:1.22.0-alpine AS builder
 
 RUN apk add --no-cache sqlite-static yaml-static libmagic-static esbuild
 
@@ -22,13 +22,13 @@ RUN esbuild "./public/-/assets/js/*" --color=false --sourcemap --minify --outdir
 
 ARG RELEASE
 RUN --mount=type=cache,target=/root/.cache/crystal if [[ "${RELEASE}" == 1 ]] ; then \
-		crystal build ./src/patchy.cr \
-		--release \
-		--static --warnings all -s -p -t -Dpatchy_minified_js; \
-	else \
-		crystal build ./src/patchy.cr \
-		--static --warnings all -s -p -t -Dpatchy_minified_js; \
-	fi
+    crystal build ./src/patchy.cr \
+    --release \
+    --static --warnings all -s -p -t -Dpatchy_minified_js; \
+    else \
+    crystal build ./src/patchy.cr \
+    --static --warnings all -s -p -t -Dpatchy_minified_js; \
+    fi
 
 FROM git.nadeko.net/fijxu/alpine-stripped-ffmpeg:3.23-ffmpeg-8.1.2
 # shared-mime-info is required so Crystal is able to guess the mime types
@@ -37,18 +37,18 @@ FROM git.nadeko.net/fijxu/alpine-stripped-ffmpeg:3.23-ffmpeg-8.1.2
 # This is subject to change with
 # https://github.com/crystal-lang/crystal/issues/15763
 RUN apk add --no-cache \
-	tini \
-	mailcap \
-	libvpx \
-	x264-libs \
-	x265-libs \
-	aom-libs \
-	libwebp \
-	libwebpmux \
-	libjxl \
-	libpng \
-	libjpeg \
-	file
+    tini \
+    mailcap \
+    libvpx \
+    x264-libs \
+    x265-libs \
+    aom-libs \
+    libwebp \
+    libwebpmux \
+    libjxl \
+    libpng \
+    libjpeg \
+    file
 
 RUN rm -rf /var/cache/apk/* /tmp/*
 
