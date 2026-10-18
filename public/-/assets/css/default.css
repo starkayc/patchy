@@ -158,6 +158,13 @@ fieldset {
 	align-content: center;
 }
 
+.speed {
+	color: var(--fg1);
+	align-content: center;
+	font-size: 0.9rem;
+	opacity: 0.8;
+}
+
 .container {
 	padding-top: 10px;
 	padding-left: 10px;

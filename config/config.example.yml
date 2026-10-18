@@ -185,6 +185,7 @@ abuse_email: "example@example.com"
 default_user_settings:
   # Gives you the direct link of the file when it gets uploaded.
   show_file_directly: false
+  show_upload_speed: true
 
 # Advanced options that you shouldn't touch
 # but you can touch them if you really need it.

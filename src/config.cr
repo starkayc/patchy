@@ -298,6 +298,7 @@ class Config
     include YAML::Serializable
 
     property show_file_directly : Bool = false
+    property show_upload_speed : Bool = true
   end
 
   property advanced : Advanced = Advanced.from_yaml("")

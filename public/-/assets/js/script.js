@@ -22,6 +22,7 @@ window.addEventListener("DOMContentLoaded", () => {
   const translate_buttonCancelUpload = translate("js_btn_cancel_upload");
   const translate_status_uploading = translate("js_status_uploading");
   const translate_status_cancelled = translate("js_status_cancelled");
+  const translate_speed = translate("js_speed");
 
   const dropAreaText = document.createElement("p");
   dropAreaText.textContent = translate_uploadText;
@@ -82,6 +83,8 @@ window.addEventListener("DOMContentLoaded", () => {
     const uploadContainer = document.createElement("div");
     const statusLink = document.createElement("div");
     const uploadText = document.createElement("a");
+    const percentText = document.createElement("span");
+    const speedText = document.createElement("span");
     const rightButtons = document.createElement("div");
     const leftButtons = document.createElement("div");
     const copyButton = document.createElement("button");
@@ -96,13 +99,18 @@ window.addEventListener("DOMContentLoaded", () => {
     rightButtons.appendChild(cancelUploadButton);
     leftButtons.appendChild(deleteButton);
     uploadContainer.appendChild(leftButtons);
+    uploadText.appendChild(percentText);
+    uploadText.appendChild(speedText);
     uploadContainer.appendChild(uploadText);
     uploadContainer.appendChild(statusLink);
     uploadContainer.appendChild(rightButtons);
     uploadStatus?.appendChild(uploadContainer);
 
-    uploadText.innerHTML = "0%";
+    percentText.innerHTML = "0%";
     uploadText.className = "percent";
+    speedText.className = "speed";
+    speedText.style.marginLeft = "6px";
+    speedText.style.display = "none";
     statusLink.className = "status";
     copyButton.className = "button copy-button";
     copyButton.innerHTML = translate_buttonCopy;
@@ -115,15 +123,31 @@ window.addEventListener("DOMContentLoaded", () => {
     cancelUploadButton.style.display = "none";
     leftButtons.style.display = "none";
 
+    let lastLoadTime = 0;
+    let lastLoaded = 0;
+
+    function formatSpeed(bytesPerSecond) {
+      if (!Number.isFinite(bytesPerSecond) || bytesPerSecond <= 0) {
+        return "";
+      }
+      const bitsPerSecond = bytesPerSecond * 8;
+      if (bitsPerSecond >= 1000 * 1000) {
+        return `(${(bitsPerSecond / (1000 * 1000)).toFixed(2)} Mbps)`;
+      }
+      return `(${(bitsPerSecond / 1000).toFixed(1)} Kbps)`;
+    }
+
     xhr.upload.addEventListener("loadstart", (_) => {
       cancelUploadButton.style.display = "inline";
       statusLink.innerHTML = `<a>${translate_status_uploading}</a>`;
+      speedText.style.display = "inline";
       cancelUploadButton.addEventListener(
         "click",
         () => {
           xhr.abort();
           statusLink.innerHTML = `<a>${translate_status_cancelled}</a>`;
-          uploadText.innerHTML = "-";
+          percentText.innerHTML = "-";
+          speedText.style.display = "none";
         },
         { once: true },
       );
@@ -132,7 +156,22 @@ window.addEventListener("DOMContentLoaded", () => {
     xhr.upload.addEventListener("progress", (e) => {
       if (e.lengthComputable) {
         const percentComplete = Math.round((e.loaded / e.total) * 100);
-        uploadText.innerHTML = `${percentComplete}%`;
+        percentText.innerHTML = `${percentComplete}%`;
+
+        const now = performance.now();
+        const elapsed = (now - lastLoadTime) / 1000;
+        if (lastLoadTime > 0 && elapsed > 0.25) {
+          const bytesPerSecond = (e.loaded - lastLoaded) / elapsed;
+          const speed = formatSpeed(bytesPerSecond);
+          if (speed) {
+            speedText.textContent = `${translate_speed} ${speed}`;
+          }
+          lastLoadTime = now;
+          lastLoaded = e.loaded;
+        } else if (lastLoadTime === 0) {
+          lastLoadTime = now;
+          lastLoaded = e.loaded;
+        }
       }
     });
 
@@ -140,7 +179,8 @@ window.addEventListener("DOMContentLoaded", () => {
       console.error("Error:", xhr.status, xhr.statusText, xhr.responseText);
       statusLink.textContent = translate_uploadUnknownError;
       cancelUploadButton.style.display = "none";
-      uploadText.innerHTML = "-";
+      percentText.innerHTML = "-";
+      speedText.style.display = "none";
     };
 
     xhr.onload = () => {
@@ -165,7 +205,8 @@ window.addEventListener("DOMContentLoaded", () => {
         } catch (_) {
           statusLink.textContent = translate_uploadUnknownError;
           cancelUploadButton.style.display = "none";
-          uploadText.innerHTML = "-";
+          percentText.innerHTML = "-";
+          speedText.style.display = "none";
         }
       } else if (xhr.status >= 400 && xhr.status < 500) {
         statusLink.textContent = translate_uploadClientError;

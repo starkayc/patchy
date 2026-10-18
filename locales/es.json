@@ -25,6 +25,7 @@
   "user_settings_filename_length_max": "Largo maximo del nombre del archivo",
   "user_settings_show_file_directly": "Mostrar archivo directamente",
   "user_settings_show_file_directly_description": "Te da el enlace directo del archivo cuando se sube.",
+  "user_settings_show_upload_speed": "Mostrar velocidad de subida.",
   "user_settings_save_settings": "Guardar ajustes",
   "info_mkv_may_not_play": "(ℹ️) Información: Este es un archivo MKV, dependiendo del navegador que estés usando y del códec utilizado en este video, puede que se reproduzca o no. Se recomienda descargarlo en su lugar si no se muestra el video o no tiene audio.",
   "info_mov_may_not_play": "(ℹ️) Información: Este es un archivo MOV, dependiendo del navegador que estés usando y del códec utilizado en este video, puede que se reproduzca o no. Se recomienda descargarlo en su lugar si no se muestra el video o no tiene audio.",
@@ -54,5 +55,6 @@
   "js_btn_copy": "Copiar",
   "js_btn_cancel_upload": "Cancelar subida",
   "js_status_uploading": "Subiendo...",
-  "js_status_cancelled": "Subida cancelada"
+  "js_status_cancelled": "Subida cancelada",
+  "js_speed": "Velocidad de subida:"
 }
