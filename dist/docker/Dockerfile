@@ -30,7 +30,7 @@ RUN --mount=type=cache,target=/root/.cache/crystal if [[ "${RELEASE}" == 1 ]] ; 
     --static --warnings all -s -p -t -Dpatchy_minified_js; \
     fi
 
-FROM git.nadeko.net/fijxu/alpine-stripped-ffmpeg:3.23-ffmpeg-8.1.2
+FROM git.nadeko.net/fijxu/alpine-stripped-ffmpeg:3.24-ffmpeg-9.0.2
 # shared-mime-info is required so Crystal is able to guess the mime types
 # of uploaded/retrieved files using the file `/etc/mime.types` provided
 # by that package.
