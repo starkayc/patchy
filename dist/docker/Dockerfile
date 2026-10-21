@@ -55,7 +55,7 @@ RUN rm -rf /var/cache/apk/* /tmp/*
 WORKDIR /patchy
 
 # Default environment variables for the container
-ENV UPLOADER_STORAGE="{files: /data/files, thumbnails: /data/thumbnails, db: /data/db/db.sqlite3}"
+ENV UPLOADER_STORAGE="{files: /data/files, thumbnails: /data/thumbnails, db: /data/db}"
 
 RUN adduser -u 10000 -S patchy
 
