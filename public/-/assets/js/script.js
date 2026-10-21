@@ -23,6 +23,7 @@ window.addEventListener("DOMContentLoaded", () => {
   const translate_status_uploading = translate("js_status_uploading");
   const translate_status_cancelled = translate("js_status_cancelled");
   const translate_speed = translate("js_speed");
+  const translate_speedUnit = translate("js_speed_unit");
 
   const dropAreaText = document.createElement("p");
   dropAreaText.textContent = translate_uploadText;
@@ -130,11 +131,26 @@ window.addEventListener("DOMContentLoaded", () => {
       if (!Number.isFinite(bytesPerSecond) || bytesPerSecond <= 0) {
         return "";
       }
-      const bitsPerSecond = bytesPerSecond * 8;
-      if (bitsPerSecond >= 1000 * 1000) {
-        return `(${(bitsPerSecond / (1000 * 1000)).toFixed(2)} Mbps)`;
+      const speedUnit = translate_speedUnit || "Mbit";
+      if (speedUnit === "MB") {
+        const mbps = bytesPerSecond / (1000 * 1000);
+        if (mbps >= 1) {
+          return `(${mbps.toFixed(2)} MB/s)`;
+        }
+        return `(${(bytesPerSecond / 1000).toFixed(1)} KB/s)`;
+      } else if (speedUnit === "MiB") {
+        const mibps = bytesPerSecond / (1024 * 1024);
+        if (mibps >= 1) {
+          return `(${mibps.toFixed(2)} MiB/s)`;
+        }
+        return `(${(bytesPerSecond / 1024).toFixed(1)} KiB/s)`;
+      } else {
+        const bitsPerSecond = bytesPerSecond * 8;
+        if (bitsPerSecond >= 1000 * 1000) {
+          return `(${(bitsPerSecond / (1000 * 1000)).toFixed(2)} Mbit/s)`;
+        }
+        return `(${(bitsPerSecond / 1000).toFixed(1)} Kbit/s)`;
       }
-      return `(${(bitsPerSecond / 1000).toFixed(1)} Kbps)`;
     }
 
     xhr.upload.addEventListener("loadstart", (_) => {

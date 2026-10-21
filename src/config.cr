@@ -294,11 +294,18 @@ class Config
 
   property default_user_settings : DefaultUserSettings = DefaultUserSettings.from_yaml("")
 
+  enum SpeedUnit
+    Mbit
+    MB
+    MiB
+  end
+
   struct DefaultUserSettings
     include YAML::Serializable
 
     property show_file_directly : Bool = false
     property show_upload_speed : Bool = true
+    property speed_unit : SpeedUnit = SpeedUnit::MiB
   end
 
   property advanced : Advanced = Advanced.from_yaml("")

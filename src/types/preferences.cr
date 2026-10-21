@@ -15,4 +15,5 @@ struct UserSettings
   property show_file_directly : Bool = CONFIG.default_user_settings.show_file_directly
   @[URI::Params::Field(converter: BoolMissingAsFalseConverter)]
   property show_upload_speed : Bool = CONFIG.default_user_settings.show_upload_speed
+  property speed_unit : Config::SpeedUnit = CONFIG.default_user_settings.speed_unit
 end

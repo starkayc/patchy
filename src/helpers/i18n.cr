@@ -85,8 +85,8 @@ module I18n
     end
   end
 
-  def translate_js(locale : String?, key : String) : String
-    translation = translate(locale, key)
+  def translate_js(locale : String?, key : String, translation = nil) : String
+    translation ||= translate(locale, key)
     "<script id=\"_translate-#{key}\" type=\"application/json\">{\"msg\":\"#{translation}\"}</script>"
   end
 end

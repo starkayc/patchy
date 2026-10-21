@@ -186,6 +186,8 @@ default_user_settings:
   # Gives you the direct link of the file when it gets uploaded.
   show_file_directly: false
   show_upload_speed: true
+  # Speed display unit: "Mbit/s", "MB/s", or "MiB/s"
+  speed_unit: "MiB"
 
 # Advanced options that you shouldn't touch
 # but you can touch them if you really need it.

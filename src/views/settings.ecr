@@ -38,6 +38,18 @@
                     </div>
                 </div>
               </div>
+              <div class="">
+                <label for="show_upload_speed" class="label"><%= I18n.translate(locale, "user_settings_show_upload_speed") %></label>
+                <input name="show_upload_speed" id="show_upload_speed" type="checkbox" <%= user_settings.show_upload_speed ? "checked" : "" %>>
+              </div>
+              <div class="">
+                <label for="speed_unit" class="label"><%= I18n.translate(locale, "user_settings_speed_unit") %></label>
+                <select name="speed_unit" id="speed_unit">
+                  <option value="Mbit" <%= user_settings.speed_unit == Config::SpeedUnit::Mbit ? "selected" : "" %>><%= I18n.translate(locale, "user_settings_speed_unit_mbits") %></option>
+                  <option value="MB" <%= user_settings.speed_unit == Config::SpeedUnit::MB ? "selected" : "" %>><%= I18n.translate(locale, "user_settings_speed_unit_mbs") %></option>
+                  <option value="MiB" <%= user_settings.speed_unit == Config::SpeedUnit::MiB ? "selected" : "" %>><%= I18n.translate(locale, "user_settings_speed_unit_mibs") %></option>
+                </select>
+              </div>
           </div>
 
           <br>
