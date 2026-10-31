@@ -44,7 +44,11 @@ module Utils::IpBlocks
     end
 
     def exit_nodes : Array(String)
+<<<<<<< HEAD
       return @@exit_nodes
+=======
+      @@exit_nodes
+>>>>>>> upstream/master
     end
   end
 
@@ -91,7 +95,11 @@ module Utils::IpBlocks
       begin
         res = client.get(uri.request_target)
         if res.status_code == 200
+<<<<<<< HEAD
           return res
+=======
+          res
+>>>>>>> upstream/master
         else
           Log.error &.emit("request to '#{url}' returned a non 200 status code, skipping")
           return
@@ -143,7 +151,11 @@ module Utils::IpBlocks
     end
 
     def ips : Array(String)
+<<<<<<< HEAD
       return @@ips
+=======
+      @@ips
+>>>>>>> upstream/master
     end
   end
 end
