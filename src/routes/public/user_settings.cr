@@ -34,7 +34,7 @@ module Routes::UserSettings
   end
 
   def parse_settings(new_user_settings : ::UserSettings) : ::UserSettings
-    new_user_settings.filename_length = new_user_settings.filename_length.clamp(CONFIG.min_filename_length, CONFIG.max_filename_length)
+    new_user_settings.filename_length = new_user_settings.filename_length.clamp(CONFIG.uploads.min_filename_length, CONFIG.uploads.max_filename_length)
 
     new_user_settings
   end

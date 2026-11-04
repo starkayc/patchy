@@ -15,14 +15,14 @@
           <div class="user-settings-fields">
               <div class="">
                 <label for="filename_length" class="label"><%= I18n.translate(locale, "user_settings_filename_length") %></label>
-                <input name="filename_length" id="filename_length" type="number" min="<%= CONFIG.min_filename_length %>" max="<%= CONFIG.max_filename_length %>" value="<%= user_settings.filename_length %>">
+                <input name="filename_length" id="filename_length" type="number" min="<%= CONFIG.uploads.min_filename_length %>" max="<%= CONFIG.uploads.max_filename_length %>" value="<%= user_settings.filename_length %>">
                 <div class="user-settings-description-box">
                     <div class="user-settings-description-elements">
                         <span class="">
-                            <%= I18n.translate(locale, "user_settings_filename_length_min") %>: <%= CONFIG.min_filename_length %>
+                            <%= I18n.translate(locale, "user_settings_filename_length_min") %>: <%= CONFIG.uploads.min_filename_length %>
                         </span>
                         <span class="">
-                            <%= I18n.translate(locale, "user_settings_filename_length_max") %>: <%= CONFIG.max_filename_length %>
+                            <%= I18n.translate(locale, "user_settings_filename_length_max") %>: <%= CONFIG.uploads.max_filename_length %>
                         </span>
                     </div>
                 </div>
