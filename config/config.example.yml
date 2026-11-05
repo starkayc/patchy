@@ -26,7 +26,7 @@ uploads:
   # Max length of the filename, this is going to be max value
   # that can be set in the user settings ("/-/settings")
   max_filename_length: 16
-  # Min length of the filename, this is going to be max value
+  # Min length of the filename, this is going to be min value
   # that can be set in the user settings ("/-/settings")
   min_filename_length: 5
   # File size limit in MiB

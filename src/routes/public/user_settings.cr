@@ -22,7 +22,6 @@ module Routes::UserSettings
     begin
       Log.trace &.emit("user settings body received", user_settings: env.params.body.to_s)
       new_user_settings = ::UserSettings.from_www_form(env.params.body.to_s)
-      new_user_settings = parse_settings(new_user_settings)
       Log.trace &.emit("new user settings set", new_user_settings: new_user_settings.to_json)
       env.response.cookies["PREFS"] = set_cookie("PREFS", host, new_user_settings)
     rescue
@@ -31,11 +30,5 @@ module Routes::UserSettings
     end
 
     env.redirect "/-/settings"
-  end
-
-  def parse_settings(new_user_settings : ::UserSettings) : ::UserSettings
-    new_user_settings.filename_length = new_user_settings.filename_length.clamp(CONFIG.uploads.min_filename_length, CONFIG.uploads.max_filename_length)
-
-    new_user_settings
   end
 end

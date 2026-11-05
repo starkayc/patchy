@@ -335,6 +335,12 @@ class Config
       exit(1)
     end
 
+    if config.uploads.min_filename_length < config.uploads.filename_length
+      Log.warn &.emit("Config: min_filename_length can't be less than filename_length", min_filename_length: config.uploads.min_filename_length, filename_length: config.uploads.filename_length)
+      config.uploads.min_filename_length = config.uploads.filename_length
+      Log.warn &.emit("Config: min_filename_length has been set to the current value of filename_length, make sure to set a right value!", min_filename_length: config.uploads.min_filename_length, filename_length: config.uploads.filename_length)
+    end
+
     if config.s3.enabled
       # if CONFIG.generate_thumbnails
       #   puts "Config [WARNING]: Thumbnail generation disabled when using S3! This is going to be fixed on a next release!"

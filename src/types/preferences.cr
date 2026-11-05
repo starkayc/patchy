@@ -16,4 +16,8 @@ struct UserSettings
   @[URI::Params::Field(converter: BoolMissingAsFalseConverter)]
   property show_upload_speed : Bool = CONFIG.default_user_settings.show_upload_speed
   property speed_unit : Config::SpeedUnit = CONFIG.default_user_settings.speed_unit
+
+  def after_initialize
+    @filename_length = @filename_length.clamp(CONFIG.uploads.min_filename_length, CONFIG.uploads.max_filename_length)
+  end
 end

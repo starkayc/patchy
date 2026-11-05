@@ -27,7 +27,11 @@ module Routing
   before_all do |env|
     env.set "host", env.request.headers["X-Forwarded-Host"]? || env.request.headers["Host"]? || nil
     env.set "scheme", env.request.headers["X-Forwarded-Proto"]? || "http"
-    env.set "ip", env.request.headers["X-Real-IP"]? || env.request.remote_address.as?(Socket::IPAddress).try &.address || nil
+    # https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/X-Forwarded-For
+    # The HTTP X-Forwarded-For (XFF) request header is a de-facto standard header for
+    # identifying the originating IP address of a client connecting to a web server
+    # through a proxy server.
+    env.set "ip", env.request.headers["X-Real-IP"]? || env.request.headers["X-Forwarded-For"]? || env.request.remote_address.as?(Socket::IPAddress).try &.address || nil
     env.set "user_agent", env.request.headers["User-Agent"]?
 
     user_settings = ::UserSettings.from_json("{}")
