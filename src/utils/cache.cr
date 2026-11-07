@@ -20,7 +20,11 @@ module Utils::Cache
       @max_size = CONFIG.cache.max_size,
       @max_allowed_filesize = CONFIG.cache.max_allowed_filesize,
     )
+<<<<<<< HEAD
       @cache = LRUCache(Bytes).new(max_size: @max_size, clean_interval: 1.second)
+=======
+      @cache = LRUCache(Bytes).new(max_size: @max_size, clean_interval: CONFIG.cache.clean_interval.try &.seconds)
+>>>>>>> upstream/master
       Log.info &.emit("using in memory LRU for caching")
       Log.info &.emit("files smaller than this size limit will be stored into the cache: '#{(@max_allowed_filesize * 1000).humanize_bytes}'")
       Log.info &.emit("maximum amount of files the cache can hold: #{@max_size}")
@@ -39,6 +43,7 @@ module Utils::Cache
       @cache.del(filename)
     end
 
+<<<<<<< HEAD
     def size
       @cache.size
     end
@@ -48,6 +53,17 @@ module Utils::Cache
     end
 
     def expire_listener(&block : String ->)
+=======
+    def size : Int64
+      @cache.size
+    end
+
+    def items : Array(String)
+      @cache.items
+    end
+
+    def expire_listener(&block : String ->) : Fiber
+>>>>>>> upstream/master
       @cache.on_event do |event|
         if event.event_type == LRUCache::EventType::Exp
           block.call(event.key)
@@ -77,16 +93,25 @@ module Utils::Cache
       if @client.ping
         Log.info &.emit("#{"connected to Redis compatible DB"}#{redis_url.presence ? " at '#{redis_url}'" : nil}")
         Log.info &.emit("setting 'notify-keyspace-events Ex' Redis config to inform about expired files")
+<<<<<<< HEAD
         self.notify_keyspace_events_expiration
+=======
+        notify_keyspace_events_expiration
+>>>>>>> upstream/master
       end
       Log.info &.emit("files smaller than this size limit will be stored into the cache: '#{(@max_allowed_filesize * 1000).humanize_bytes}'")
     end
 
+<<<<<<< HEAD
     private def notify_keyspace_events_expiration
+=======
+    private def notify_keyspace_events_expiration : Array(Redis::Value)? | Int64? | String?
+>>>>>>> upstream/master
       command = {"CONFIG", "SET", "notify-keyspace-events", "Ex"}
       @client.run(command)
     end
 
+<<<<<<< HEAD
     def set(filename : String, filedata : String, expire_time : UInt64?)
       begin
         @client.set(filename, filedata, ex: expire_time)
@@ -94,6 +119,13 @@ module Utils::Cache
         Log.error &.emit("failed to insert file '#{filename}' from cache", error: ex.message)
         return
       end
+=======
+    def set(filename : String, filedata : String, expire_time : UInt64?) : String?
+      @client.set(filename, filedata, ex: expire_time)
+    rescue ex
+      Log.error &.emit("failed to insert file '#{filename}' from cache", error: ex.message)
+      return
+>>>>>>> upstream/master
     end
 
     def del(filename : String) : Nil
@@ -118,6 +150,7 @@ module Utils::Cache
       @client.dbsize
     end
 
+<<<<<<< HEAD
     def items
       # TODO: Not implemented
       nil
@@ -126,6 +159,15 @@ module Utils::Cache
     def expire_listener(&block : String ->)
       @client.subscribe "__keyevent@0__:expired" do |subscription, connection|
         subscription.on_message do |channel, message|
+=======
+    def items : Array(String)
+      @client.keys
+    end
+
+    def expire_listener(&block : String ->) : Redis::Subscription
+      @client.subscribe "__keyevent@0__:expired" do |subscription, _|
+        subscription.on_message do |_, message|
+>>>>>>> upstream/master
           # message is the filename that expired
           block.call(message)
         end
@@ -133,7 +175,11 @@ module Utils::Cache
     end
   end
 
+<<<<<<< HEAD
   def init
+=======
+  def init : Fiber?
+>>>>>>> upstream/master
     return if !CONFIG.cache.enabled
 
     case CONFIG.cache.type
@@ -145,7 +191,11 @@ module Utils::Cache
       @@cache = LRU.new
     end
 
+<<<<<<< HEAD
     self.expire_listener
+=======
+    expire_listener
+>>>>>>> upstream/master
   end
 
   # NOTE: Since I have future ideas for Patchy being more distributed without a
@@ -156,7 +206,11 @@ module Utils::Cache
 
   # This event listener will listen to expire events to delete expired files
   # from the @@files Hash.
+<<<<<<< HEAD
   private def expire_listener
+=======
+  private def expire_listener : Fiber?
+>>>>>>> upstream/master
     cache = @@cache
     return if cache.nil?
 
@@ -174,7 +228,11 @@ module Utils::Cache
     end
   end
 
+<<<<<<< HEAD
   private def is_too_big_for_cache?(filename : String, filesize : Int64, max_allowed_filesize : Int32)
+=======
+  private def too_big_for_cache?(filename : String, filesize : Int64, max_allowed_filesize : Int32) : Bool
+>>>>>>> upstream/master
     if filesize > max_allowed_filesize &* 1000
       Log.debug &.emit("not caching '#{filename}', size too big to be cached", size: filesize.humanize_bytes)
       true
@@ -191,7 +249,11 @@ module Utils::Cache
     file = File.open(file_path)
     filesize = file.size
 
+<<<<<<< HEAD
     return if is_too_big_for_cache?(filename, filesize, CONFIG.cache.max_allowed_filesize)
+=======
+    return if too_big_for_cache?(filename, filesize, CONFIG.cache.max_allowed_filesize)
+>>>>>>> upstream/master
 
     if cache.is_a?(LRU)
       filedata = Bytes.new(filesize)
@@ -237,7 +299,12 @@ module Utils::Cache
     end
   end
 
+<<<<<<< HEAD
   def files
     return @@files
+=======
+  def files : Hash(String, Int64)
+    @@files
+>>>>>>> upstream/master
   end
 end

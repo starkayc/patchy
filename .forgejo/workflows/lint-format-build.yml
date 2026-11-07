@@ -1,0 +1,101 @@
+# yaml-language-server: $schema=https://www.schemastore.org/github-workflow.json
+name: Run Ameba Linter and Crystal Formatter against Patchy source code
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - "main"
+      - "master"
+    paths-ignore: &paths_ignore
+      - "*.md"
+      - LICENCE
+      - .git*
+      - screenshots/*
+      - config/**
+      - .vscode/**
+      - patchy.service
+      - docker-compose.yml
+      - docs/**
+  pull_request:
+    branches:
+      - "*"
+    paths-ignore: *paths_ignore
+
+jobs:
+  ameba-lint:
+    runs-on: ubuntu-24.04
+
+    steps:
+      - uses: actions/checkout@v7
+      - uses: https://github.com/crystal-ameba/github-action@v1
+
+  crystal-format:
+    runs-on: ubuntu-24.04
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Install Crystal
+        uses: https://github.com/crystal-lang/install-crystal@v1.9.3
+        with:
+          crystal: 1.22.0
+          token: ${{ secrets.GH_PAT }}
+
+      - name: Check Crystal formatter compliance
+        run: |
+          if ! crystal tool format --check; then
+            crystal tool format
+            git diff
+            exit 1
+          fi
+
+  test-build:
+    runs-on: ubuntu-24.04
+
+    name: "test build - crystal: ${{ matrix.crystal }}, stable: ${{ matrix.stable }}"
+
+    continue-on-error: ${{ !matrix.stable }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        stable: [true]
+        crystal:
+          - 1.18.2
+          - 1.19.2
+          - 1.20.3
+          - 1.21.1
+          - 1.22.0
+        include:
+          - crystal: nightly
+            stable: false
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Install Crystal
+        uses: https://github.com/crystal-lang/install-crystal@v1.9.3
+        with:
+          crystal: ${{ matrix.crystal }}
+          token: ${{ secrets.GH_PAT }}
+
+      - name: Cache Shards
+        uses: actions/cache@v6
+        with:
+          path: |
+            ./lib
+          key: shards-${{ hashFiles('shard.lock') }}
+
+      - name: Install Shards
+        run: |
+          # Set TZ to UTC to prevent
+          # `Unhandled exception: Invalid location name: /UTC (Time::Location::InvalidLocationNameError)`
+          # errors from shards.
+          export TZ='Etc/UTC'
+          if ! shards check; then
+            shards install --skip-postinstall --skip-executables
+          fi
+
+      - name: Build without code generation
+        run: crystal build --no-codegen --warnings all --error-on-warnings --stats --time --progress --error-trace src/patchy.cr

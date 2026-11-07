@@ -1,6 +1,18 @@
+<<<<<<< HEAD
 services:
   patchy:
     image: git.nadeko.net/fijxu/patchy:latest
+=======
+# yaml-language-server: $schema=https://raw.githubusercontent.com/compose-spec/compose-go/master/schema/compose-spec.json
+services:
+  patchy:
+    # You can use whatever image registry you want to use
+    # since Patchy pushes to git.nadeko.net and quay.io,
+    # for availability purposes.
+    image: git.nadeko.net/fijxu/patchy:latest
+    # image: quay.io/fijxu/patchy:latest
+
+>>>>>>> upstream/master
     # This program should never use that many memory and more than 50% of the cpu,
     # but feel free to adjust it acording to your requirements
     mem_limit: 512MB

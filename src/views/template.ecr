@@ -1,9 +1,17 @@
+<<<<<<< HEAD
+=======
+<%
+  user_settings = Headers.user_settings
+%>
+
+>>>>>>> upstream/master
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<<<<<<< HEAD
   <link rel="stylesheet" href="/-/assets/css/styles.css?v=<%= ASSET_COMMIT %>">
   <link rel="icon" type="image/x-icon" href="/-/assets/favicon.ico?v=<%= ASSET_COMMIT %>" />
   <link rel="icon" type="image/png" href="/-/assets/favicon.png?v=<%= ASSET_COMMIT %>" />
@@ -12,10 +20,23 @@
   <% if !CONFIG.analytics.cloudflare_token.empty? %>
   <script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "<%= CONFIG.analytics.cloudflare_token %>"}'></script>
   <% end %>
+=======
+  <link rel="stylesheet" href="/-/assets/css/default.css?v=<%= ASSET_COMMIT %>">
+  <link rel="icon" type="image/x-icon" href="/-/assets/favicon.ico?v=<%= ASSET_COMMIT %>" />
+  <link rel="icon" type="image/png" href="/-/assets/favicon.png?v=<%= ASSET_COMMIT %>" />
+  <% if CONFIG.server.no_robots %>
+    <meta name="robots" content="none" />
+  <% end %>
+  <%= yield_content "head" %>
+>>>>>>> upstream/master
 </head>
 
 <body>
   <%= content %>
 </body>
 
+<<<<<<< HEAD
 </html>
+=======
+</html>
+>>>>>>> upstream/master

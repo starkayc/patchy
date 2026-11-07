@@ -1,3 +1,7 @@
+<<<<<<< HEAD
+=======
+/* @license magnet:?xt=urn:btih:0b31508aeb0634b347b8270c7bee4d411b5d4109&dn=agpl-3.0.txt AGPL-3.0 */
+>>>>>>> upstream/master
 import UploadHistory from "./history.js";
 import { translate } from "./translations.js";
 
@@ -115,10 +119,17 @@ window.addEventListener("DOMContentLoaded", () => {
       fileinfobox.appendChild(expiresAtElement);
     }
 
+<<<<<<< HEAD
     if (CONFIG.thumbnailsEnabled && fileinfo.thumbnailLink) {
       const img = document.createElement("img");
       img.className = "img";
       img.src = fileinfo.thumbnailLink;
+=======
+    if (CONFIG.thumbnailsEnabled) {
+      const img = document.createElement("img");
+      img.className = "img";
+      img.src = `/-/thumbnail/${fileinfo.id}.jpg`;
+>>>>>>> upstream/master
 
       fileinfoContainer.appendChild(img);
     }
@@ -175,3 +186,7 @@ window.addEventListener("DOMContentLoaded", () => {
     fileHistoryContainer?.appendChild(fileinfoContainer);
   });
 });
+<<<<<<< HEAD
+=======
+/* @license-end */
+>>>>>>> upstream/master
