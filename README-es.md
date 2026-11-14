@@ -2,4 +2,8 @@
 
 ---
 
+<<<<<<< HEAD
 Por traducir...
+=======
+Por traducir...
+>>>>>>> upstream/master

@@ -33,7 +33,11 @@ module Utils::DB
         WHERE type = 'table'
         AND name = ?
       )
+<<<<<<< HEAD
     SQL
+=======
+      SQL
+>>>>>>> upstream/master
 
     SQL.query_one(request, table_name, as: Bool?)
   end

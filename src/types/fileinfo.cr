@@ -25,10 +25,17 @@ struct Fileinfo
   )
   end
 
+<<<<<<< HEAD
   def to_tuple : Tuple(String, String, String, Int64, String | Nil, String, String, String | Nil)
     {% begin %}
       {
         {{@type.instance_vars.map(&.name).splat}}
+=======
+  def to_tuple : Tuple(String, String, String, Int64, String?, String, String, String?)
+    {% begin %}
+      {
+        {{ @type.instance_vars.map(&.name).splat }}
+>>>>>>> upstream/master
       }
     {% end %}
   end

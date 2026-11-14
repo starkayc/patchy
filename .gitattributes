@@ -1,0 +1,12 @@
+*          text=auto eol=lf
+*.ecr      linguist-language=HTML
+*.ico      binary
+*.jpg      binary
+*.png      binary
+*.woff2    binary
+*.xcf      binary
+*.yaml     linguist-detectable
+*.yml      linguist-language=YAML
+.git*      linguist-language=Shell
+flake.lock linguist-language=JSON linguist-generated
+shard.lock linguist-language=YAML linguist-generated
