@@ -33,7 +33,7 @@ def http(url, method="GET", token=None, payload=None, accept="application/json")
             return json.loads(body) if body else {}
     except urllib.error.HTTPError as error:
         detail = error.read().decode(errors="replace")
-        raise SystemExit(f"{method} {url} failed: {error.code} {detail}") from error
+        raise RuntimeError(f"{method} {url} failed: {error.code} {detail}") from error
 
 
 def signature_digest(tag):
@@ -62,7 +62,7 @@ def prune_dockerhub():
 
     by_name = {tag["name"]: tag for tag in tags}
     if "latest" not in by_name:
-        raise SystemExit("Docker Hub: latest tag not found")
+        raise RuntimeError("Docker Hub: latest tag not found")
 
     latest_digest = by_name["latest"].get("digest")
     keep = set(KEEP_TAGS) | {"latest"}
@@ -74,7 +74,15 @@ def prune_dockerhub():
     print(f"Docker Hub: keeping {', '.join(sorted(keep))}")
     for name in stale:
         if APPLY:
-            http(f"https://hub.docker.com/v2/repositories/{repo}/tags/{name}/", "DELETE", token=jwt)
+            try:
+                http(f"https://hub.docker.com/v2/repositories/{repo}/tags/{name}/", "DELETE", token=jwt)
+            except RuntimeError as error:
+                if "insufficient scope" in str(error):
+                    raise RuntimeError(
+                        "Docker Hub token cannot delete tags. Give the DOCKER_TOKEN access "
+                        "token the Delete permission in Docker Hub account settings."
+                    ) from error
+                raise
             print(f"Docker Hub: deleted {name}")
         else:
             print(f"Docker Hub: would delete {name}")
@@ -108,7 +116,7 @@ def prune_ghcr():
 
     latest = next((version for version in versions if "latest" in tags_of(version)), None)
     if latest is None:
-        raise SystemExit("GHCR: latest version not found")
+        raise RuntimeError("GHCR: latest version not found")
 
     keep_tags = set(KEEP_TAGS) | {"latest"}
     keep_digests = {latest["name"]}
@@ -142,9 +150,16 @@ def prune_ghcr():
 
 def main():
     print("mode:", "apply" if APPLY else "dry-run")
-    prune_dockerhub()
-    prune_ghcr()
+    failed = []
+    for name, prune in (("Docker Hub", prune_dockerhub), ("GHCR", prune_ghcr)):
+        try:
+            prune()
+        except RuntimeError as error:
+            print(f"{name}: {error}", file=sys.stderr)
+            failed.append(name)
+    if failed:
+        raise SystemExit(f"prune failed for: {', '.join(failed)}")
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    main()
