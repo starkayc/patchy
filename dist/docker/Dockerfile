@@ -20,6 +20,11 @@ COPY ./locales/ ./locales/
 
 RUN esbuild "./public/-/assets/js/*" --color=false --sourcemap --minify --outdir="./public/-/assets/js-m"
 
+# Passed from CI so the Crystal compile-time macro gets the real branch name
+# even when the checkout is in detached HEAD state (e.g. GitHub Actions).
+ARG CURRENT_BRANCH
+ENV CURRENT_BRANCH=${CURRENT_BRANCH}
+
 ARG RELEASE
 RUN --mount=type=cache,target=/root/.cache/crystal if [[ "${RELEASE}" == 1 ]] ; then \
   crystal build ./src/patchy.cr \

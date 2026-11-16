@@ -10,7 +10,7 @@ module Routes::Views
 
   IMAGE_EXTENSIONS = Set{".png", ".jpg", ".gif", ".webp", ".jpeg", ".bmp", ".tiff", ".jfif", ".avif", ".jxl"}
   VIDEO_EXTENSIONS = Set{".mp4", ".m4v", ".webm", ".avi", ".mov", ".ogv", ".mkv"}
-  AUDIO_EXTENSIONS = Set{".flac", ".wav", ".mp3", ".acc", ".ogg", ".opus", ".m4a"}
+  AUDIO_EXTENSIONS = Set{".flac", ".wav", ".mp3", ".aac", ".ogg", ".opus", ".m4a"}
 
   def index(env : HTTP::Server::Context) : String
     locale = Headers.locale

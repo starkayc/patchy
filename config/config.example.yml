@@ -53,6 +53,11 @@ uploads:
     # You shouldn't change this value, unless you know what you are doing!
     buffer_size: 131072
 
+# Analytics
+analytics:
+  # Cloudflare Web Analytics beacon token (keep this out of version control)
+  cloudflare_token: ""
+
 # http server
 server:
   port: 8080
@@ -198,3 +203,9 @@ advanced:
   gc:
     enabled: true
     interval: 10
+
+# Last.fm integration for fetching album art on the audio player.
+# Get a free API key at https://www.last.fm/api/account/create
+# lastfm:
+#   enabled: false
+#   api_key: ""

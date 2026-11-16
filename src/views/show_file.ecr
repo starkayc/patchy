@@ -31,13 +31,273 @@
 <meta property="og:audio:secure_url" content="<%= scheme %>://<%= host %>/-/file/<%= full_filename %>">
 <meta property="og:audio:type" content="<%= mime_type %>">
 <% end %>
+<% if filetype == Filetype::Audio %>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const audio    = document.getElementById('audio-el');
+  const playBtn  = document.getElementById('ap-play');
+  const elapsed  = document.getElementById('ap-elapsed');
+  const dur      = document.getElementById('ap-duration');
+  const progress = document.getElementById('ap-progress');
+  const fill     = document.getElementById('ap-fill');
+  const thumb    = document.getElementById('ap-thumb');
+  const volSlider = document.getElementById('ap-vol');
+  const volFill  = document.getElementById('ap-vol-fill');
+  const artImg   = document.getElementById('ap-art');
+  const artWrap  = document.getElementById('ap-art-placeholder');
+  const artistEl = document.getElementById('ap-artist');
+  const pageBg   = document.getElementById('ap-page-bg');
+  const canvas   = document.getElementById('ap-canvas');
+  const player   = document.getElementById('audio-player');
+  const lastfmKey  = player.dataset.lastfmKey;
+  const embeddedArt = player.dataset.thumbnail;
+  const waveCanvas = document.getElementById('ap-waveform');
+  const wctx = waveCanvas ? waveCanvas.getContext('2d') : null;
+  let analyser = null, audioCtx = null, waveRaf = null, waveRunning = false;
+  let artSeq = 0;
 
+  function setupAnalyser() {
+    if (analyser) return;
+    try {
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      const src = audioCtx.createMediaElementSource(audio);
+      analyser = audioCtx.createAnalyser();
+      analyser.fftSize = 64;
+      analyser.smoothingTimeConstant = 0.82;
+      src.connect(analyser);
+      analyser.connect(audioCtx.destination);
+    } catch(e) {}
+  }
+
+  function drawWaveform(playing) {
+    if (!wctx || !waveCanvas) return;
+    const dpr = window.devicePixelRatio || 1;
+    const W = waveCanvas.offsetWidth * dpr;
+    const H = waveCanvas.offsetHeight * dpr;
+    if (W <= 0 || H <= 0) return;
+    if (waveCanvas.width !== W || waveCanvas.height !== H) {
+      waveCanvas.width = W;
+      waveCanvas.height = H;
+    }
+    wctx.clearRect(0, 0, W, H);
+    const N = 36;
+    const accent = getComputedStyle(player).getPropertyValue('--ap-accent').trim() || '#fc3c44';
+    let bins;
+    if (analyser && playing) {
+      bins = new Uint8Array(analyser.frequencyBinCount);
+      analyser.getByteFrequencyData(bins);
+    }
+    const gap = 2.5 * dpr;
+    const barW = (W - gap * (N - 1)) / N;
+    for (let i = 0; i < N; i++) {
+      let amp;
+      if (bins) {
+        const idx = Math.floor((i / N) * bins.length * 0.75);
+        amp = bins[idx] / 255;
+      } else {
+        amp = 0.04 + 0.02 * Math.sin(Date.now() / 1200 + i * 0.45);
+      }
+      const h = Math.max(2 * dpr, amp * H);
+      const x = i * (barW + gap);
+      const y = (H - h) / 2;
+      wctx.fillStyle = accent;
+      wctx.globalAlpha = playing ? Math.max(0.2, amp * 0.85 + 0.15) : 0.18;
+      const r = Math.min(barW / 2, 3 * dpr);
+      wctx.beginPath();
+      if (wctx.roundRect) { wctx.roundRect(x, y, barW, h, r); }
+      else { wctx.rect(x, y, barW, h); }
+      wctx.fill();
+    }
+  }
+
+  function tickWave() {
+    if (!waveRunning) return;
+    drawWaveform(true);
+    waveRaf = requestAnimationFrame(tickWave);
+  }
+
+  function startWaveAnim() {
+    waveRunning = true;
+    if (!waveRaf) tickWave();
+  }
+
+  function pauseWaveAnim() {
+    waveRunning = false;
+    if (waveRaf) { cancelAnimationFrame(waveRaf); waveRaf = null; }
+    drawWaveform(false);
+  }
+
+  drawWaveform(false); // draw idle state on load
+  audio.addEventListener('play',  () => { startWaveAnim(); artImg.classList.add('playing'); artWrap.classList.add('playing'); });
+  audio.addEventListener('pause', () => { pauseWaveAnim(); artImg.classList.remove('playing'); artWrap.classList.remove('playing'); });
+  window.addEventListener('resize', () => { if (!waveRunning) drawWaveform(false); });
+
+  const SVG_PLAY  = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>';
+  const SVG_PAUSE = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>';
+  playBtn.innerHTML = SVG_PLAY;
+
+  function fmt(s) {
+    if (!isFinite(s)) return '0:00';
+    return Math.floor(s/60) + ':' + String(Math.floor(s%60)).padStart(2,'0');
+  }
+
+  function extractColor(img) {
+    try {
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, 20, 20);
+      const d = ctx.getImageData(0, 0, 20, 20).data;
+      let bH=0, bS=0;
+      for (let i=0; i<d.length; i+=4) {
+        const r=d[i]/255, g=d[i+1]/255, b=d[i+2]/255;
+        const mx=Math.max(r,g,b), mn=Math.min(r,g,b), l=(mx+mn)/2;
+        if (mx!==mn) {
+          const s = l>0.5 ? (mx-mn)/(2-mx-mn) : (mx-mn)/(mx+mn);
+          if (s>bS) {
+            bS=s;
+            bH = mx===r ? ((g-b)/(mx-mn)+6)%6 : mx===g ? (b-r)/(mx-mn)+2 : (r-g)/(mx-mn)+4;
+          }
+        }
+      }
+      return bS > 0.15 ? `hsl(${bH*60},${Math.min(bS*100+15,85)}%,60%)` : null;
+    } catch(e) { return null; }
+  }
+
+  function applyArt(url) {
+    const seq = ++artSeq;
+    artImg.onload = () => {
+      if (seq !== artSeq) return;
+      artImg.style.display = 'block';
+      artWrap.style.display = 'none';
+      const mediaContainer = document.querySelector('.media-container');
+      if (pageBg) {
+        pageBg.style.backgroundImage = `url('${url}')`;
+        pageBg.classList.add('has-art');
+      }
+      if (mediaContainer) mediaContainer.classList.add('has-art');
+      const color = extractColor(artImg);
+      if (color) {
+        player.style.setProperty('--ap-accent', color);
+      }
+    };
+    artImg.onerror = () => {};
+    artImg.src = url;
+  }
+
+  // Use embedded cover art when available; only fall back to Last.fm when there is none
+  if (embeddedArt) applyArt(embeddedArt);
+
+  if (lastfmKey && !embeddedArt) {
+    const raw       = document.getElementById('ap-title').textContent;
+    const trackName = raw.replace(/\.\w{1,5}$/, '').replace(/^[\[(]?\d+(?:-\d+)?[\])]?[-._\s]+/, '').trim();
+    const q         = encodeURIComponent(trackName);
+    const PLACEHOLDER = '2a96cbd8b46e442fc41c2b86b821562f';
+
+    function bestImage(images) {
+      // Walk all sizes (small→extralarge), keep last non-empty non-placeholder URL
+      // Mirrors getBestImage() from the OBS overlay — last entry is always the largest
+      let url = '';
+      for (const img of (images || [])) {
+        if (img['#text'] && !img['#text'].includes(PLACEHOLDER)) url = img['#text'];
+      }
+      return url;
+    }
+
+    // Step 1: track.search → canonical name, artist, and MBID
+    fetch(`https://ws.audioscrobbler.com/2.0/?method=track.search&track=${q}&api_key=${lastfmKey}&format=json&limit=1`)
+      .then(r => r.json())
+      .then(data => {
+        const result = data?.results?.trackmatches?.track?.[0];
+        if (!result) return;
+
+        const artist    = result.artist || '';
+        const canonical = result.name   || trackName; // use Last.fm's own name, not the filename
+        const mbid      = result.mbid;
+
+        if (artist) artistEl.textContent = artist;
+
+        // Step 2: track.getInfo — prefer MBID (no name ambiguity), fall back to name+artist
+        const infoParams = mbid
+          ? `mbid=${encodeURIComponent(mbid)}`
+          : `track=${encodeURIComponent(canonical)}&artist=${encodeURIComponent(artist)}&autocorrect=1`;
+
+        return fetch(`https://ws.audioscrobbler.com/2.0/?method=track.getInfo&${infoParams}&api_key=${lastfmKey}&format=json`)
+          .then(r => r.json())
+          .then(info => {
+            const url = bestImage(info?.track?.album?.image);
+            if (url) { applyArt(url); return; }
+
+            // Step 3: fall back to artist image — mirrors track.artist.image in the OBS overlay
+            if (!artist) return;
+            return fetch(`https://ws.audioscrobbler.com/2.0/?method=artist.getInfo&artist=${encodeURIComponent(artist)}&api_key=${lastfmKey}&format=json&autocorrect=1`)
+              .then(r => r.json())
+              .then(aInfo => {
+                const aUrl = bestImage(aInfo?.artist?.image);
+                if (aUrl) applyArt(aUrl);
+              });
+          });
+      })
+      .catch(() => {});
+  }
+
+  function updateDuration() {
+    if (isFinite(audio.duration) && audio.duration > 0) dur.textContent = '-' + fmt(audio.duration);
+  }
+  audio.addEventListener('loadedmetadata', updateDuration);
+  audio.addEventListener('durationchange', updateDuration);
+  audio.addEventListener('canplay', updateDuration);
+  // Metadata may already be loaded if the browser cached the file
+  if (audio.readyState >= 1) updateDuration();
+
+  audio.addEventListener('timeupdate', () => {
+    elapsed.textContent = fmt(audio.currentTime);
+    dur.textContent = audio.duration ? '-' + fmt(audio.duration - audio.currentTime) : '--:--';
+    const pct = audio.duration ? (audio.currentTime / audio.duration) * 100 : 0;
+    fill.style.width = pct + '%';
+    thumb.style.left = pct + '%';
+  });
+
+  audio.addEventListener('ended', () => { playBtn.innerHTML = SVG_PLAY; pauseWaveAnim(); artImg.classList.remove('playing'); artWrap.classList.remove('playing'); });
+
+  playBtn.addEventListener('click', () => {
+    setupAnalyser();
+    if (audio.paused) { audio.play(); playBtn.innerHTML = SVG_PAUSE; }
+    else              { audio.pause(); playBtn.innerHTML = SVG_PLAY; }
+  });
+
+  let scrubbing = false;
+  function scrubTo(e) {
+    if (!audio.duration) return;
+    const rect = progress.getBoundingClientRect();
+    const x = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left;
+    fill.style.transition = 'none';
+    audio.currentTime = Math.max(0, Math.min(1, x / rect.width)) * audio.duration;
+  }
+  progress.addEventListener('mousedown',  e => { scrubbing = true; scrubTo(e); });
+  progress.addEventListener('touchstart', e => { scrubbing = true; scrubTo(e); }, { passive: true });
+  window.addEventListener('mousemove',  e => { if (scrubbing) scrubTo(e); });
+  window.addEventListener('touchmove',  e => { if (scrubbing) scrubTo(e); }, { passive: true });
+  window.addEventListener('mouseup',  () => { scrubbing = false; fill.style.transition = ''; });
+  window.addEventListener('touchend', () => { scrubbing = false; fill.style.transition = ''; });
+
+  volSlider.addEventListener('input', () => {
+    audio.volume = volSlider.value;
+    volFill.style.width = (volSlider.value * 100) + '%';
+  });
+  volFill.style.width = '100%';
+
+  <% if CONFIG.views.show_file.autoplay_audio %>
+  setupAnalyser();
+  audio.play().then(() => playBtn.innerHTML = SVG_PAUSE).catch(() => {});
+  <% end %>
+});
+</script>
+<% end %>
 <% end %>
 
 <div class="media-container">
   <div class="navbar">
-    <a href='/'><%= I18n.translate(locale, "go_back") %></a>
-    <a href='/-/file/<%= filename_ %>' download=''><%= I18n.translate(locale, "download_file") %> (<%= original_filename_ %>)</a>
+    <a href='/'>← <%= I18n.translate(locale, "go_back") %></a>
+    <a href='/-/file/<%= filename_ %>' download=''>⬇ <%= I18n.translate(locale, "download_file") %> (<%= original_filename_ %>)</a>
     <%
       # Disable view button for .html
       if fileinfo.extension != ".html"
@@ -74,17 +334,67 @@
         Your browser does not support the video tag.
       </video>
     <% elsif filetype == Filetype::Audio %>
-      <% if thumbnail %>
-        <img class="media-audio-img" src="/-/thumbnail/<%= thumbnail %>">
-      <% end %>
-      <audio class="content" controls <%= CONFIG.views.show_file.autoplay_audio ? "autoplay" : "" %>>
-        <source src="/-/file/<%= filename_ %>" type="<%= mime_type %>">
-        Your browser does not support the audio tag.
-      </audio>
+      <audio id="audio-el" src="/-/file/<%= filename_ %>" preload="metadata"></audio>
+      <div id="ap-page-bg" class="ap-page-bg"></div>
+      <div class="audio-player" id="audio-player"
+        data-lastfm-key="<%= CONFIG.lastfm.enabled ? CONFIG.lastfm.api_key : "" %>"
+        data-thumbnail="<%= fileinfo.thumbnail ? "/-/thumbnail/#{fileinfo.thumbnail}" : "" %>">
+        <canvas id="ap-canvas" width="20" height="20" style="display:none"></canvas>
+        <img id="ap-art" class="ap-art-img" alt="Album art" crossorigin="anonymous" style="display:none">
+        <div id="ap-art-placeholder" class="ap-art-placeholder">
+          <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="24" cy="24" r="22" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.12)" stroke-width="1.5"/>
+            <circle cx="24" cy="24" r="18" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="0.75"/>
+            <circle cx="24" cy="24" r="14" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+            <circle cx="24" cy="24" r="10" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="0.75"/>
+            <circle cx="24" cy="24" r="6"  fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.10)" stroke-width="1"/>
+            <circle cx="24" cy="24" r="2.5" fill="rgba(255,255,255,0.35)"/>
+          </svg>
+        </div>
+        <div class="ap-scrub">
+          <span id="ap-elapsed" class="ap-time">--:--</span>
+          <div id="ap-progress" class="ap-bar">
+            <div id="ap-fill" class="ap-bar-fill"></div>
+            <div id="ap-thumb" class="ap-bar-thumb"></div>
+          </div>
+          <span id="ap-duration" class="ap-time">--:--</span>
+        </div>
+        <div class="ap-meta">
+          <div class="ap-title" id="ap-title"><%= original_filename_ %></div>
+          <div class="ap-artist" id="ap-artist"></div>
+        </div>
+        <canvas id="ap-waveform" class="ap-waveform" aria-hidden="true"></canvas>
+        <div class="ap-controls">
+          <button id="ap-play" class="ap-play-btn" aria-label="Play / Pause"></button>
+        </div>
+        <div class="ap-volume">
+          <svg class="ap-vol-icon" viewBox="0 0 20 20">
+            <path d="M9 4L5 7.5H2v5h3L9 16V4zm4.07 1.93a7 7 0 010 12.14M11.54 7.46a4 4 0 010 5.08"/>
+          </svg>
+          <div class="ap-vol-track">
+            <div id="ap-vol-fill" class="ap-vol-fill"></div>
+            <input id="ap-vol" class="ap-vol-input" type="range" min="0" max="1" step="0.01" value="1">
+          </div>
+        </div>
+      </div>
     <% else %>
       <div class="file-no-display">
-        <p><%= I18n.translate(locale, "file_cannot_be_displayed") %></p>
-        <a href='/-/file/<%= filename_ %>' download=''><%= I18n.translate(locale, "download_file") %> (<%= original_filename_ %>)</a>
+        <div class="fnd-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/>
+          </svg>
+        </div>
+        <p class="fnd-title"><%= original_filename_ %></p>
+        <p class="fnd-sub"><%= I18n.translate(locale, "file_cannot_be_displayed") %></p>
+        <a class="fnd-btn" href='/-/file/<%= filename_ %>' download=''>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="7 10 12 15 17 10"/>
+            <line x1="12" y1="15" x2="12" y2="3"/>
+          </svg>
+          <%= I18n.translate(locale, "download_file") %>
+        </a>
       </div>
     <% end %>
   </div>

@@ -9,13 +9,16 @@ module Utils::Thumbnails
       Set{".heic", ".crw", ".dng", ".wmv", ".flv", ".amv", ".3gp", ".mpg", ".mpeg", ".yuv", ".ogv"}
 
   def generate_thumbnail(filename : String, extension : String, background_generation : Bool) : String?
+    ext = extension.downcase
+    is_audio = Routes::Views::AUDIO_EXTENSIONS.includes?(ext)
+
     if !CONFIG.thumbnail_generation.enabled ||
-       ALLOWED_EXTENSIONS.none? { |ext| extension.downcase.includes?(ext) }
+       ALLOWED_EXTENSIONS.none? { |allowed| ext.includes?(allowed) }
       return
     end
 
     Log.debug &.emit("generating thumbnail for #{filename + extension}", background_generation: background_generation)
-    process = generate(filename, extension, CONFIG.thumbnail_generation.resolution)
+    process = is_audio ? generate_audio_cover(filename, extension) : generate(filename, extension, CONFIG.thumbnail_generation.resolution)
 
     if process.success?
       Log.debug &.emit("thumbnail for '#{filename + extension}' generated successfully")
@@ -23,6 +26,18 @@ module Utils::Thumbnails
     else
       Log.debug &.emit("failed to generate thumbnail for '#{filename + extension}'. Exit code of ffmpeg: #{process.exit_code}")
     end
+  end
+
+  private def generate_audio_cover(filename : String, extension : String) : Process::Status
+    arguments = [
+      "-hide_banner",
+      "-i", "#{CONFIG.storage.files}/#{filename + extension}",
+      "-map", "0:v:0",
+      "-frames:v", "1",
+      "-y",
+      "#{CONFIG.storage.thumbnails}/#{filename}.jpg",
+    ]
+    Process.run("ffmpeg", arguments)
   end
 
   private def generate(filename : String, extension : String, resolution : Config::ThumbnailGeneration::Resolution) : Process::Status

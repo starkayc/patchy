@@ -27,8 +27,17 @@ window.addEventListener("DOMContentLoaded", () => {
 
   const dropAreaText = document.createElement("p");
   dropAreaText.textContent = translate_uploadText;
+  dropAreaText.className = "drop-area-text";
   dropArea?.appendChild(dropAreaText);
   fileInput?.setAttribute("multiple", "");
+
+  const sizeLimit = dropArea?.dataset.sizeLimit;
+  if (sizeLimit) {
+    const dropAreaSub = document.createElement("p");
+    dropAreaSub.textContent = `Max file size: ${sizeLimit}`;
+    dropAreaSub.className = "drop-area-limit";
+    dropArea?.appendChild(dropAreaSub);
+  }
   dropArea?.addEventListener("click", () => fileInput?.click());
 
   fileInput?.addEventListener(
@@ -36,6 +45,7 @@ window.addEventListener("DOMContentLoaded", () => {
     () => {
       const files = fileInput.files;
       handleFiles(files);
+      fileInput.value = "";
     },
     false,
   );
@@ -268,7 +278,6 @@ window.addEventListener("DOMContentLoaded", () => {
   function copyToClipboard(text, copyButton) {
     navigator.clipboard.writeText(text);
     const prevState = copyButton.innerHTML;
-    copyButton.innerHTML = translate_LinkCopied;
     copyButton.innerHTML = translate_LinkCopied;
     setTimeout(() => {
       copyButton.innerHTML = prevState;
