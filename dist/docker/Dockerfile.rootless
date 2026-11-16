@@ -79,7 +79,9 @@ COPY --from=runtime-deps --chown=65532:65532 /tmp /tmp
 ENV UPLOADER_STORAGE="{files: /data/files, thumbnails: /data/thumbnails, db: /data/db}"
 ENV PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
 
-WORKDIR /app
+# Keep the config lookup path (config/config.yml) identical to the default
+# image. The binary itself lives at /app/patchy.
+WORKDIR /patchy
 
 EXPOSE 8080
 
