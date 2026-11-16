@@ -69,7 +69,7 @@ RUN mkdir -p /rootfs \
 
 FROM gcr.io/distroless/base-debian12:nonroot
 
-COPY --from=builder /patchy/patchy /patchy/patchy
+COPY --from=builder /patchy/patchy /app/patchy
 COPY --from=runtime-deps /rootfs/ /
 COPY --from=runtime-deps --chown=65532:65532 /data /data
 COPY --from=runtime-deps --chown=65532:65532 /tmp /tmp
@@ -78,7 +78,7 @@ COPY --from=runtime-deps --chown=65532:65532 /tmp /tmp
 ENV UPLOADER_STORAGE="{files: /data/files, thumbnails: /data/thumbnails, db: /data/db}"
 ENV PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
 
-WORKDIR /patchy
+WORKDIR /app
 
 EXPOSE 8080
 
@@ -86,4 +86,4 @@ USER 65532:65532
 
 ENTRYPOINT ["/usr/bin/tini", "--"]
 
-CMD ["/patchy/patchy"]
+CMD ["/app/patchy"]

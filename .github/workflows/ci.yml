@@ -101,6 +101,18 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
+      - name: Install cosign
+        if: github.event_name != 'pull_request'
+        uses: sigstore/cosign-installer@v3
+
+      - name: Sign main image
+        if: github.event_name != 'pull_request'
+        env:
+          DIGEST: ${{ steps.build.outputs.digest }}
+        run: |
+          cosign sign --yes "starkayc/patchy@${DIGEST}"
+          cosign sign --yes "ghcr.io/${{ github.repository }}@${DIGEST}"
+
       - name: Docker meta (rootless)
         id: meta-rootless
         if: github.event_name != 'pull_request'
@@ -135,6 +147,8 @@ jobs:
           set -euo pipefail
           IMAGE=patchy-rootless:test
           docker run --rm --entrypoint /usr/bin/ffmpeg "$IMAGE" -version >/dev/null
+          UPLOAD=/tmp/patchy-upload.txt
+          printf 'hello patchy\n' > "$UPLOAD"
           rm -rf /tmp/patchy-smoke && mkdir -p /tmp/patchy-smoke
           sudo chown -R 65532:65532 /tmp/patchy-smoke
           docker run -d --name patchy-rootless -p 18080:8080 \
@@ -146,10 +160,9 @@ jobs:
             sleep 1
           done
           if [ "$ready" -ne 1 ]; then docker logs patchy-rootless; exit 1; fi
-          printf 'hello patchy\n' > /tmp/patchy-smoke/upload.txt
-          curl -fsS -F "file=@/tmp/patchy-smoke/upload.txt" \
-            http://127.0.0.1:18080/-/upload > /tmp/patchy-smoke/response.json
-          grep -q '"link"' /tmp/patchy-smoke/response.json
+          curl -fsS -F "file=@${UPLOAD}" \
+            http://127.0.0.1:18080/-/upload > /tmp/patchy-response.json
+          grep -q '"link"' /tmp/patchy-response.json
 
       - name: Build and push rootless image
         id: build-rootless
@@ -170,17 +183,10 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-      - name: Install cosign
-        if: github.event_name != 'pull_request'
-        uses: sigstore/cosign-installer@v3
-
-      - name: Sign published images
+      - name: Sign rootless image
         if: github.event_name != 'pull_request'
         env:
-          DIGEST: ${{ steps.build.outputs.digest }}
-          ROOTLESS_DIGEST: ${{ steps.build-rootless.outputs.digest }}
+          DIGEST: ${{ steps.build-rootless.outputs.digest }}
         run: |
           cosign sign --yes "starkayc/patchy@${DIGEST}"
           cosign sign --yes "ghcr.io/${{ github.repository }}@${DIGEST}"
-          cosign sign --yes "starkayc/patchy@${ROOTLESS_DIGEST}"
-          cosign sign --yes "ghcr.io/${{ github.repository }}@${ROOTLESS_DIGEST}"
