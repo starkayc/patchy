@@ -69,7 +69,7 @@ RUN mkdir -p /rootfs \
 
 FROM gcr.io/distroless/base-debian12:nonroot
 
-COPY --from=builder /patchy/patchy /patchy
+COPY --from=builder /patchy/patchy /patchy/patchy
 COPY --from=runtime-deps /rootfs/ /
 COPY --from=runtime-deps --chown=65532:65532 /data /data
 COPY --from=runtime-deps --chown=65532:65532 /tmp /tmp
