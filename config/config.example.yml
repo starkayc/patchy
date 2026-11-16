@@ -14,6 +14,11 @@ files_per_ip: 32
 rate_limit_period: 20
 filename_length: 5
 
+# Analytics
+analytics:
+  # Cloudflare Web Analytics beacon token (keep this out of version control)
+  cloudflare_token: ""
+
 # In hours (168 = 7 days)
 delete_files_after: 168
 # In seconds
@@ -136,3 +141,9 @@ blocked_extensions:
   - "exe"
 # alternative_domains:
 #   - "example.com"
+
+# Last.fm integration for fetching album art on the audio player.
+# Get a free API key at https://www.last.fm/api/account/create
+# lastfm:
+#   enabled: false
+#   api_key: ""

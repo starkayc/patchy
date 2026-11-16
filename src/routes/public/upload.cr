@@ -31,7 +31,7 @@ module Routes::Upload
       @link_ext = "#{scheme}://#{host}/#{fileinfo.filename}#{fileinfo.extension}"
       @direct_link = "#{scheme}://#{host}/-/file/#{fileinfo.filename}"
       @direct_link_ext = "#{scheme}://#{host}/-/file/#{fileinfo.filename}#{fileinfo.extension}"
-      @thumbnail_link = "#{scheme}://#{host}/-/thumbnail/#{fileinfo.thumbnail}"
+      @thumbnail_link = fileinfo.thumbnail ? "#{scheme}://#{host}/-/thumbnail/#{fileinfo.thumbnail}" : nil
       @id = fileinfo.filename
       @ext = fileinfo.extension
       @name = fileinfo.original_filename

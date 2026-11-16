@@ -219,8 +219,30 @@ class Config
   # The lenght of the delete key
   property delete_key_length : Int32 = 6
 
+  property analytics : Analytics = Analytics.from_yaml("")
+
+  struct Analytics
+    include YAML::Serializable
+
+    # Cloudflare Web Analytics beacon token.
+    # Leave empty to disable Cloudflare analytics.
+    property cloudflare_token : String = ""
+  end
+
   # Abuse email that is going to be displayed on the website of the uploader
   property abuse_email : String = ""
+
+  # Last.fm integration for fetching album art on the audio player.
+  property lastfm : LastFM = LastFM.from_yaml("")
+
+  struct LastFM
+    include YAML::Serializable
+
+    # Set to true and provide an api_key to enable Last.fm album art fetching.
+    # Get a free API key at https://www.last.fm/api/account/create
+    property enabled : Bool = false
+    property api_key : String = ""
+  end
 
   # Blocked extensions that are not allowed to be uploaded to the server
   property blocked_extensions : Array(String) = [] of String

@@ -115,10 +115,10 @@ window.addEventListener("DOMContentLoaded", () => {
       fileinfobox.appendChild(expiresAtElement);
     }
 
-    if (CONFIG.thumbnailsEnabled) {
+    if (CONFIG.thumbnailsEnabled && fileinfo.thumbnailLink) {
       const img = document.createElement("img");
       img.className = "img";
-      img.src = `/-/thumbnail/${fileinfo.id}.jpg`;
+      img.src = fileinfo.thumbnailLink;
 
       fileinfoContainer.appendChild(img);
     }
