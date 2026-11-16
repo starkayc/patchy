@@ -11,52 +11,40 @@ jobs:
     timeout-minutes: 10
 
     steps:
-      - name: Delete stale tags
+      - name: Delete stale GHCR versions
         env:
-          DOCKERHUB_USER: ${{ secrets.DOCKER_NAME }}
-          DOCKERHUB_TOKEN: ${{ secrets.DOCKER_TOKEN }}
-          GHCR_USER: ${{ github.actor }}
           GHCR_TOKEN: ${{ secrets.GHCR_TOKEN }}
-          TAGS: >-
-            2026.11.16-2847d83
-            2026.11.16-e8eca32
-            2026.11.16-efe4d33
-            2026.11.16-6f1e7a4
-            sha256-2b05547ca65fec61fab0403bd3089da63d3db83322a0109dcfcf829812d58097.sig
+          TARGETS: >-
+            ["2026.11.16-e8eca32","2026.11.16-efe4d33","2026.11.16-6f1e7a4",
+            "sha256-2b05547ca65fec61fab0403bd3089da63d3db83322a0109dcfcf829812d58097.sig"]
         run: |
           set -euo pipefail
 
-          DH_TOKEN=$(curl -fsS -X POST https://hub.docker.com/v2/users/login/ \
-            -H 'Content-Type: application/json' \
-            -d "{\"username\":\"${DOCKERHUB_USER}\",\"password\":\"${DOCKERHUB_TOKEN}\"}" \
-            | jq -r .token)
+          page=1
+          while :; do
+            response=$(curl -fsS \
+              -H "Authorization: Bearer ${GHCR_TOKEN}" \
+              -H "Accept: application/vnd.github+json" \
+              "https://api.github.com/user/packages/container/patchy/versions?per_page=100&page=${page}")
 
-          GH_TOKEN=$(curl -fsS -u "${GHCR_USER}:${GHCR_TOKEN}" \
-            "https://ghcr.io/token?service=ghcr.io&scope=repository:starkayc/patchy:delete" \
-            | jq -r .token)
+            count=$(echo "$response" | jq 'length')
+            ids=$(echo "$response" | jq -r --argjson targets "$TARGETS" '
+              [ .[] | select((.metadata.container.tags // []) as $tags
+                | $tags | any(. as $t | $targets | index($t))) | .id ] | unique | .[]')
 
-          for tag in $TAGS; do
-            if curl -fsS -o /dev/null -X DELETE \
-              -H "Authorization: Bearer ${DH_TOKEN}" \
-              "https://hub.docker.com/v2/repositories/starkayc/patchy/tags/${tag}/"; then
-              echo "DockerHub: deleted ${tag}"
-            else
-              echo "DockerHub: skipped ${tag}"
-            fi
+            for id in $ids; do
+              tags=$(echo "$response" | jq -r --argjson id "$id" '.[] | select(.id == $id) | (.metadata.container.tags // []) | join(",")')
+              if curl -fsS -o /dev/null -X DELETE \
+                -H "Authorization: Bearer ${GHCR_TOKEN}" \
+                -H "Accept: application/vnd.github+json" \
+                "https://api.github.com/user/packages/container/patchy/versions/${id}"; then
+                echo "GHCR: deleted version ${id} (${tags})"
+              else
+                echo "GHCR: failed to delete version ${id} (${tags})"
+                exit 1
+              fi
+            done
 
-            digest=$(curl -fsSI \
-              -H "Authorization: Bearer ${GH_TOKEN}" \
-              -H "Accept: application/vnd.oci.image.index.v1+json, application/vnd.docker.distribution.manifest.list.v2+json, application/vnd.oci.image.manifest.v1+json, application/vnd.docker.distribution.manifest.v2+json" \
-              "https://ghcr.io/v2/starkayc/patchy/manifests/${tag}" \
-              | tr -d '\r' | awk -F': ' 'tolower($1) == "docker-content-digest" { print $2 }' || true)
-
-            if [ -n "${digest}" ]; then
-              curl -fsS -o /dev/null -X DELETE \
-                -H "Authorization: Bearer ${GH_TOKEN}" \
-                "https://ghcr.io/v2/starkayc/patchy/manifests/${digest}" \
-                && echo "GHCR: deleted ${tag}" \
-                || echo "GHCR: skipped ${tag}"
-            else
-              echo "GHCR: skipped ${tag} (not found)"
-            fi
+            [ "$count" -lt 100 ] && break
+            page=$((page + 1))
           done
