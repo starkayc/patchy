@@ -21,7 +21,3 @@ public/-/assets/js-m
 
 # graphify
 graphify-out
-
-# Python bytecode
-__pycache__/
-*.py[cod]
