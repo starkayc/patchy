@@ -1,22 +1,79 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/compose-spec/compose-go/master/schema/compose-spec.json
+#
+# Deployment used on Leona. Before the first `up -d`:
+#   docker volume create patchy-data patchy-valkey
+#   mkdir -p app_data
+#   cp config/config.example.yml app_data/config.yml
+#   # then set storage.* to /data/... and server.port to 7828
+#
 services:
   patchy:
-    # You can use whatever image registry you want to use
-    # since Patchy pushes to git.nadeko.net and quay.io,
-    # for availability purposes.
-    image: git.nadeko.net/fijxu/patchy:latest
-    # image: quay.io/fijxu/patchy:latest
-
-    # This program should never use that many memory and more than 50% of the cpu,
-    # but feel free to adjust it acording to your requirements
-    mem_limit: 512MB
-    cpus: 0.5
-    # If you want to use a custom config file, you can mount it here.
+    depends_on:
+      - patchy-valkey
+    image: ghcr.io/starkayc/patchy:latest
+    # Hardened distroless variant (UID 65532, no shell). If you switch to it,
+    # set user to "65532:65532", chown the volume to 65532, and drop the
+    # healthcheck below (distroless has no wget).
+    # image: ghcr.io/starkayc/patchy:latest-rootless
+    container_name: patchy
+    user: "1000:1000"
     volumes:
-      # IMPORTANT: You need to create the data folder first:
-      # mkdir ./data && sudo chown -R 10000:10000 ./data
-      - ./data:/data
-      # Uncomment this if you want to change the settings of patchy.
-      # - ./config.yml:/patchy/config/config.yml:ro
+      # storage.db in the config must be a directory (/data/db), not a file.
+      # The app appends /db.sqlite3 to it.
+      - patchy-data:/data
+      - ./app_data/config.yml:/patchy/config/config.yml:ro
     ports:
-      - 127.0.0.1:8080:8080
+      - "127.0.0.1:7828:7828"
+    networks:
+      frontend_net:
+      backend_net:
+    restart: unless-stopped
+    cpus: 0.5
+    mem_limit: 512MB
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    # Requires wget, which is present in :latest (not in :latest-rootless).
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:7828/-/healthz"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+  patchy-valkey:
+    image: valkey/valkey:9-alpine@sha256:bf09d58e96d6b4524a15396b65b242bbe18beebbcc15a04d8ee75ddac62fae0b
+    container_name: patchy-valkey
+    volumes:
+      - patchy-valkey:/data
+    healthcheck:
+      test: ["CMD", "valkey-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      backend_net:
+    restart: unless-stopped
+
+volumes:
+  # External so `docker compose down -v` cannot delete the data.
+  # On a fresh host create them first:
+  #   docker volume create patchy-data
+  #   docker volume create patchy-valkey
+  # patchy-data must be writable by the patchy service user (1000:1000);
+  # a fresh volume initialized by the current image is world-writable, but an
+  # existing volume may need `chown -R 1000:1000` on the host mountpoint.
+  patchy-data:
+    name: patchy-data
+    external: true
+  patchy-valkey:
+    name: patchy-valkey
+    external: true
+
+networks:
+  frontend_net:
+    driver: bridge
+  backend_net:
+    driver: bridge
+    internal: true
