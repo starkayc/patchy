@@ -66,7 +66,7 @@ jobs:
             --body "Automated sync from [upstream](https://codeberg.org/Fijxu/patchy).
 
           Contains **${{ steps.check.outputs.new_commits }}** new commit(s). Review the changes below and merge to incorporate upstream updates." \
-            --base main \
+            --base master \
             --head upstream-sync \
             --label "upstream-sync" \
           || echo "A pull request for this sync already exists"
