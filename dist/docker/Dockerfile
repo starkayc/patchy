@@ -64,7 +64,9 @@ ENV UPLOADER_STORAGE="{files: /data/files, thumbnails: /data/thumbnails, db: /da
 
 RUN adduser -u 10000 -S patchy
 
-RUN mkdir -p /data && chown -R 10000:10000 /data
+# World-writable data root so a `user:` override (e.g. 1000:1000) works with
+# fresh named volumes. Bind mounts still follow the host directory's owner.
+RUN mkdir -p /data && chown -R 10000:10000 /data && chmod 0777 /data
 
 COPY --from=builder --chown=10000:10000 /patchy/patchy /patchy
 
