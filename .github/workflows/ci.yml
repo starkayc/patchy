@@ -101,6 +101,75 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
+      - name: Docker meta (rootless)
+        id: meta-rootless
+        if: github.event_name != 'pull_request'
+        uses: docker/metadata-action@v5
+        with:
+          images: |
+            starkayc/patchy
+            ghcr.io/${{ github.repository }}
+          tags: |
+            type=sha,format=short,prefix={{date 'YYYY.MM.DD'}}-,suffix=-rootless,enable=${{ github.ref == format('refs/heads/{0}', 'master') || github.ref == format('refs/heads/{0}', 'main') }}
+            type=raw,value=latest-rootless,enable=${{ github.ref == format('refs/heads/{0}', 'master') || github.ref == format('refs/heads/{0}', 'main') }}
+
+      - name: Build rootless image for smoke test
+        if: github.event_name != 'pull_request'
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: dist/docker/Dockerfile.rootless
+          build-args: |
+            RELEASE=1
+            CURRENT_BRANCH=${{ github.ref_name }}
+          tags: patchy-rootless:test
+          platforms: linux/amd64
+          load: true
+          push: false
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Smoke test rootless image
+        if: github.event_name != 'pull_request'
+        run: |
+          set -euo pipefail
+          IMAGE=patchy-rootless:test
+          docker run --rm --entrypoint /usr/bin/ffmpeg "$IMAGE" -version >/dev/null
+          rm -rf /tmp/patchy-smoke && mkdir -p /tmp/patchy-smoke
+          sudo chown -R 65532:65532 /tmp/patchy-smoke
+          docker run -d --name patchy-rootless -p 18080:8080 \
+            -v /tmp/patchy-smoke:/data "$IMAGE"
+          trap 'docker rm -f patchy-rootless >/dev/null 2>&1 || true' EXIT
+          ready=0
+          for _ in $(seq 1 30); do
+            if curl -fsS http://127.0.0.1:18080/-/healthz >/dev/null; then ready=1; break; fi
+            sleep 1
+          done
+          if [ "$ready" -ne 1 ]; then docker logs patchy-rootless; exit 1; fi
+          printf 'hello patchy\n' > /tmp/patchy-smoke/upload.txt
+          curl -fsS -F "file=@/tmp/patchy-smoke/upload.txt" \
+            http://127.0.0.1:18080/-/upload > /tmp/patchy-smoke/response.json
+          grep -q '"link"' /tmp/patchy-smoke/response.json
+
+      - name: Build and push rootless image
+        id: build-rootless
+        if: github.event_name != 'pull_request'
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: dist/docker/Dockerfile.rootless
+          build-args: |
+            RELEASE=1
+            CURRENT_BRANCH=${{ github.ref_name }}
+          tags: ${{ steps.meta-rootless.outputs.tags }}
+          labels: ${{ steps.meta-rootless.outputs.labels }}
+          platforms: linux/amd64
+          push: true
+          provenance: true
+          sbom: true
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
       - name: Install cosign
         if: github.event_name != 'pull_request'
         uses: sigstore/cosign-installer@v3
@@ -109,6 +178,9 @@ jobs:
         if: github.event_name != 'pull_request'
         env:
           DIGEST: ${{ steps.build.outputs.digest }}
+          ROOTLESS_DIGEST: ${{ steps.build-rootless.outputs.digest }}
         run: |
           cosign sign --yes "starkayc/patchy@${DIGEST}"
           cosign sign --yes "ghcr.io/${{ github.repository }}@${DIGEST}"
+          cosign sign --yes "starkayc/patchy@${ROOTLESS_DIGEST}"
+          cosign sign --yes "ghcr.io/${{ github.repository }}@${ROOTLESS_DIGEST}"

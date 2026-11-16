@@ -1,0 +1,89 @@
+# Rootless Patchy image: distroless nonroot (UID/GID 65532), no shell.
+# Kept separate from Dockerfile so the default image is unchanged.
+
+FROM crystallang/crystal:1.22.0-alpine AS builder
+
+RUN apk add --no-cache sqlite-static yaml-static libmagic-static esbuild
+
+WORKDIR /patchy
+
+COPY ./shard.yml ./shard.yml
+COPY ./shard.lock ./shard.lock
+RUN shards install --production
+
+COPY ./src/ ./src/
+# TODO: .git folder is required for building – this is destructive.
+# See definition of CURRENT_BRANCH, CURRENT_COMMIT and CURRENT_VERSION.
+COPY ./.git/ ./.git/
+
+# Copy public folder to image
+COPY ./public/ ./public/
+COPY ./locales/ ./locales/
+
+RUN esbuild "./public/-/assets/js/*" --color=false --sourcemap --minify --outdir="./public/-/assets/js-m"
+
+# Passed from CI so the Crystal compile-time macro gets the real branch name
+# even when the checkout is in detached HEAD state (e.g. GitHub Actions).
+ARG CURRENT_BRANCH
+ENV CURRENT_BRANCH=${CURRENT_BRANCH}
+
+ARG RELEASE
+RUN --mount=type=cache,target=/root/.cache/crystal if [[ "${RELEASE}" == 1 ]] ; then \
+  crystal build ./src/patchy.cr \
+  --release \
+  --static --warnings all -s -p -t -Dpatchy_minified_js; \
+  else \
+  crystal build ./src/patchy.cr \
+  --static --warnings all -s -p -t -Dpatchy_minified_js; \
+  fi
+
+# Distroless ships no ffmpeg, tini, or libmagic database, so gather them with
+# their shared libraries here. The binary itself is statically linked.
+FROM debian:12-slim AS runtime-deps
+
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends \
+    ca-certificates \
+    ffmpeg \
+    file \
+    media-types \
+    tini \
+  && rm -rf /var/lib/apt/lists/*
+
+RUN mkdir -p /rootfs \
+  && for bin in /usr/bin/ffmpeg /usr/bin/ffprobe /usr/bin/tini /usr/bin/tini-static; do \
+       [ -x "$bin" ] || continue; \
+       ldd "$bin" 2>/dev/null \
+         | awk '{ for (i = 1; i <= NF; i++) if ($i ~ /^\//) print $i }' \
+         | sort -u \
+         | xargs -r -I{} cp -L --parents {} /rootfs; \
+       cp -L --parents "$bin" /rootfs; \
+     done \
+  && MAGIC="$(find /usr/share/misc /usr/lib/file -name 'magic.mgc' 2>/dev/null | head -n1)" \
+  && test -n "$MAGIC" \
+  && install -D "$MAGIC" /rootfs/usr/share/misc/magic.mgc \
+  && install -D /etc/mime.types /rootfs/etc/mime.types \
+  && mkdir -p /data/files /data/thumbnails /data/db /tmp \
+  && chmod 1777 /tmp \
+  && chown -R 65532:65532 /data
+
+FROM gcr.io/distroless/base-debian12:nonroot
+
+COPY --from=builder /patchy/patchy /patchy
+COPY --from=runtime-deps /rootfs/ /
+COPY --from=runtime-deps --chown=65532:65532 /data /data
+COPY --from=runtime-deps --chown=65532:65532 /tmp /tmp
+
+# Default environment variables for the container
+ENV UPLOADER_STORAGE="{files: /data/files, thumbnails: /data/thumbnails, db: /data/db}"
+ENV PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+
+WORKDIR /patchy
+
+EXPOSE 8080
+
+USER 65532:65532
+
+ENTRYPOINT ["/usr/bin/tini", "--"]
+
+CMD ["/patchy/patchy"]
