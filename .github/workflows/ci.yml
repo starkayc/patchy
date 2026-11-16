@@ -11,6 +11,23 @@ on:
       - LICENCE
       - LICENSE
       - .git*
+      - .github/**
+      - screenshots/*
+      - config/**
+      - .vscode/**
+      - patchy.service
+      - docker-compose.yml
+      - docs/**
+  pull_request:
+    branches:
+      - "main"
+      - "master"
+    paths-ignore:
+      - "*.md"
+      - LICENCE
+      - LICENSE
+      - .git*
+      - .github/**
       - screenshots/*
       - config/**
       - .vscode/**
@@ -39,13 +56,15 @@ jobs:
         uses: docker/setup-buildx-action@v3
 
       - name: Login to ghcr.io
+        if: github.event_name != 'pull_request'
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
-          password: ${{ secrets.GHCR_TOKEN }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Login to DockerHub
+        if: github.event_name != 'pull_request'
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKER_NAME }}
@@ -74,16 +93,18 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           platforms: linux/amd64
-          push: true
-          provenance: true
-          sbom: true
-          cache-from: type=registry,ref=ghcr.io/${{ github.repository }}:buildcache
-          cache-to: type=registry,ref=ghcr.io/${{ github.repository }}:buildcache,mode=max,image-manifest=true,oci-mediatypes=true
+          push: ${{ github.event_name != 'pull_request' }}
+          provenance: ${{ github.event_name != 'pull_request' }}
+          sbom: ${{ github.event_name != 'pull_request' }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
       - name: Install cosign
+        if: github.event_name != 'pull_request'
         uses: sigstore/cosign-installer@v3
 
       - name: Sign published images
+        if: github.event_name != 'pull_request'
         env:
           DIGEST: ${{ steps.build.outputs.digest }}
         run: |

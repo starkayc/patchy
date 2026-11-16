@@ -1,0 +1,36 @@
+name: Prune Images
+
+on:
+  workflow_dispatch:
+    inputs:
+      keep_tags:
+        description: "Extra tags to keep (comma-separated). latest and tags sharing its digest are always kept."
+        required: false
+        default: "2026.03.12-b67ac61"
+      apply:
+        description: "Delete stale tags. Leave unchecked for a dry run."
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  prune:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Prune stale image tags
+        env:
+          APPLY: ${{ inputs.apply }}
+          KEEP_TAGS: ${{ inputs.keep_tags }}
+          DOCKERHUB_USER: ${{ secrets.DOCKER_NAME }}
+          DOCKERHUB_TOKEN: ${{ secrets.DOCKER_TOKEN }}
+          DOCKERHUB_REPO: starkayc/patchy
+          GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GHCR_PACKAGE: patchy
+        run: python3 .github/scripts/prune-images.py
