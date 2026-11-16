@@ -9,6 +9,7 @@ on:
     paths-ignore:
       - "*.md"
       - LICENCE
+      - LICENSE
       - .git*
       - screenshots/*
       - config/**
@@ -17,9 +18,19 @@ on:
       - docker-compose.yml
       - docs/**
 
+permissions:
+  contents: read
+  packages: write
+  id-token: write
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build:
     runs-on: ubuntu-latest
+    timeout-minutes: 45
 
     steps:
       - uses: actions/checkout@v4
@@ -52,11 +63,13 @@ jobs:
             type=raw,value=latest,enable=${{ github.ref == format('refs/heads/{0}', 'master') || github.ref == format('refs/heads/{0}', 'main') }}
 
       - name: Build and push images
+        id: build
         uses: docker/build-push-action@v6
         with:
           context: .
           file: dist/docker/Dockerfile
           build-args: |
+            RELEASE=1
             CURRENT_BRANCH=${{ github.ref_name }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
@@ -66,3 +79,13 @@ jobs:
           sbom: true
           cache-from: type=registry,ref=ghcr.io/${{ github.repository }}:buildcache
           cache-to: type=registry,ref=ghcr.io/${{ github.repository }}:buildcache,mode=max,image-manifest=true,oci-mediatypes=true
+
+      - name: Install cosign
+        uses: sigstore/cosign-installer@v3
+
+      - name: Sign published images
+        env:
+          DIGEST: ${{ steps.build.outputs.digest }}
+        run: |
+          cosign sign --yes "starkayc/patchy@${DIGEST}"
+          cosign sign --yes "ghcr.io/${{ github.repository }}@${DIGEST}"
