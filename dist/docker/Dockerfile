@@ -1,5 +1,5 @@
 # Based on https://github.com/iv-org/invidious/blob/master/docker/Dockerfile
-FROM crystallang/crystal:1.22.0-alpine AS builder
+FROM crystallang/crystal:1.22.3-alpine AS builder
 
 RUN apk add --no-cache sqlite-static yaml-static libmagic-static esbuild
 
@@ -60,7 +60,7 @@ RUN rm -rf /var/cache/apk/* /tmp/*
 WORKDIR /patchy
 
 # Default environment variables for the container
-ENV UPLOADER_STORAGE="{files: /data/files, thumbnails: /data/thumbnails, db: /data/db}"
+ENV UPLOADER_STORAGE="{files: /data/files, thumbnails: /data/thumbnails, db: /data/db/db.sqlite3}"
 
 RUN adduser -u 10000 -S patchy
 
