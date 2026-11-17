@@ -21,7 +21,7 @@ dependencies:
   baked_file_handler:
     github: ralsina/baked_file_handler
   baked_file_system:
-    github: fijxu/baked_file_system_no_gzip
+    github: schovi/baked_file_system
   redis:
     github: jgaskins/redis
   flib:
